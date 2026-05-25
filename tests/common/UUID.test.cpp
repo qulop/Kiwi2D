@@ -26,3 +26,25 @@ TEST(UUID_Test, ReInitializationWithGeneratedUUID) {
     EXPECT_TRUE(uuid_1);
     EXPECT_EQ(uuid_0, uuid_1.value());
 }
+
+TEST(UUID_Test, AssociativeContainers) {
+    using namespace Kiwi;
+
+    const UUID uuid_0 = UUID::Generate();
+    const UUID uuid_1 = UUID::Generate();
+
+    std::unordered_map<UUID, String> hashMap;
+    hashMap.emplace(uuid_0, "AMD");
+    hashMap.emplace(uuid_1, "NVIDIA");
+
+    EXPECT_EQ(hashMap.at(uuid_0), "AMD");
+    EXPECT_EQ(hashMap.at(uuid_1), "NVIDIA");
+
+
+    std::map<UUID, String> map;
+    map.emplace(uuid_0, "AMD");
+    map.emplace(uuid_1, "NVIDIA");
+
+    EXPECT_EQ(map.at(uuid_0), "AMD");
+    EXPECT_EQ(map.at(uuid_1), "NVIDIA");
+}
