@@ -3,8 +3,7 @@
 #include <core/Object.hpp>
 
 #include <common/Definitions.hpp>
-
-#include <graphics/Color.hpp>
+#include <common/Color.hpp>
 
 #include <math/Rect.hpp>
 

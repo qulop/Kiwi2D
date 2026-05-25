@@ -3,8 +3,11 @@
 #include <common/Definitions.hpp>
 #include <common/types/CString.hpp>
 #include <common/Debug.hpp>
-#include <graphics/Texture2D.hpp>
+
 #include <platform/Platform.hpp>
+
+#include <renderer/Texture.hpp>
+
 
 #ifdef KIWI_WIN32_USED
     #define GLFW_EXPOSE_NATIVE_WIN32
@@ -63,7 +66,7 @@ namespace Kiwi {
     }
 
     void GLFWWindow::SetIcon(const String& path) {
-        Texture2D texture{ path };
+        Texture texture{ path };
 
         GLFWimage ico {
             .width = texture.GetWidth(),
@@ -80,7 +83,7 @@ namespace Kiwi {
 
 
     void GLFWWindow::SetInnerCursor(const String& path) {
-        Texture2D texture{ path };
+        Texture texture{ path };
 
         GLFWimage cur {
             .width = texture.GetWidth(),

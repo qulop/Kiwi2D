@@ -210,12 +210,20 @@ namespace Kiwi {
     bool String::IsEmpty() const noexcept {
         return m_data.empty();
     }
-    
-    String String::CreateSlice(const size_t from, const size_t to, const size_t step) const {
+
+    size_t String::MaxIndex() const noexcept {
+        return Size() - 1;
+    }
+
+    String String::CreateSlice(const size_t from, size_t to, const size_t step) const {
         KIWI_ASSERT_BASIC(to <= Size());
 
         if (step == 0) {
             return EmptyString();
+        }
+
+        if (to == STR_END) {
+            to = Size();
         }
 
         String res;
@@ -224,6 +232,19 @@ namespace Kiwi {
             res += CharAt(i);
         }
         return res;
+    }
+
+    StringView String::CreateSliceView(const size_t from, const size_t to) const {
+        return StringView(ToCString(), (to == STR_END ? Size() : to) - from);
+    }
+
+    Vector<String> String::Split(StringView delimiter) const {
+        return std::views::split(m_data, delimiter)
+            | std::ranges::to<Vector<String>>();
+    }
+
+    index_t String::FindFirstCharacter(const ValueType c, const size_t offset) const {
+        return m_data.find_first_of(c, offset);
     }
 
     const String::ValueType* String::ToCString() const {

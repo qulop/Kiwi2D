@@ -1,17 +1,17 @@
 #define STB_IMAGE_IMPLEMENTATION
-#include "Texture2D.hpp"
+#include "Texture.hpp"
 
 #include <common/Debug.hpp>
 #include <common/cast/Cast.hpp>
 
 
 namespace Kiwi {
-    Texture2D::Texture2D(const String& path, TextureParams params) { 
+    Texture::Texture(const String& path, TextureParams params) {
         LoadByPath(path, params); 
     }
 
 
-    void Texture2D::LoadByPath(const String& path, TextureParams params) {
+    void Texture::LoadByPath(const String& path, TextureParams params) {
         stbi_set_flip_vertically_on_load(true);
 
         i32 channels = 0;
@@ -28,7 +28,7 @@ namespace Kiwi {
     }
 
 
-    void Texture2D::LoadByBuffer(i32 width, i32 height, u8* buffer, TextureParams params) {
+    void Texture::LoadByBuffer(i32 width, i32 height, u8* buffer, TextureParams params) {
         glGenTextures(1, &m_texture);
         glBindTexture(GL_TEXTURE_2D, m_texture);
 
@@ -47,23 +47,23 @@ namespace Kiwi {
     }
 
 
-    void Texture2D::AddDeleter(const Deleter& deleter) { 
+    void Texture::AddDeleter(const Deleter& deleter) {
         m_deleter = deleter; 
     }
 
-    const u8* Texture2D::GetData() const { 
+    const u8* Texture::GetData() const {
         return m_data; 
     }
 
-    KIWI_NODISCARD i32 Texture2D::GetWidth() const {
+    KIWI_NODISCARD i32 Texture::GetWidth() const {
         return m_width;
     }
 
-    KIWI_NODISCARD i32 Texture2D::GetHeight() const {
+    KIWI_NODISCARD i32 Texture::GetHeight() const {
         return m_height;
     }
 
-    void Texture2D::Bind() const { 
+    void Texture::Bind() const {
         KIWI_ASSERT(m_texture != KIWI_UNDEFINED_ID,
             "Texture2D::Use() : You must firstly generate texture, before use it");
 
@@ -71,7 +71,7 @@ namespace Kiwi {
     }
 
 
-    void Texture2D::Unbind() const { 
+    void Texture::Unbind() const {
         KIWI_ASSERT(m_texture != KIWI_UNDEFINED_ID,
             "Texture2D::StopUsing() : You must firstly generate texture, before call this method");
 
@@ -79,14 +79,14 @@ namespace Kiwi {
     }
 
 
-    GLuint Texture2D::GetTextureID() const {
+    GLuint Texture::GetTextureID() const {
         KIWI_ASSERT(m_texture != KIWI_UNDEFINED_ID,
             "Texture2D::GetTextureID() : You must firstly generate texture, before get it's id");
 
         return m_texture;
     }
 
-    Texture2D::~Texture2D() {
+    Texture::~Texture() {
         if (m_data) {
             std::invoke(m_deleter, m_data);
         }

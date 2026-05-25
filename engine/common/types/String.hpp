@@ -17,6 +17,8 @@ namespace Kiwi {
         using ConstIteratorType = std::string::const_iterator;
         using ReverseIteratorType = std::string::reverse_iterator;
         using ConstReverseIteratorType = std::string::const_reverse_iterator;
+
+        static constexpr size_t STR_END = std::string::npos;
     
     
         enum class ECharsDisplayFormat : u8 {
@@ -108,7 +110,7 @@ namespace Kiwi {
         }
 
         KIWI_NODISCARD static index_t FindSubString(StringView src, StringView targetSubStr, size_t offset = 0);
-    
+
     public:
         String() = default;
 
@@ -195,6 +197,8 @@ namespace Kiwi {
     
         KIWI_NODISCARD bool IsEmpty() const noexcept;
 
+        KIWI_NODISCARD size_t MaxIndex() const noexcept;
+
 
         template<Concepts::Callable TFunc>
         bool RemoveByPredicate(TFunc&& func) {
@@ -203,7 +207,12 @@ namespace Kiwi {
             return res != m_data.end();
         }
 
-        KIWI_NODISCARD String CreateSlice(const size_t from, const size_t to, const size_t step = 1) const;
+        KIWI_NODISCARD String CreateSlice(size_t from, size_t to = STR_END, size_t step = 1) const;
+        KIWI_NODISCARD StringView CreateSliceView(size_t from, size_t to = STR_END) const;
+
+        KIWI_NODISCARD Vector<String> Split(StringView delimiter = " ") const;
+
+        KIWI_NODISCARD index_t FindFirstCharacter(ValueType c, size_t offset = 0) const;
     
         KIWI_NODISCARD const ValueType* ToCString() const;
 

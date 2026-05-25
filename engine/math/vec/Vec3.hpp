@@ -204,7 +204,7 @@ namespace Kiwi {
         }
 
         KIWI_NODISCARD constexpr f32 Magnitude() const noexcept {
-            return std::sqrt(Numeric::pow2(x) + Numeric::pow2(y) + Numeric::pow2(z));
+            return std::sqrt(Numeric::Pow2(x) + Numeric::Pow2(y) + Numeric::Pow2(z));
         }
 
         constexpr f32 Dot(const SelfType& other) const noexcept {

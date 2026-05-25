@@ -3,6 +3,9 @@
 #include <stb_image.h>
 #include <glad/glad.h>
 
+#include <core/Object.hpp>
+#include <core/resources/Asset.hpp>
+
 #include <common/meta/TypeTraits.hpp>
 #include <common/Definitions.hpp>
 #include <common/types/String.hpp>
@@ -42,12 +45,20 @@ namespace Kiwi {
     };
 
 
-    class Texture2D {
+    class ATexture : public AAsset {
+        KIWI_CREATE_OBJECT(ATexture, AAsset);
+
+    public:
+        
+    };
+
+
+    class Texture {
     public:
         using Deleter = std::function<void(u8*)>;
 
-        Texture2D() = default;
-        explicit Texture2D(const String& path, TextureParams params={});
+        Texture() = default;
+        explicit Texture(const String& path, TextureParams params={});
 
         void LoadByPath(const String& path, TextureParams params={});
         void LoadByBuffer(i32 width, i32 height, u8* buffer, TextureParams params={});
@@ -63,7 +74,7 @@ namespace Kiwi {
 
         KIWI_NODISCARD GLuint GetTextureID() const;
 
-        ~Texture2D();
+        ~Texture();
 
     private:
         u8* m_data = nullptr;

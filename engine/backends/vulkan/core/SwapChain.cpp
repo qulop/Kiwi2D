@@ -1,4 +1,6 @@
-#define NOMINMAX
+#ifndef NOMINMAX
+    #define NOMINMAX
+#endif
 
 #include "SwapChain.hpp"
 
