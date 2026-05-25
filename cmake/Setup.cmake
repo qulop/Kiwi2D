@@ -45,7 +45,6 @@ function(kiwi_setup_library TARGET_NAME)
         PRIVATE shaderc
         PRIVATE xxhash
         PRIVATE Tracy::TracyClient
-        PRIVATE GTest::gtest_main
     )
     if(WIN32)
         target_link_libraries(${TARGET_NAME} PRIVATE Winmm)

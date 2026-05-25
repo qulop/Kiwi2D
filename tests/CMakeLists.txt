@@ -3,9 +3,12 @@ project("Tests" LANGUAGES CXX)
 
 set(TESTS_SRC
     common/Result.test.cpp
+    common/UUID.test.cpp
 )
 
 set(BUILD_GMOCK OFF CACHE BOOL "" FORCE)
+set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+
 add_subdirectory(${CMAKE_SOURCE_DIR}/third_party/gtest ${CMAKE_CURRENT_BINARY_DIR}/gtest)
 
 
@@ -15,7 +18,10 @@ target_include_directories("Tests"
     PRIVATE ${CMAKE_SOURCE_DIR}/third_party/gtest/googletest/include
 )
 
-target_link_libraries("Tests" ${ENGINE_LIBRARY_NAME})
+target_link_libraries("Tests"
+    PRIVATE ${ENGINE_LIBRARY_NAME}
+    PRIVATE GTest::gtest_main
+)
 
 
 include(CTest)

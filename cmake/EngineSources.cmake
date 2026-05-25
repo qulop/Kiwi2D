@@ -14,10 +14,6 @@ set(ENGINE_LIBRARY_SRC
     engine/misc/ParserBase.cpp
     engine/misc/WindowSubsystem.cpp
 
-    engine/graphics/FontTTF.cpp
-    engine/graphics/Text.cpp
-    engine/graphics/Texture2D.cpp
-
     engine/platform/window/GLFWWindow.cpp
     engine/platform/PlatformVars.cpp
 
@@ -58,6 +54,7 @@ set(ENGINE_LIBRARY_SRC
     engine/renderer/shaders/SpirV.cpp
     engine/renderer/shaders/ShaderCacheManager.cpp
     engine/renderer/shaders/ShaderCompiler.cpp
+    engine/renderer/Texture.cpp
     # --- END ---
 
     engine/sync/Mutex.cpp
@@ -69,6 +66,8 @@ set(ENGINE_LIBRARY_SRC
     engine/common/Time.cpp
     engine/common/ProgramOptions.cpp
     engine/common/Debug.cpp
+    engine/common/UUID.cpp
+    engine/common/Numeric.cpp
     engine/common/types/String.cpp
 )
 

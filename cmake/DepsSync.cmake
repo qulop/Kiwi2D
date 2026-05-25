@@ -3,7 +3,7 @@ function(kiwi_shaderc_sync_deps)
     
     message(STATUS "[INFO]: Trying to sync shaderc dependencies...")
     execute_process(
-        COMMAND ${Python_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/third_party/shaderc/utils/git-sync-deps
+        COMMAND ${Python_EXECUTABLE} utils/git-sync-deps
         WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/third_party/shaderc
         RESULT_VARIABLE result
     )
