@@ -27,6 +27,8 @@ namespace Kiwi {
         UUID(const UUID& other) = default;
         UUID(UUID&& other) noexcept = default;
 
+        KIWI_NODISCARD UInt128 ToUInt128() const noexcept;
+
         KIWI_NODISCARD String ToString() const;
 
         KIWI_NODISCARD std::array<u8, 16> ToBytes() const noexcept;
@@ -59,7 +61,16 @@ namespace std {
     template<>
     struct hash<Kiwi::UUID> {
         std::size_t operator()(const Kiwi::UUID& uuid) const noexcept {
-            return std::hash<size_t>{}(0);
+            const Kiwi::UInt128 uuidValue = uuid.ToUInt128();
+
+            const Kiwi::u64 high = static_cast<Kiwi::u64>(uuidValue >> 64);
+            const Kiwi::u64 low  = static_cast<Kiwi::u64>(uuidValue);
+
+            const size_t hash1 = std::hash<Kiwi::u64>{}(high);
+            const size_t hash2 = std::hash<Kiwi::u64>{}(low);
+
+            // Golden Ratio magic number
+            return hash1 ^ (hash2 + 0x9e3779b97f4a7c15ULL + (hash1 << 6) + (hash1 >> 2));
         }
     };
 }

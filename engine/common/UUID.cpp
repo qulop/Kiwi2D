@@ -46,6 +46,10 @@ namespace Kiwi {
         return UUID(UInt128(high) << 64 | UInt128(low));
     }
 
+    UInt128 UUID::ToUInt128() const noexcept {
+        return m_uuid;
+    }
+
     String UUID::ToString() const {
         static constexpr char HEX_CHARS[] = "0123456789abcdef";
 
