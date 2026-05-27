@@ -27,6 +27,8 @@ namespace Kiwi {
         UUID(const UUID& other) = default;
         UUID(UUID&& other) noexcept = default;
 
+        KIWI_NODISCARD bool IsEmpty() const noexcept;
+
         KIWI_NODISCARD UInt128 ToUInt128() const noexcept;
 
         KIWI_NODISCARD String ToString() const;

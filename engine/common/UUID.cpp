@@ -46,6 +46,10 @@ namespace Kiwi {
         return UUID(UInt128(high) << 64 | UInt128(low));
     }
 
+    bool UUID::IsEmpty() const noexcept {
+        return m_uuid == 0;
+    }
+
     UInt128 UUID::ToUInt128() const noexcept {
         return m_uuid;
     }
