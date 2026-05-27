@@ -9,6 +9,10 @@ set(ENGINE_LIBRARY_SRC
     engine/core/Engine.cpp
     engine/core/Object.cpp
     engine/core/LogSubsystem.cpp
+    engine/core/Project.cpp
+    engine/core/ProjectSubsystem.cpp
+    engine/core/resources/AssetManager.cpp
+    engine/core/resources/AssetImporter.cpp
 
     engine/misc/Window.cpp
     engine/misc/ParserBase.cpp
@@ -20,6 +24,7 @@ set(ENGINE_LIBRARY_SRC
     # --- BEGIN: OpenGL backend ---
     engine/backends/opengl/RenderContextGL.cpp
     engine/backends/opengl/GraphicObjectsFactoryGL.cpp
+    engine/backends/opengl/TextureGL.cpp
     engine/backends/opengl/shaders/ShaderGL.cpp
     engine/backends/opengl/shaders/ShaderCompilerGL.cpp
     # --- END ---
@@ -52,8 +57,8 @@ set(ENGINE_LIBRARY_SRC
     engine/renderer/shaders/ShaderMetaInfo.cpp
     engine/renderer/shaders/PreprocessorGLSL.cpp
     engine/renderer/shaders/SpirV.cpp
-    engine/renderer/shaders/ShaderCacheManager.cpp
     engine/renderer/shaders/ShaderCompiler.cpp
+    engine/renderer/shaders/ShaderBundle.cpp
     engine/renderer/Texture.cpp
     # --- END ---
 
@@ -69,11 +74,6 @@ set(ENGINE_LIBRARY_SRC
     engine/common/UUID.cpp
     engine/common/Numeric.cpp
     engine/common/types/String.cpp
-)
-
-set(ENGINE_TESTS_SRC
-    ruby/tests/framework/core/TestsRuntime.cpp
-    ruby/tests/framework/core/Emoji.cpp
 )
 
 set(ENGINE_APPLICATION_SRC
