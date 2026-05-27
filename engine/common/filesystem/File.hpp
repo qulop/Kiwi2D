@@ -10,20 +10,26 @@
 
 
 namespace Kiwi {
+    // TODO: Refactor this class
     class File {
     public:
-        KIWI_NODISCARD static Status<Error<EErrorIO>> SaveInFile(Path filePath, StringView data, bool overwrite = false);
-        KIWI_NODISCARD static Status<Error<EErrorIO>> SaveInFile(Path filePath, const FileContent& data, bool isBinary, bool overwrite = false);
+        KIWI_NODISCARD static Status<Error<EErrorIO>> SaveInFile(std::filesystem::path filePath, StringView data, bool overwrite = false);
+        KIWI_NODISCARD static Status<Error<EErrorIO>> SaveInFile(std::filesystem::path filePath, const FileContent& data, bool isBinary, bool overwrite = false);
 
         // Note: you should use `EFileOpenMode::READ | EFileOpenMode::BINARY` to read a file(even a plain text file!)
-        KIWI_NODISCARD static Result<FileContent, EErrorIO> LoadFromFile(Path filePath, EFileOpenMode mode = EFileOpenMode::READ);
+        KIWI_NODISCARD static Result<FileContent, EErrorIO> LoadFromFile(std::filesystem::path filePath, EFileOpenMode::Type mode = EFileOpenMode::READ);
 
-        KIWI_NODISCARD static Result<File, EErrorIO> OpenFileStatic(Path filePath, EFileOpenMode mode);
+        KIWI_NODISCARD static Result<File, EErrorIO> OpenFileStatic(std::filesystem::path filePath, EFileOpenMode::Type mode);
 
     public:
         File() = default;
 
-        KIWI_NODISCARD Status<Error<EErrorIO>> Open(Path path, EFileOpenMode mode);
+        KIWI_NODISCARD Status<Error<EErrorIO>> Open(std::filesystem::path path, EFileOpenMode::Type mode);
+
+        KIWI_NODISCARD FILE* GetFileHandle();
+        KIWI_NODISCARD const FILE* GetFileHandle() const;
+
+        KIWI_NODISCARD std::fstream ToStdFStream() const;
 
         KIWI_NODISCARD bool IsOpened() const;
         KIWI_NODISCARD bool IsEOF() const;
@@ -44,13 +50,15 @@ namespace Kiwi {
         void Rewind() const;
 
         KIWI_NODISCARD u32 GetFileSize() const;
-        KIWI_NODISCARD EFileOpenMode GetOpenMode() const;
+        KIWI_NODISCARD EFileOpenMode::Type GetOpenMode() const;
 
         ~File();
 
     private:
         FILE* m_file = nullptr;
-        EFileOpenMode m_mode = EFileOpenMode::READ;
+        EFileOpenMode::Type m_mode = EFileOpenMode::READ;
         size_t m_fileSize = 0;
+        
+        std::filesystem::path m_path;
     };
 }

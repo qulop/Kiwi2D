@@ -6,7 +6,7 @@
 
 
 namespace Kiwi {
-    Status<Error<EErrorIO>> File::SaveInFile(Path filePath, StringView data, bool overwrite) {
+    Status<Error<EErrorIO>> File::SaveInFile(std::filesystem::path filePath, StringView data, bool overwrite) {
         return File::SaveInFile(
             std::move(filePath),
             FileContent{ EFileContentDataFormat::PLAIN_TEXT, data },
@@ -14,8 +14,8 @@ namespace Kiwi {
         );
     }
 
-    Status<Error<EErrorIO>> File::SaveInFile(Path filePath, const FileContent& data, bool isBinary, bool overwrite) {
-        auto mode = EFileOpenMode::WRITE;
+    Status<Error<EErrorIO>> File::SaveInFile(std::filesystem::path filePath, const FileContent& data, bool isBinary, bool overwrite) {
+        EFileOpenMode::Type mode = EFileOpenMode::WRITE;
         if (isBinary) {
             mode |= EFileOpenMode::BINARY;
         }
@@ -31,7 +31,7 @@ namespace Kiwi {
         }
     }
 
-    Result<FileContent, EErrorIO> File::LoadFromFile(Path filePath, EFileOpenMode mode) {
+    Result<FileContent, EErrorIO> File::LoadFromFile(std::filesystem::path filePath, EFileOpenMode::Type mode) {
         if (auto res = OpenFileStatic(std::move(filePath), mode); !res) {
             return res.GetError();
         }
@@ -40,7 +40,7 @@ namespace Kiwi {
         }
     }
 
-    Result<File, EErrorIO> File::OpenFileStatic(Path filePath, EFileOpenMode mode) {
+    Result<File, EErrorIO> File::OpenFileStatic(std::filesystem::path filePath, EFileOpenMode::Type mode) {
         File r;
         if (auto err = r.Open(std::move(filePath), mode); !err) {
             return err.error();
@@ -100,8 +100,8 @@ namespace Kiwi {
         return Write(FileContent(EFileContentDataFormat::PLAIN_TEXT, data));
     }
 
-    Status<Error<EErrorIO>> File::Open(Path path, EFileOpenMode mode) {
-        auto cStyleFileOpenMode = Cast<EFileOpenMode>::ToCStyleOpenMode(mode);
+    Status<Error<EErrorIO>> File::Open(std::filesystem::path path, EFileOpenMode::Type mode) {
+        const Opt<String> cStyleFileOpenMode = EFileOpenMode::ToCStyleOpenMode(mode);
         if (!cStyleFileOpenMode) {
             return Unexpected(Error{
                 .kind = EErrorIO::INVALID_ARGUMENT,
@@ -121,13 +121,27 @@ namespace Kiwi {
         m_fileSize = Tell();
         Rewind();
 
+        m_path = std::move(path);
+
         return {};
+    }
+
+    FILE* File::GetFileHandle() {
+        return m_file;
+    }
+
+    const FILE* File::GetFileHandle() const {
+        return m_file;
+    }
+
+    std::fstream File::ToStdFStream() const {
+        return std::fstream(m_path, EFileOpenMode::ToStdOpenMode(m_mode));
     }
 
     Result<FileContent, EErrorIO> File::ReadAll(bool rewindOnEnd) const {
         KIWI_ASSERT_BASIC(m_file != nullptr);
         
-        auto contentType = ((m_mode & EFileOpenMode::BINARY) == EFileOpenMode::BINARY) ?
+        auto contentType = (m_mode & EFileOpenMode::BINARY) ?
             EFileContentDataFormat::BINARY : EFileContentDataFormat::PLAIN_TEXT;
 
         (void)SeekBegin(0);
@@ -178,7 +192,7 @@ namespace Kiwi {
         return BasicCast::To<u32>(m_fileSize);
     }
 
-    EFileOpenMode File::GetOpenMode() const {
+    EFileOpenMode::Type File::GetOpenMode() const {
         return m_mode;
     }
 
