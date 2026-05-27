@@ -1,7 +1,6 @@
 #include "ShaderCompilerGL.hpp"
 
 #include <renderer/shaders/SpirV.hpp>
-#include <renderer/shaders/ShaderCacheManager.hpp>
 
 #include "ShaderGL.hpp"
 
@@ -104,40 +103,43 @@ namespace Kiwi::OpenGL {
             return KIWI_GL_UNDEFINED_ID;
         }
 
-        ShaderCacheManager& shaderCacheManager = ShaderCacheManager::GetInstance();
-        if (auto shaderCacheEntry = shaderCacheManager.TryToFindCachedShader(hashedShaderSource); shaderCacheEntry) {
-            if (!shaderCacheManager.IsInLocalCache(hashedShaderSource)) {
-                if (!shaderCacheManager.AddToLocalCache(hashedShaderSource, shaderCacheEntry.value())) KIWI_UNLIKELY {
-                    KIWI_CTX_LOG(ERROR, "Failed to add cache entry into the local cache");
-                }
-            }
+        // TODO:
+        // ShaderCacheManager& shaderCacheManager = ShaderCacheManager::GetInstance();
+        // if (auto shaderCacheEntry = shaderCacheManager.TryToFindCachedShader(hashedShaderSource); shaderCacheEntry) {
+        //     if (!shaderCacheManager.IsInLocalCache(hashedShaderSource)) {
+        //         if (!shaderCacheManager.AddToLocalCache(hashedShaderSource, shaderCacheEntry.value())) KIWI_UNLIKELY {
+        //             KIWI_CTX_LOG(ERROR, "Failed to add cache entry into the local cache");
+        //         }
+        //     }
+        //
+        //     return CreateFromSpirVByteCode(stage, "main", shaderCacheEntry.value().spriVByteCode);
+        // }
 
-            return CreateFromSpirVByteCode(stage, "main", shaderCacheEntry.value().spriVByteCode);
-        }
 
+        // Path outputFilePath = shaderCacheManager.GetCacheDirAbsolutePath() / hashedShaderSource.ToString().ToStdString();
 
-        Path outputFilePath = shaderCacheManager.GetCacheDirAbsolutePath() / hashedShaderSource.ToString().ToStdString();
+        // SpirV::CompilationDetails cDetails;
+        // cDetails.stage = stage;
+        // cDetails.src = src;
+        // cDetails.environment = ESpirVEnvironment::OpenGL;
+        // cDetails.optimizationLevel = ESpirVOptimizationLevel::PERFORMANCE;
+        // cDetails.outputFile = outputFilePath.string();
+        //
+        // Vector<u32> byteCode = SpirV::CompileGLSL(cDetails).ValueOr(Vector<u32>{});
+        // GlID id = CreateFromSpirVByteCode(stage, "main", byteCode);
+        // if (id == KIWI_GL_UNDEFINED_ID) {
+        //     return KIWI_GL_UNDEFINED_ID;
+        // }
+        //
+        // if (!shaderCacheManager.AddToCache(hashedShaderSource, ShaderCacheEntry{ byteCode })) KIWI_UNLIKELY {
+        //     KIWI_CTX_LOG(WARNING, "Failed to add {} in to the local or global cache!",
+        //         hashedShaderSource
+        //     );
+        // }
 
-        SpirV::CompilationDetails cDetails;
-        cDetails.stage = stage;
-        cDetails.src = src;
-        cDetails.environment = ESpirVEnvironment::OpenGL;
-        cDetails.optimizationLevel = ESpirVOptimizationLevel::PERFORMANCE;
-        cDetails.outputFile = outputFilePath.string();
+        // return id;
 
-        Vector<u32> byteCode = SpirV::CompileGLSL(cDetails).ValueOr(Vector<u32>{});
-        GlID id = CreateFromSpirVByteCode(stage, "main", byteCode);
-        if (id == KIWI_GL_UNDEFINED_ID) {
-            return KIWI_GL_UNDEFINED_ID;
-        }
-
-        if (!shaderCacheManager.AddToCache(hashedShaderSource, ShaderCacheEntry{ byteCode })) KIWI_UNLIKELY {
-            KIWI_CTX_LOG(WARNING, "Failed to add {} in to the local or global cache!",
-                hashedShaderSource
-            );
-        }
-
-        return id;
+        return 0;
     }
 
 

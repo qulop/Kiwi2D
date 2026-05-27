@@ -12,76 +12,59 @@
 
 
 namespace Kiwi {
-    struct TextureParams {
-        enum ETextureWrap {
-            CLAMP_TO_EDGE = GL_CLAMP_TO_EDGE,
-            CLAMP_TO_BORDER = GL_CLAMP_TO_BORDER,
-            REPEAT = GL_REPEAT,
-            MIRRORED_REPEAT = GL_MIRRORED_REPEAT
+    namespace EImageFormat {
+        enum Type {
+            NONE = 0,
+            GRAYSCALE,
+            RGB_8,
+            RGBA_8,
         };
 
-        enum ETextureFilter {
-            LINEAR              = GL_LINEAR,
-            NEAREST             = GL_NEAREST
-        };
+        constexpr Type FromChannels(const i32 channels) {
+            switch (channels) {
+            case 1:
+                return GRAYSCALE;
+            case 3:
+                return RGB_8;
+            case 4:
+                return RGBA_8;
+            default:
+                return NONE;
+            }
+        }
+    }
 
-        enum EImageFormat {
-            DEFAULT = STBI_default,
-            GREY = STBI_grey,
-            GREY_ALPHA = STBI_grey_alpha,
-            RGB = STBI_rgb,
-            RGBA = STBI_rgb_alpha
-        };
 
-
-        ETextureFilter filter = ETextureFilter::LINEAR;
-        ETextureWrap wrap = ETextureWrap::CLAMP_TO_EDGE;
-        EImageFormat imageFormat = EImageFormat::RGB;
-
-        GLint internalFormat = GL_RGBA;
-        GLenum glFormat = GL_RGBA;
-
-        std::array<GLfloat, 4> textureBorderColor = { 0.56f, 0.23f, 0.77f, 1.0f };
+    struct ImageDesc {
+        EImageFormat::Type format = EImageFormat::NONE;
+        i32 channels = 0;
+        i32 width = 0;
+        i32 height = 0;
+        i32 size = 0;
+        unsigned char* data = nullptr;
     };
+
 
 
     class ATexture : public AAsset {
         KIWI_CREATE_OBJECT(ATexture, AAsset);
 
     public:
-        
+        virtual u32 GetWidth() const = 0;
+        virtual u32 GetHeight() const = 0;
+
+        ~ATexture() override = default;
     };
 
 
-    class Texture {
+
+    class ATexture2D : public ATexture {
+        KIWI_CREATE_OBJECT(ATexture2D, ATexture)
+
     public:
-        using Deleter = std::function<void(u8*)>;
+        KIWI_NODISCARD static std::shared_ptr<ATexture2D> Create(const ImageDesc& desc);
 
-        Texture() = default;
-        explicit Texture(const String& path, TextureParams params={});
 
-        void LoadByPath(const String& path, TextureParams params={});
-        void LoadByBuffer(i32 width, i32 height, u8* buffer, TextureParams params={});
-
-        void AddDeleter(const Deleter& deleter);
-
-        void Bind() const;
-        void Unbind() const;
-
-        KIWI_NODISCARD const u8* GetData() const;
-        KIWI_NODISCARD i32 GetWidth() const;
-        KIWI_NODISCARD i32 GetHeight() const;
-
-        KIWI_NODISCARD GLuint GetTextureID() const;
-
-        ~Texture();
-
-    private:
-        u8* m_data = nullptr;
-        i32 m_width = 0;
-        i32 m_height = 0;
-
-        Deleter m_deleter = [](u8* data) { stbi_image_free(data); };
-        GLuint m_texture = -1;
+        ~ATexture2D() override = default;
     };
 }

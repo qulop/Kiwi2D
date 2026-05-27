@@ -12,6 +12,7 @@ namespace Kiwi {
     const String OPT_MAX_FPS = "MaxFPS";
     const String OPT_ENGINE_OUT_DIR = "EngineOutDir";
     const String OPT_APPLICATION_OUT_DIR = "ApplicationOutDir";
+    const String OPT_PROJECT_ROOT = "ProjectRoot";
     const String OPT_WINDOW_NAME = "MainWindowName";
     const String OPT_LOG_NAME = "LogFileName";
 

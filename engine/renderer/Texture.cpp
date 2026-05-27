@@ -1,94 +1,11 @@
-#define STB_IMAGE_IMPLEMENTATION
 #include "Texture.hpp"
 
-#include <common/Debug.hpp>
-#include <common/cast/Cast.hpp>
+#include <backends/opengl/TextureGL.hpp>
+
 
 
 namespace Kiwi {
-    Texture::Texture(const String& path, TextureParams params) {
-        LoadByPath(path, params); 
-    }
-
-
-    void Texture::LoadByPath(const String& path, TextureParams params) {
-        stbi_set_flip_vertically_on_load(true);
-
-        i32 channels = 0;
-        m_data = stbi_load(path.ToCString(), &m_width, &m_height, &channels, params.imageFormat);
-        if (!m_data) {
-            auto&& reason = (stbi_failure_reason()) ? stbi_failure_reason() : "<unknown reason>";
-            //KIWI_ERROR("Texture2D::LoadByPath() : Failed to load texture from path {}. Reason: {}", path, reason);
-            return;
-        }
-
-        LoadByBuffer(m_width, m_height, m_data, params);
-
-        glBindTexture(GL_TEXTURE_2D, 0);
-    }
-
-
-    void Texture::LoadByBuffer(i32 width, i32 height, u8* buffer, TextureParams params) {
-        glGenTextures(1, &m_texture);
-        glBindTexture(GL_TEXTURE_2D, m_texture);
-
-        if (TextureParams::CLAMP_TO_BORDER)
-            glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, params.textureBorderColor.data());
-
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, params.wrap);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, params.wrap);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, params.filter);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, params.filter);
-
-        glTexImage2D(GL_TEXTURE_2D, 0, params.internalFormat, 
-            width, height, 0, params.glFormat, GL_UNSIGNED_BYTE, buffer);
-
-        glBindTexture(GL_TEXTURE_2D, 0);
-    }
-
-
-    void Texture::AddDeleter(const Deleter& deleter) {
-        m_deleter = deleter; 
-    }
-
-    const u8* Texture::GetData() const {
-        return m_data; 
-    }
-
-    KIWI_NODISCARD i32 Texture::GetWidth() const {
-        return m_width;
-    }
-
-    KIWI_NODISCARD i32 Texture::GetHeight() const {
-        return m_height;
-    }
-
-    void Texture::Bind() const {
-        KIWI_ASSERT(m_texture != KIWI_UNDEFINED_ID,
-            "Texture2D::Use() : You must firstly generate texture, before use it");
-
-        glBindTexture(GL_TEXTURE_2D, m_texture); 
-    }
-
-
-    void Texture::Unbind() const {
-        KIWI_ASSERT(m_texture != KIWI_UNDEFINED_ID,
-            "Texture2D::StopUsing() : You must firstly generate texture, before call this method");
-
-        glBindTexture(GL_TEXTURE_2D, 0); 
-    }
-
-
-    GLuint Texture::GetTextureID() const {
-        KIWI_ASSERT(m_texture != KIWI_UNDEFINED_ID,
-            "Texture2D::GetTextureID() : You must firstly generate texture, before get it's id");
-
-        return m_texture;
-    }
-
-    Texture::~Texture() {
-        if (m_data) {
-            std::invoke(m_deleter, m_data);
-        }
-    }
+      std::shared_ptr<ATexture2D> ATexture2D::Create(const ImageDesc& desc) {
+            return std::make_shared<OpenGL::Texture2DGL>(desc);
+      }
 }

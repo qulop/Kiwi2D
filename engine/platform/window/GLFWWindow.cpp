@@ -66,14 +66,16 @@ namespace Kiwi {
     }
 
     void GLFWWindow::SetIcon(const String& path) {
-        Texture texture{ path };
+        // TODO:
+        // Texture texture{ path };
+        // GLFWimage ico {
+        //     .width = texture.GetWidth(),
+        //     .height = texture.GetHeight(),
+        //     .pixels = const_cast<u8*>(texture.GetData())
+        // };
+        // glfwSetWindowIcon(m_window, 1, &ico);
 
-        GLFWimage ico {
-            .width = texture.GetWidth(),
-            .height = texture.GetHeight(),
-            .pixels = const_cast<u8*>(texture.GetData())
-        };
-        glfwSetWindowIcon(m_window, 1, &ico);
+        KIWI_CTX_LOG(WARNING, "GLFWWindow::SetIcon is not implemented yet");
     }
 
 
@@ -83,16 +85,17 @@ namespace Kiwi {
 
 
     void GLFWWindow::SetInnerCursor(const String& path) {
-        Texture texture{ path };
+        // TODO:
+        // Texture texture{ path };
+        // GLFWimage cur {
+        //     .width = texture.GetWidth(),
+        //     .height = texture.GetHeight(),
+        //     .pixels = const_cast<u8*>(texture.GetData())
+        // };
+        // m_cursor = glfwCreateCursor(&cur, 0, 0);
+        // glfwSetCursor(m_window, m_cursor);
 
-        GLFWimage cur {
-            .width = texture.GetWidth(),
-            .height = texture.GetHeight(),
-            .pixels = const_cast<u8*>(texture.GetData())
-        };
-
-        m_cursor = glfwCreateCursor(&cur, 0, 0);
-        glfwSetCursor(m_window, m_cursor);
+        KIWI_LOG(WARNING, "GLFWWindow::SetInnerCursor is not implemented yet");
     }
 
 

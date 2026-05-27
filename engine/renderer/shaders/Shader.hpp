@@ -4,7 +4,7 @@
 #include <common/hash/Hash.hpp>
 #include <common/Definitions.hpp>
 
-#include <core/Object.hpp>
+#include <core/resources/Asset.hpp>
 
 #include <renderer/shaders/ShaderStage.hpp>
 
@@ -24,11 +24,8 @@ namespace Kiwi {
     };
 
 
-    class KIWI_API AShader : public AObject {
-        KIWI_CREATE_OBJECT(AShader, AObject)
-
-    public:
-        KIWI_NODISCARD static Opt<EShaderStage> StringToShaderStage(StringView stageName);
+    class KIWI_API AShader : public AAsset {
+        KIWI_CREATE_OBJECT(AShader, AAsset)
 
     public:
         KIWI_NODISCARD virtual u32 GetUniformLocation(const char* name) const = 0;
@@ -66,6 +63,8 @@ namespace Kiwi {
 
         friend class AShaderCompiler;
 
+        UUID m_shaderUUID = UUID::Generate();
+        std::filesystem::path m_assetPath;
         Map<EShaderStage, UniquePtr<IShaderModule>> m_shaderModules;
     };
 }

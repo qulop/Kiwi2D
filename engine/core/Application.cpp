@@ -1,7 +1,5 @@
 #include "Application.hpp"
 
-#include <renderer/shaders/ShaderCacheManager.hpp>
-
 #include <sync/Atomic.hpp>
 
 #include <common/Time.hpp>
@@ -11,6 +9,7 @@
 #include <core/Object.hpp>
 #include <core/EngineConfig.hpp>
 #include <core/LogSubsystem.hpp>
+#include <core/ProjectSubsystem.hpp>
 
 #include <platform/io/SystemConsole.hpp>
 
@@ -58,6 +57,16 @@ namespace Kiwi {
             .Get<Path>(OPT_APPLICATION_OUT_DIR)
             .value_or(Platform::GetTemporaryDirectoryPath());
 
+        Path projectRoot = m_cliOptions
+            .Get<Path>(OPT_PROJECT_ROOT)
+            .value_or(std::filesystem::current_path());
+
+        RegisterSubsystem<ProjectSubsystem>(projectRoot, false);
+        if (!GetSubsystem<ProjectSubsystem>()->Init()) {
+            Console::WriteLine("Failed to initialize Project subsystem");
+            return false;
+        }
+
 
         LoggerInitInfo loggerInfo {
             .loggerPathDirectory = GetApplicationOutputDirectory()
@@ -66,8 +75,6 @@ namespace Kiwi {
         if (!GetSubsystem<LogSubsystem>()->Init()) {
             return false;
         }
-
-        KIWI_IGNORE_RETURN(ShaderCacheManager::Init());
 
         RegisterSubsystem<WindowSubsystem>();
         GetSubsystem<WindowSubsystem>()->Init();
