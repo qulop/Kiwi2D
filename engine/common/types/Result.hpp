@@ -79,6 +79,14 @@ namespace Kiwi {
             return m_result.value();
         }
 
+        KIWI_NODISCARD constexpr SuccessType* GetValuePtr() & {
+            return HasValue() ? std::addressof(GetValue()) : nullptr;
+        }
+
+        KIWI_NODISCARD constexpr SuccessType* GetValuePtr() const& {
+            return HasValue() ? std::addressof(GetValue()) : nullptr;
+        }
+
         KIWI_NODISCARD constexpr SuccessType StealValue() {
             KIWI_ENSURE(HasValue());
 
