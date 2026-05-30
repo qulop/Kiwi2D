@@ -99,6 +99,13 @@ namespace Kiwi {
         Opt<String> desc;
     
     public:
+        KIWI_NODISCARD static Error Create(ErrorEnumeration e, Opt<String> d = nullopt) {
+            return Error {
+                .kind = e,
+                .desc = d
+            };
+        }
+
         KIWI_NODISCARD static Error FromKind(ErrorEnumeration v)
             requires requires(ErrorEnumeration e) { { Cast<ErrorEnumeration>::ToString(e) } -> std::convertible_to<String>; }
         {
@@ -126,9 +133,4 @@ namespace Kiwi {
             return kind == other.kind && desc == other.desc;
         }
     };
-
-
-
-    template<typename TErrorEnum>
-    using StatusResult = Status<Error<TErrorEnum>>;
 }
