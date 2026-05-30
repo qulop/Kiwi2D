@@ -14,17 +14,27 @@ namespace Kiwi {
     struct ProjectConfig {
         String projectName;
         UUID projectUUID;
+
+        // Folders inside the `.kiwi`
+        std::filesystem::path engineDataDirectoryPath;
         std::filesystem::path assetRegistryPath;
         std::filesystem::path cacheDirectoryPath;
+
+        std::filesystem::path assetsPath;
+
 
         struct Keys {
             static constexpr StringView PROJECT_NAME = "ProjectName";
             static constexpr StringView PROJECT_UUID = "UUID";
-            static constexpr StringView PROJECT_CACHE = "CacheDirectory";
+            static constexpr StringView ENGINE_DATA_DIRECTORY = "EngineDataDirectory";
             static constexpr StringView PROJECT_ASSET_REGISTRY = "AssetRegistryDirectory";
+            static constexpr StringView PROJECT_CACHE = "DataCacheDirectory";
+            static constexpr StringView ASSETS_DIRECTORY = "AssetsDirectory";
         };
 
-        KIWI_NODISCARD nlohmann::json ToJSON() const;
+        KIWI_NODISCARD nlohmann::ordered_json ToJSON() const;
+
+        KIWI_NODISCARD std::array<std::filesystem::path, 4> GetDirectoryPaths() const;
 
         KIWI_NODISCARD static Opt<ProjectConfig> ReadConfig(const std::filesystem::path& configPath);
         KIWI_NODISCARD static ProjectConfig CreateNew(StringView projectName, const std::filesystem::path& projectPath);
@@ -36,11 +46,10 @@ namespace Kiwi {
     public:
 
         static constexpr StringView KIWI_PROJECT_EXTENSION = ".kiwiprj";
-        static constexpr StringView KIWI_ASSETS_REGISTRY_ROOT_DIRECTORY_NAME = "Assets";
-
-        static constexpr StringView CONFIG_DIRECTORY_NAME = ".kiwi";
-        static constexpr StringView CACHE_DIRECTORY_NAME = "cache";
-        static constexpr StringView SHADER_CACHE_DIRECTORY_NAME = "shaders";
+        static constexpr StringView ASSETS_DIRECTORY_NAME = "Assets";
+        static constexpr StringView ASSETS_REGISTRY_DIRECTORY_NAME = "AssetsRegistry";
+        static constexpr StringView ENGINE_DATA_DIRECTORY_NAME = ".kiwi";
+        static constexpr StringView CACHE_DIRECTORY_NAME = "DataCache";
 
     public:
         KIWI_NODISCARD static std::shared_ptr<Project> FromConfig(const std::filesystem::path& projectPath, const ProjectConfig& config);

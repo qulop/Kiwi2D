@@ -8,12 +8,23 @@
 
 
 namespace Kiwi {
-    nlohmann::json ProjectConfig::ToJSON() const {
-        return nlohmann::json {
+    nlohmann::ordered_json ProjectConfig::ToJSON() const {
+        return nlohmann::ordered_json {
             { Keys::PROJECT_NAME, projectName.ToStdString() },
             { Keys::PROJECT_UUID, projectUUID.ToString().ToStdString() },
+            { Keys::ENGINE_DATA_DIRECTORY, engineDataDirectoryPath },
             { Keys::PROJECT_ASSET_REGISTRY, assetRegistryPath },
-            { Keys::PROJECT_CACHE, cacheDirectoryPath }
+            { Keys::PROJECT_CACHE, cacheDirectoryPath },
+            { Keys::ASSETS_DIRECTORY, assetsPath },
+        };
+    }
+
+    std::array<std::filesystem::path, 4> ProjectConfig::GetDirectoryPaths() const {
+        return std::array {
+            engineDataDirectoryPath,
+            assetRegistryPath,
+            cacheDirectoryPath,
+            assetsPath,
         };
     }
 
@@ -29,8 +40,8 @@ namespace Kiwi {
             return nullopt;
         }
 
-        nlohmann::json jsonConfig = nlohmann::json::parse(content);
-        if (jsonConfig.empty()) {
+        nlohmann::json jsonConfig = nlohmann::json::parse(content, nullptr, false);
+        if (jsonConfig.is_discarded() || jsonConfig.empty()) {
             return nullopt;
         }
 
@@ -43,8 +54,10 @@ namespace Kiwi {
         }
 
         result.projectName = jsonConfig[Keys::PROJECT_NAME].get<std::string>();
-        result.cacheDirectoryPath = jsonConfig[Keys::PROJECT_CACHE].get<std::filesystem::path>();
+        result.engineDataDirectoryPath = jsonConfig[Keys::ENGINE_DATA_DIRECTORY].get<std::filesystem::path>();
         result.assetRegistryPath = jsonConfig[Keys::PROJECT_ASSET_REGISTRY].get<std::filesystem::path>();
+        result.cacheDirectoryPath = jsonConfig[Keys::PROJECT_CACHE].get<std::filesystem::path>();
+        result.assetsPath = jsonConfig[Keys::ASSETS_DIRECTORY].get<std::filesystem::path>();
 
         return result;
     }
@@ -53,15 +66,32 @@ namespace Kiwi {
         ProjectConfig result;
         result.projectName = projectName;
         result.projectUUID = UUID::Generate();
-        result.assetRegistryPath = projectPath / Project::KIWI_ASSETS_REGISTRY_ROOT_DIRECTORY_NAME;
-        result.cacheDirectoryPath = projectPath / Project::CONFIG_DIRECTORY_NAME /
-            Project::CACHE_DIRECTORY_NAME / Project::SHADER_CACHE_DIRECTORY_NAME;
+
+        result.engineDataDirectoryPath = projectPath / Project::ENGINE_DATA_DIRECTORY_NAME;
+        result.assetRegistryPath = result.engineDataDirectoryPath / Project::ASSETS_REGISTRY_DIRECTORY_NAME;
+        result.cacheDirectoryPath = result.engineDataDirectoryPath / Project::CACHE_DIRECTORY_NAME;
+
+        result.assetsPath = projectPath / Project::ASSETS_DIRECTORY_NAME;
 
         return result;
     }
 
 
+
     std::shared_ptr<Project> Project::FromConfig(const std::filesystem::path& projectPath, const ProjectConfig& config) {
+        for (const auto& directory : config.GetDirectoryPaths()) {
+            if (!std::filesystem::exists(directory)) {
+                std::error_code ec;
+                std::filesystem::create_directories(directory, ec);
+
+                if (ec) {
+                    return nullptr;
+                }
+
+                ec.clear();
+            }
+        }
+
         auto&& assetManager = std::make_shared<AssetManager>();
         if (assetManager->BindToRegistry(config.assetRegistryPath)) {
             auto&& project = std::make_shared<Project>();
@@ -109,9 +139,10 @@ namespace Kiwi {
         const ProjectConfig config = ProjectConfig::CreateNew(projectName, projectPath);
         const String projectConfigFileName = String::Format("{}{}", projectName, KIWI_PROJECT_EXTENSION);
 
-        Status<Error<EErrorIO>> saveResult = File::SaveInFile(
+        const Result<void, EErrorIO> saveResult = File::SaveInFile(
             projectPath / projectConfigFileName.ToStdString(),
-            config.ToJSON().dump()
+            config.ToJSON().dump(4),
+            true
         );
         if (!saveResult) {
             return nullptr;

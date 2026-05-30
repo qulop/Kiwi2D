@@ -42,7 +42,7 @@ namespace Kiwi {
             constexpr static StringView MAIN_SECTION_NAME = "MainMeta";
             constexpr static StringView UUID_KEY_NAME = "UUID";
             constexpr static StringView ASSET_TYPE_KEY_NAME = "AssetType";
-            constexpr static StringView ASSET_PATH_KEY_NAME = "AssetType";
+            constexpr static StringView ASSET_PATH_KEY_NAME = "AssetPath";
         };
 
         constexpr static StringView METADATA_EXTENSION = ".assetmeta";
