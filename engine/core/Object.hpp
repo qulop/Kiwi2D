@@ -95,7 +95,7 @@ namespace Kiwi {
         template<Concepts::DerivedFrom<ASubsystem> T>
         void DestroySubsystem() {
             KIWI_ASSERT_BASIC(s_subsystems);
-            KIWI_ASSERT(ThisThread::IsMainThread(), "You must call this function only from a main thread");
+            KIWI_ASSERT(ThisThread::IsMainThread(), "You must call this function only from the main thread");
 
             auto it = s_subsystems->find(T::GetStaticType());
             if (it == std::ranges::end(*s_subsystems)) {
@@ -106,13 +106,11 @@ namespace Kiwi {
         }
 
         template<Concepts::DerivedFrom<ASubsystem> T>
-        SharedPtr<T> GetSubsystem() {
-            return GetSubsystemImpl<T>(this);
-        }
+        KIWI_NODISCARD static SharedPtr<T> GetSubsystem() {
+            KIWI_ASSERT_BASIC(s_subsystems && s_subsystems->contains(T::GetStaticType()));
 
-        template<Concepts::DerivedFrom<ASubsystem> T>
-        SharedPtr<T> GetSubsystem() const {
-            return GetSubsystemImpl<T>(this);
+            SharedPtr<ASubsystem> baseSubsystemPtr = s_subsystems->at(T::GetStaticType());
+            return std::static_pointer_cast<T>(baseSubsystemPtr);
         }
 
         template<typename... Args>
@@ -134,28 +132,12 @@ namespace Kiwi {
         virtual void DirectInheritanceChecker(AObject*) = 0;
 
     private:
-        template<Concepts::DerivedFrom<ASubsystem> T, typename Self>
-        static SharedPtr<T> GetSubsystemImpl(Self* self) {
-            KIWI_ASSERT_BASIC(s_subsystems && s_subsystems->contains(T::GetStaticType()));
-
-            SharedPtr<ASubsystem> baseSubsystemPtr = s_subsystems->at(T::GetStaticType());
-            if constexpr (std::same_as<SharedPtr<ASubsystem>, std::shared_ptr<ASubsystem>>) {
-                return std::static_pointer_cast<T>(baseSubsystemPtr);
-            }
-            else {
-                KIWI_ASSERT(false, "You should to adapt this function for engine's custom SharedPtr<T> type!");
-                return nullptr;
-            }
-        }
-
         void LogImpl(ELogLevel lvl, const String& msg) const;
 
     private:
         friend class Application;
 
-
         TypeMetaInfo m_typeMetaInfo;
-
         static SubsystemHolderType* s_subsystems;
     };
 
