@@ -127,6 +127,10 @@ namespace Kiwi {
             m_data(str)
         {}
 
+        String(size_t sz, ValueType ch) :
+            m_data(sz, ch)
+        {}
+
         String(const ValueType* str, size_t len) :
             m_data(str, len)
         {}

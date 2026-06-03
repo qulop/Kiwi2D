@@ -1,6 +1,7 @@
 #include "String.hpp"
 
 #include <common/Debug.hpp>
+#include <platform/Platform.hpp>
 #include <renderer/shaders/ShaderStage.hpp>
 
 
@@ -71,16 +72,7 @@ namespace Kiwi {
     }
 
     String String::FromWideCharPtr(const wchar_t* cstr) {
-        // size_t bytesNeeded = std::wcstombs(nullptr, cstr, 0);
-        // if (bytesNeeded == static_cast<size_t>(-1)) {
-        //     return {};
-        // }
-        //
-        // String res;
-        // res.ReserveSpace(bytesNeeded + 1);
-        //
-        // std::wcstombs(res.GetRaw(), cstr, bytesNeeded);
-        return {};
+        return Platform::WideToUTF8(cstr);
     }
 
     index_t String::FindSubString(StringView src, StringView targetSubStr, size_t offset) {

@@ -114,7 +114,7 @@ namespace Kiwi {
         }
 
         template<typename... Args>
-        void Log(ELogLevel lvl, std::format_string<Args...> fmt, Args&&... args) {
+        static void Log(ELogLevel lvl, std::format_string<Args...> fmt, Args&&... args) {
             LogImpl(lvl, String::Format(fmt, std::forward<Args>(args)...));
         }
 
@@ -132,7 +132,7 @@ namespace Kiwi {
         virtual void DirectInheritanceChecker(AObject*) = 0;
 
     private:
-        void LogImpl(ELogLevel lvl, const String& msg) const;
+        static void LogImpl(ELogLevel lvl, const String& msg);
 
     private:
         friend class Application;
