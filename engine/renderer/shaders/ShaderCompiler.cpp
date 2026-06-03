@@ -1,12 +1,39 @@
 #include "ShaderCompiler.hpp"
 
+#include <core/ProjectSubsystem.hpp>
+#include <core/Project.hpp>
+
 #include <renderer/shaders/SpirV.hpp>
 
 #include <common/types/Result.hpp>
 
+#include <backends/opengl/shaders/ShaderCompilerGL.hpp>
+#include <backends/vulkan/shaders/ShaderCompilerVK.hpp>
+
 
 
 namespace Kiwi {
+    std::unique_ptr<AShaderCompiler> AShaderCompiler::Create() {
+        std::shared_ptr<ProjectSubsystem> projectSubsystem = GetSubsystem<ProjectSubsystem>();
+        if (!projectSubsystem) {
+            return nullptr;
+        }
+
+        std::shared_ptr<Project> activeProject = projectSubsystem->GetActiveProject();
+        if (!activeProject) {
+            return nullptr;
+        }
+
+        switch (activeProject->GetConfig().renderAPI) {
+        case ERenderAPI::OpenGL:
+            return std::make_unique<OpenGL::ShaderCompilerGL>();
+        case ERenderAPI::Vulkan:
+            return std::make_unique<Vulkan::ShaderCompilerVK>();
+        default:
+            return nullptr;
+        }
+    }
+
     Opt<PreprocessorGLSL::SourcesMap> AShaderCompiler::PreprocessSource(const String& src) {
         PreprocessorGLSL preprocessor;
 
@@ -60,11 +87,12 @@ namespace Kiwi {
     }
 
     Result<Map<EShaderStage, Vector<u32>>> AShaderCompiler::PreprocessAndCompileToSpirV(const File& sourceFile, ESpirVEnvironment env, ESpirVOptimizationLevel optimizationLvl) {
-        Result src = sourceFile.ReadAll();
+        Result<FileContent> src = sourceFile.ReadAll();
         if (!src) {
-            KIWI_LOG(ERROR, "Failed to read source file: {}",  src.GetError().GetDescription());
-
-            return Error::Create(EGeneralError::COMPILE_ERROR);
+            return Error::Create(
+                EGeneralError::COMPILE_ERROR,
+                String::Format("Failed to read source file: {}",  src.GetError().GetDescription())
+            );
         }
 
         if (const Opt preprocessedSrc = PreprocessSource(src->GetAsString())) {
@@ -80,8 +108,7 @@ namespace Kiwi {
                 return compiledSpirV.GetError();
             }
         }
-        else {
 
-        }
+        return Error::Create(EGeneralError::COMPILE_ERROR, "Failed to preprocess a source file");
     }
 }

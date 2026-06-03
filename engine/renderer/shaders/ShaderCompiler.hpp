@@ -26,10 +26,7 @@ namespace Kiwi {
         };
 
     public:
-        template<Concepts::DerivedFrom<SelfType> T, typename... Args>
-        KIWI_NODISCARD static UniquePtr<SelfType> Create(Args&&... args) {
-            return MakeUnique<T>(std::forward<Args>(args)...);
-        }
+        KIWI_NODISCARD static std::unique_ptr<AShaderCompiler> Create();
 
         KIWI_NODISCARD static Opt<PreprocessorGLSL::SourcesMap> PreprocessSource(const String& src);
         KIWI_NODISCARD static Result<Map<EShaderStage, Vector<u32>>> CompileToSpirV(const CompilationDetails& compilationDetails);
@@ -37,7 +34,7 @@ namespace Kiwi {
         KIWI_NODISCARD static Result<Map<EShaderStage, Vector<u32>>> PreprocessAndCompileToSpirV(const File& sourceFile, ESpirVEnvironment env, ESpirVOptimizationLevel optimizationLvl);
 
     public:
-        KIWI_NODISCARD virtual UniquePtr<AShader> CompileFile(const File& sourceFile) = 0;
+        KIWI_NODISCARD virtual std::shared_ptr<AShader> CompileFile(const File& sourceFile) = 0;
 
         ~AShaderCompiler() override = default;
     };
