@@ -6,9 +6,7 @@
 
 namespace Kiwi {
    bool AssetManager::BindToRegistry(const std::filesystem::path& registryPath) {
-        namespace fs = std::filesystem;
-
-        if (registryPath.empty() || !fs::is_directory(registryPath)) {
+        if (registryPath.empty() || !std::filesystem::is_directory(registryPath)) {
             if (registryPath.empty()) {
                 KIWI_LOG(ERROR, "Failed to bind asset manager to a registry, because provided path is empty");
             }
@@ -24,14 +22,17 @@ namespace Kiwi {
             m_registry.clear();
         }
 
-        constexpr auto options = fs::directory_options::follow_directory_symlink;
+        constexpr auto options = std::filesystem::directory_options::follow_directory_symlink;
         for (const std::filesystem::directory_entry& entry : std::filesystem::recursive_directory_iterator(registryPath, options)) {
             if (entry.is_regular_file() && entry.path().extension() == AssetMetaData::METADATA_EXTENSION) {
-                if (const Opt<AssetMetaData> assetMetaData = AssetImporter::OpenMetaData(entry.path())) {
+                if (const Result<AssetMetaData> assetMetaData = AssetImporter::OpenMetaData(entry.path())) {
                     m_registry[assetMetaData->assetUUID] = *assetMetaData;
                 }
                 else {
-                    KIWI_LOG(ERROR, "Failed to open a metadata file: {}", entry.path().string());
+                    KIWI_LOG(ERROR, "Failed to open a metadata file: {}. The reason: {}",
+                        entry.path().string(),
+                        assetMetaData.GetError().GetDescription()
+                    );
                 }
             }
         }

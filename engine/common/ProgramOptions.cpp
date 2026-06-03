@@ -46,7 +46,7 @@ namespace Kiwi {
 
     Opt<ProgramOptions> ProgramOptions::Parse(const Vector<String>& args) {
         ProgramOptions result;
-        auto existingOptions = EngineConfig::GetCommandLineOptions();
+        Vector<CmdLineOption> existingOptions = EngineConfig::GetCommandLineOptions();
 
         for (size_t tokenIndex = 0; tokenIndex < args.size(); tokenIndex++) {
             const String& token = args.at(tokenIndex);

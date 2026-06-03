@@ -43,7 +43,7 @@ namespace Kiwi {
         using value_type = typename HashStorageType::value_type;
 
     public:
-        static Expected<Hash, Error<EGeneralError>> ParseString(StringView str, i32 base = 16) {
+        static Result<Hash> ParseString(StringView str, i32 base = 16) {
             return ParseString32_64(str, base);
         }
 
@@ -114,7 +114,7 @@ namespace Kiwi {
 
             std::from_chars_result res = std::from_chars(str.data(), str.data() + str.size(), val, base);
             if (res.ec != std::errc{}) {
-                EGeneralError errorKind;
+                EGeneralError::Type errorKind;
                 String errorDesc = std::make_error_code(res.ec).message();
 
                 if (res.ec == std::errc::invalid_argument) {
@@ -124,22 +124,22 @@ namespace Kiwi {
                     errorKind = EGeneralError::OUT_OF_RANGE;
                 }
 
-                return Error{ .kind = errorKind, .desc = errorDesc };
+                return Error::Create(errorKind, errorDesc);
             }
 
             if (res.ptr != str.data() + str.size()) {
-                return Error{
-                    .kind = EGeneralError::INVALID_ARGUMENT,
-                    .desc = std::format("Invalid character detected at position {}", res.ptr - str.data())
-                };
+                return Error::Create(
+                    EGeneralError::INVALID_ARGUMENT,
+                    String::Format("Invalid character detected at position {}", res.ptr - str.data())
+                );
             }
 
             if constexpr (BitDepth == 32) {
                 if (val > (std::numeric_limits<u32>::max)()) {
-                    return Error{
-                        .kind = EGeneralError::BUFF_OVERFLOW,
-                        .desc = std::format("Overflow: {} exceeded specified bit depth of {} bits", str, BitDepth)
-                    };
+                    return Error::Create(
+                        EGeneralError::BUFF_OVERFLOW,
+                        String::Format("Overflow: {} exceeded specified bit depth of {} bits", str, BitDepth)
+                    );
                 }
             }
 

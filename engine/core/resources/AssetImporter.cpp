@@ -1,8 +1,11 @@
 #include "AssetImporter.hpp"
 
 #include <core/resources/Asset.hpp>
+#include <core/ProjectSubsystem.hpp>
+#include <core/Project.hpp>
 
 #include <renderer/Texture.hpp>
+#include <renderer/shaders/ShaderCompiler.hpp>
 #include <renderer/shaders/ShaderBundle.hpp>
 
 #include <common/types/INI.hpp>
@@ -12,34 +15,34 @@
 
 
 namespace Kiwi {
-    Opt<AssetMetaData> AssetImporter::OpenMetaData(const std::filesystem::path& assetPath) {
+    Result<AssetMetaData> AssetImporter::OpenMetaData(const std::filesystem::path& assetPath) {
         INI metaData = INI::FromPath(assetPath);
         if (metaData.IsEmpty()) {
-            return nullopt;
+            return Error::Create(EGeneralError::PARSE_ERROR, "Failed to parse asset metadata file");
         }
 
         AssetMetaData res;
-        const auto& mainIniFileSection = metaData[AssetMetaData::IniFile::MAIN_SECTION_NAME];
+        const auto& mainIniFileSection = metaData[AssetMetaData::IniKeys::MAIN_SECTION_NAME];
 
         Opt<UUID> uuidParseResult = UUID::FromString(
-            mainIniFileSection[AssetMetaData::IniFile::UUID_KEY_NAME].As<String>()
+            mainIniFileSection[AssetMetaData::IniKeys::UUID].As<String>()
         );
         if (uuidParseResult) {
             res.assetUUID = *uuidParseResult;
         }
         else {
-            return nullopt;
+            return Error::Create(EGeneralError::PARSE_ERROR, "Failed to parse asset UUID");
         }
 
         res.type = EAssetType::FromString(
-            mainIniFileSection[AssetMetaData::IniFile::ASSET_TYPE_KEY_NAME]
+            mainIniFileSection[AssetMetaData::IniKeys::ASSET_TYPE]
                 .As<String>()
                 .ToStringView()
         );
 
-        res.assetPath = mainIniFileSection[AssetMetaData::IniFile::ASSET_TYPE_KEY_NAME].As<std::filesystem::path>();
+        res.assetPath = mainIniFileSection[AssetMetaData::IniKeys::ASSET_TYPE].As<std::filesystem::path>();
 
-        return res;
+        return Success(res);
     }
 
     std::shared_ptr<AAsset> AssetImporter::ImportAsset(const AssetMetaData& assetMetaData) {
@@ -56,6 +59,15 @@ namespace Kiwi {
     }
 
     std::shared_ptr<AAsset> AssetImporter::ImportShaderAsset(const AssetMetaData& assetMetaData) {
+        KIWI_MAYBE_UNUSED SharedPtr<Project> activeProject = GetSubsystem<ProjectSubsystem>()->GetActiveProject();
+        if (!activeProject) {
+            return nullptr;
+        }
+
+
+        // AShaderCompiler::
+
+
         KIWI_IGNORE_RETURN(assetMetaData);
         return nullptr;
     }

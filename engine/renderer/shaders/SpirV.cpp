@@ -61,10 +61,10 @@ namespace Kiwi {
             compileOptions
         );
         if (result.GetCompilationStatus() != shaderc_compilation_status_success) {
-            return Error {
-                .kind = EGeneralError::COMPILE_ERROR,
-                .desc = result.GetErrorMessage()
-            };
+            return Error::Create(
+                EGeneralError::COMPILE_ERROR,
+                result.GetErrorMessage()
+            );
         }
 
         return Success(
@@ -88,10 +88,10 @@ namespace Kiwi {
             compileOptions
         );
         if (result.GetCompilationStatus() != shaderc_compilation_status_success) {
-            return Error {
-                .kind = EGeneralError::COMPILE_ERROR,
-                .desc = result.GetErrorMessage()
-            };
+            return Error::Create(
+                EGeneralError::COMPILE_ERROR,
+                result.GetErrorMessage()
+            );
         }
 
         return Success(

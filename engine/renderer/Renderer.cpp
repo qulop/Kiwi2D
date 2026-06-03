@@ -50,5 +50,6 @@ namespace Kiwi {
     }
 
     void Renderer::SetViewport(const I32Rect& viewport) const {
+        
     }
 }

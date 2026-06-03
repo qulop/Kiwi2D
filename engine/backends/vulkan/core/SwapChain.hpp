@@ -30,7 +30,7 @@ namespace Kiwi::Vulkan {
         void PrepareSwapChainProps(const PhysicalDeviceSwapChainSupportDetails& supportDetails);
 
         KIWI_NODISCARD bool CreateSwapChain(VkSurfaceKHR surface);
-        KIWI_NODISCARD Result<VkImageView, VkResult> CreateViewFromImage(VkImage image) const;
+        KIWI_NODISCARD Result<VkImageView> CreateViewFromImage(VkImage image) const;
 
     private:
         SharedPtr<Device> m_parentDevice;

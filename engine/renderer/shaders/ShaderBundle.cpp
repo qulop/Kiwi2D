@@ -36,7 +36,7 @@ namespace Kiwi {
             return nullptr;
         }
 
-        Result<FileContent, EErrorIO> result = File::LoadFromFile(bundlePath, EFileOpenMode::READ | EFileOpenMode::BINARY);
+        Result<FileContent> result = File::LoadFromFile(bundlePath, EFileOpenMode::READ | EFileOpenMode::BINARY);
 
         const FileContent* fileContent = result.GetValuePtr();
         if (!fileContent) {

@@ -15,12 +15,12 @@
 namespace Kiwi {
     class File {
     public:
-        KIWI_NODISCARD static Result<void, EErrorIO> SaveInFile(std::filesystem::path filePath, StringView data, bool overwrite = false);
-        KIWI_NODISCARD static Result<void, EErrorIO> SaveInFile(std::filesystem::path filePath, const FileContent& data, bool isBinary, bool overwrite = false);
+        KIWI_NODISCARD static Result<void> SaveInFile(std::filesystem::path filePath, StringView data, bool overwrite = false);
+        KIWI_NODISCARD static Result<void> SaveInFile(std::filesystem::path filePath, const FileContent& data, bool isBinary, bool overwrite = false);
 
-        KIWI_NODISCARD static Result<FileContent, EErrorIO> LoadFromFile(std::filesystem::path filePath, EFileOpenMode::Type mode);
+        KIWI_NODISCARD static Result<FileContent> LoadFromFile(std::filesystem::path filePath, EFileOpenMode::Type mode);
 
-        KIWI_NODISCARD static Result<File, EErrorIO> OpenFileStatic(std::filesystem::path filePath, EFileOpenMode::Type mode);
+        KIWI_NODISCARD static Result<File> OpenFileStatic(std::filesystem::path filePath, EFileOpenMode::Type mode);
 
     public:
         File() = default;
@@ -32,7 +32,7 @@ namespace Kiwi {
         File(const File&) = delete;
         File& operator=(const File&) = delete;
 
-        KIWI_NODISCARD Result<void, EErrorIO> Open(std::filesystem::path path, EFileOpenMode::Type mode);
+        KIWI_NODISCARD Result<void> Open(std::filesystem::path path, EFileOpenMode::Type mode);
 
         KIWI_NODISCARD std::fstream& GetStream();
         KIWI_NODISCARD const std::fstream& GetStream() const;
@@ -49,11 +49,11 @@ namespace Kiwi {
         KIWI_NODISCARD size_t SeekBegin(size_t offset) const;
         KIWI_NODISCARD size_t SeekEnd(size_t offset) const;
 
-        KIWI_NODISCARD Result<void, EErrorIO> Write(const FileContent& data) const;
-        KIWI_NODISCARD Result<void, EErrorIO> Write(StringView data) const;
+        KIWI_NODISCARD Result<void> Write(const FileContent& data) const;
+        KIWI_NODISCARD Result<void> Write(StringView data) const;
 
-        KIWI_NODISCARD Result<FileContent, EErrorIO> ReadAll(bool rewindOnEnd = false) const;
-        KIWI_NODISCARD Result<SharedPtr<byte>, EErrorIO> ReadAsBytes(bool rewindOnEnd = false) const;
+        KIWI_NODISCARD Result<FileContent> ReadAll(bool rewindOnEnd = false) const;
+        KIWI_NODISCARD Result<SharedPtr<byte>> ReadAsBytes(bool rewindOnEnd = false) const;
 
         void Rewind() const;
 

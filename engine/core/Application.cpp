@@ -47,27 +47,22 @@ namespace Kiwi {
         }
     #endif
 
-        m_cliOptions = ProgramOptions::Parse(Platform::GetApplicationArguments()).value_or(ProgramOptions());
-        if (m_cliOptions.IsEmpty()) {
-            Console::WriteLine("Failed to parse command line arguments");
+        if (Opt options = ProgramOptions::Parse(Platform::GetApplicationArguments()); options) {
+           m_cliOptions = std::move(*options);
+        }
+        else {
             return false;
         }
 
         s_applicationOutputDirectory = m_cliOptions
             .Get<Path>(OPT_APPLICATION_OUT_DIR)
-            .value_or(Platform::GetTemporaryDirectoryPath());
+            .value_or(Platform::GetPathToSysTemp());
 
         Path projectRoot = m_cliOptions
             .Get<Path>(OPT_PROJECT_ROOT)
             .value_or(std::filesystem::current_path());
 
-        RegisterSubsystem<ProjectSubsystem>(projectRoot, false);
-        if (!GetSubsystem<ProjectSubsystem>()->Init()) {
-            Console::WriteLine("Failed to initialize Project subsystem");
-            return false;
-        }
-
-
+        // Logger initialization
         LoggerInitInfo loggerInfo {
             .loggerPathDirectory = GetApplicationOutputDirectory()
         };
@@ -76,6 +71,13 @@ namespace Kiwi {
             return false;
         }
 
+        // Project initialization
+        // RegisterSubsystem<ProjectSubsystem>(projectRoot, false);
+        // if (!GetSubsystem<ProjectSubsystem>()->Init()) {
+        //     return false;
+        // }
+
+        // Window initialization
         RegisterSubsystem<WindowSubsystem>();
         GetSubsystem<WindowSubsystem>()->Init();
 

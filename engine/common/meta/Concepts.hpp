@@ -4,33 +4,33 @@
 
 
 namespace Kiwi::Concepts {
-    template<typename Tx, typename Ty>
-    concept SameAs = std::same_as<Tx, Ty>;
+    template<typename T, typename Ty>
+    concept SameAs = std::same_as<T, Ty>;
 
 
-    template<typename Tx>
-    concept Range = requires(Tx& rng) {
+    template<typename T>
+    concept Range = requires(T& rng) {
         std::ranges::begin(rng);
         std::ranges::end(rng);
     };
 
-    template<typename Tx>
-    concept Integral = (std::is_integral_v<Tx>);
+    template<typename T>
+    concept Integral = (std::is_integral_v<T>);
 
-    template<typename Tx>
-    concept FloatingPoint = (std::is_floating_point_v<Tx>);
+    template<typename T>
+    concept FloatingPoint = (std::is_floating_point_v<T>);
 
-    template<typename Tx>
-    concept Number = (std::is_integral_v<Tx> || std::is_floating_point_v<Tx>);
+    template<typename T>
+    concept Number = (std::is_integral_v<T> || std::is_floating_point_v<T>);
 
 
-    template<typename Tx>
-    concept Enumeration = std::is_enum_v<Tx>;
-
-    template<typename Tx>
+    template<typename T>
+    concept Enumeration = std::is_enum_v<T>;
+    
+    template<typename T>
     concept CString = \
-        std::same_as<std::remove_cv_t<Tx>, char*> ||
-        std::same_as<std::remove_cv_t<Tx>, wchar_t*>;
+        std::same_as<std::remove_cv_t<T>, char*> ||
+        std::same_as<std::remove_cv_t<T>, wchar_t*>;
 
     template<typename T>
     concept TrivialCharacter = \
@@ -50,13 +50,13 @@ namespace Kiwi::Concepts {
     template<typename Der, typename Base>
     concept IsBaseOf = Traits::isBaseOf_v<Der, Base>;
 
-    template<typename Tx>
-    concept ImplementsEqualityOp = requires(Tx a, Tx b) {
+    template<typename T>
+    concept ImplementsEqualityOp = requires(T a, T b) {
         { a == b } -> ConvertibleTo<bool>;
     };
 
-    template<typename Tx>
-    concept ImplementsInequalityOp = requires(Tx a, Tx b) {
+    template<typename T>
+    concept ImplementsInequalityOp = requires(T a, T b) {
         { a != b } -> ConvertibleTo<bool>;
     };
 
@@ -67,8 +67,8 @@ namespace Kiwi::Concepts {
         { c.data() } -> ConvertibleTo<const typename T::value_type*>;
     };
 
-    template<typename Tx>
-    concept ContainerSTL = ContainsData<Tx> && requires(Tx c) {
+    template<typename T>
+    concept ContainerSTL = ContainsData<T> && requires(T c) {
         { c.size() } -> ConvertibleTo<size_t>;
         { c.empty() } -> ConvertibleTo<bool>;
     };

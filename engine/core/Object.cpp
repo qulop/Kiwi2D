@@ -20,7 +20,7 @@ namespace Kiwi {
         s_subsystems->operator[](subsystem->GetType()).reset(subsystem);
     }
 
-    void AObject::LogImpl(ELogLevel lvl, const String& msg) const {
+    void AObject::LogImpl(ELogLevel lvl, const String& msg) {
         KIWI_ASSERT_BASIC(s_subsystems->contains(LogSubsystem::GetStaticType()));
 
         GetSubsystem<LogSubsystem>()->Log(lvl, msg);

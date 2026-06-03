@@ -8,8 +8,8 @@
 
 
 namespace Kiwi {
-    Result<void, EErrorIO> File::SaveInFile(std::filesystem::path filePath, StringView data, bool overwrite) {
-        return File::SaveInFile(
+    Result<void> File::SaveInFile(std::filesystem::path filePath, StringView data, bool overwrite) {
+        return SaveInFile(
             std::move(filePath),
             FileContent{ EFileContentDataFormat::PLAIN_TEXT, data },
             false,
@@ -17,7 +17,7 @@ namespace Kiwi {
         );
     }
 
-    Result<void, EErrorIO> File::SaveInFile(std::filesystem::path filePath, const FileContent& data, bool isBinary, bool overwrite) {
+    Result<void> File::SaveInFile(std::filesystem::path filePath, const FileContent& data, bool isBinary, bool overwrite) {
         EFileOpenMode::Type mode = EFileOpenMode::WRITE;
         if (isBinary) {
             mode |= EFileOpenMode::BINARY;
@@ -34,11 +34,11 @@ namespace Kiwi {
 
             std::filesystem::create_directories(parentPath, ec);
             if (ec) {
-                return Error<EErrorIO>::Create(EErrorIO::UNKNOWN, ec.message());
+                return Error::Create(EErrorIO::UNKNOWN, ec.message());
             }
         }
 
-        if (Result<File, EErrorIO> res = OpenFileStatic(std::move(filePath), mode); !res) {
+        if (Result<File> res = OpenFileStatic(std::move(filePath), mode); !res) {
             return res.GetError();
         }
         else {
@@ -46,8 +46,8 @@ namespace Kiwi {
         }
     }
 
-    Result<FileContent, EErrorIO> File::LoadFromFile(std::filesystem::path filePath, EFileOpenMode::Type mode) {
-        if (Result<File, EErrorIO> res = OpenFileStatic(std::move(filePath), mode); !res) {
+    Result<FileContent> File::LoadFromFile(std::filesystem::path filePath, EFileOpenMode::Type mode) {
+        if (Result<File> res = OpenFileStatic(std::move(filePath), mode); !res) {
             return res.GetError();
         }
         else {
@@ -55,31 +55,31 @@ namespace Kiwi {
         }
     }
 
-    Result<File, EErrorIO> File::OpenFileStatic(std::filesystem::path filePath, EFileOpenMode::Type mode) {
+    Result<File> File::OpenFileStatic(std::filesystem::path filePath, EFileOpenMode::Type mode) {
         File file;
-        if (Result<void, EErrorIO> res = file.Open(std::move(filePath), mode); !res) {
+        if (Result<void> res = file.Open(std::move(filePath), mode); !res) {
             return res.GetError();
         }
 
         return Success(std::move(file));
     }
 
-    Result<void, EErrorIO> File::Open(std::filesystem::path path, EFileOpenMode::Type mode) {
+    Result<void> File::Open(std::filesystem::path path, EFileOpenMode::Type mode) {
         const std::ios_base::openmode stdMode = EFileOpenMode::ToStdOpenMode(mode);
 
         errno = 0;
         m_stream.open(path, stdMode);
         if (!m_stream.is_open()) {
             if (const errno_t err = errno; err != 0) {
-                return Error<EErrorIO>::FromKind(Cast<EErrorIO>::FromPosixCodes(err));
+                return Error::Create(EErrorIO::FromPosixCode(err), std::strerror(err));
             }
 
             std::error_code ec;
             if (!std::filesystem::exists(path, ec)) {
-                return Error<EErrorIO>::Create(EErrorIO::DOES_NOT_EXIST, ec.message());
+                return Error::Create(EErrorIO::DOES_NOT_EXIST, ec.message());
             }
 
-            return Error<EErrorIO>::FromKind(EErrorIO::UNKNOWN);
+            return Error::Create(EErrorIO::UNKNOWN);
         }
 
         m_mode = mode;
@@ -166,7 +166,7 @@ namespace Kiwi {
         return m_stream.good() ? 0 : -1;
     }
 
-    Result<void, EErrorIO> File::Write(const FileContent& data) const {
+    Result<void> File::Write(const FileContent& data) const {
         KIWI_ASSERT_BASIC(m_stream.is_open());
 
         if (data.GetContentFormat() == EFileContentDataFormat::PLAIN_TEXT) {
@@ -191,17 +191,17 @@ namespace Kiwi {
 
 
         if (!m_stream.good()) {
-            return Error<EErrorIO>::FromKind(EErrorIO::UNKNOWN);
+            return Error::Create(EErrorIO::UNKNOWN);
         }
 
         return {};
     }
 
-    Result<void, EErrorIO> File::Write(StringView data) const {
+    Result<void> File::Write(StringView data) const {
         return Write(FileContent(EFileContentDataFormat::PLAIN_TEXT, data));
     }
 
-    Result<FileContent, EErrorIO> File::ReadAll(bool rewindOnEnd) const {
+    Result<FileContent> File::ReadAll(bool rewindOnEnd) const {
         KIWI_ASSERT_BASIC(m_stream.is_open());
 
         const auto contentType = (m_mode & EFileOpenMode::BINARY) ?
@@ -217,16 +217,16 @@ namespace Kiwi {
         return fileBytes.GetError();
     }
 
-    Result<SharedPtr<byte>, EErrorIO> File::ReadAsBytes(bool rewindOnEnd) const {
+    Result<SharedPtr<byte>> File::ReadAsBytes(bool rewindOnEnd) const {
         KIWI_ASSERT_BASIC(m_stream.is_open());
 
         byte* buffer = KIWI_NOTHROW_NEW byte[m_fileSize + 1];
         if (!buffer) {
-            return Error<EErrorIO>::FromKind(EErrorIO::UNKNOWN);
+            return Error::Create(EGeneralError::ALLOC_FAILED, "Failed to allocate buffer");
         }
 
         m_stream.read(
-            BasicCast::UnsafeCast<char*>(buffer),
+            reinterpret_cast<char*>(buffer),
             static_cast<std::streamsize>(m_fileSize)
         );
 
@@ -234,13 +234,13 @@ namespace Kiwi {
             delete[] buffer;
 
             if (m_stream.bad()) {
-                return Error<EErrorIO>::FromKind(EErrorIO::UNKNOWN);
+                return Error::Create(EErrorIO::IO_ERROR, "Bad bit set in stream");
             }
             if (m_stream.eof()) {
-                return Error<EErrorIO>::FromKind(EErrorIO::UNEXPECTED_EOF);
+                return Error::Create(EErrorIO::UNEXPECTED_EOF, "Unexpected end of file");
             }
 
-            return Error<EErrorIO>::FromKind(EErrorIO::UNKNOWN);
+            return Error::Create(EErrorIO::UNKNOWN, "Unknown error");
         }
 
         buffer[m_fileSize] = static_cast<byte>('\0');

@@ -39,7 +39,7 @@ namespace Kiwi::Vulkan {
             auto resImageView = CreateViewFromImage(m_images[i]);
             if (!resImageView) {
                 KIWI_CTX_LOG(ERROR, "Failed to create an image view from VkImage: {}",
-                    *resImageView.GetError().desc
+                    resImageView.GetError().GetDescription()
                 );
                 return false;
             }
@@ -176,7 +176,7 @@ namespace Kiwi::Vulkan {
         return true;
     }
 
-    Result<VkImageView, VkResult> SwapChain::CreateViewFromImage(VkImage image) const {
+    Result<VkImageView> SwapChain::CreateViewFromImage(VkImage image) const {
         VkComponentMapping defaultComponents = {
             .r = VK_COMPONENT_SWIZZLE_IDENTITY,
             .g = VK_COMPONENT_SWIZZLE_IDENTITY,
@@ -200,11 +200,11 @@ namespace Kiwi::Vulkan {
         createInfo.subresourceRange = defaultSubresourceRange;
 
         VkImageView view = VK_NULL_HANDLE;
-        if (auto r = vkCreateImageView(m_parentDevice->GetDevice(), &createInfo, nullptr, &view); r != VK_SUCCESS) {
-            return Error {
-                .kind = r,
-                .desc = string_VkResult(r)
-            };
+        if (VkResult r = vkCreateImageView(m_parentDevice->GetDevice(), &createInfo, nullptr, &view); r != VK_SUCCESS) {
+            return Error::Create(
+                EGeneralError::CREATION_FAILED,
+                string_VkResult(r)
+            );
         }
 
         return Success(view);

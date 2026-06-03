@@ -10,24 +10,28 @@ namespace Kiwi {
     Opt<PreprocessorGLSL::SourcesMap> AShaderCompiler::PreprocessSource(const String& src) {
         PreprocessorGLSL preprocessor;
 
-        auto res = preprocessor.Preprocess(src);
+        Result res = preprocessor.Preprocess(src);
         if (res) {
             return *res;
         }
 
-        auto kind = res.error().kind;
-        KIWI_ASSERT_BASIC(kind != GlslPreprocessError::NONE);
+        Opt<EShaderPreprocessError::Type> errKind = res.GetError().GetAsEnum<EShaderPreprocessError::Type>();
+        KIWI_ASSERT_BASIC(errKind && *errKind != EShaderPreprocessError::NONE);
 
         // TODO: Idk where am i should output error messages, so for now just skip it
-        switch (kind) {
-            case GlslPreprocessError::INCORRECT_STAGE_NAME:
-                break;
-            case GlslPreprocessError::END_OF_STAGE_MISSED:
-                break;
-            case GlslPreprocessError::TOKEN_ALREADY_DECLARED:
-                break;
-            case GlslPreprocessError::INCORRECT_PREPROCESSOR_PROPERTIES_COUNT:
-                break;
+        switch (*errKind) {
+        case EShaderPreprocessError::SHADER_VERSION_MISSING:
+            break;
+        case EShaderPreprocessError::INCORRECT_STAGE_NAME:
+            break;
+        case EShaderPreprocessError::END_OF_STAGE_MISSED:
+            break;
+        case EShaderPreprocessError::TOKEN_ALREADY_DECLARED:
+            break;
+        case EShaderPreprocessError::INCORRECT_PREPROCESSOR_PROPERTIES_COUNT:
+            break;
+        default:
+            break;
         }
 
         return nullopt;
@@ -56,22 +60,24 @@ namespace Kiwi {
     }
 
     Result<Map<EShaderStage, Vector<u32>>> AShaderCompiler::PreprocessAndCompileToSpirV(const File& sourceFile, ESpirVEnvironment env, ESpirVOptimizationLevel optimizationLvl) {
-        FileContent src = sourceFile.ReadAll().ValueOr(FileContent{});
-        if (src.IsEmpty()) {
-            // TODO
+        Result src = sourceFile.ReadAll();
+        if (!src) {
+            KIWI_LOG(ERROR, "Failed to read source file: {}",  src.GetError().GetDescription());
+
+            return Error::Create(EGeneralError::COMPILE_ERROR);
         }
 
-        if (const auto preprocessedSrc = PreprocessSource(src.GetAsString())) {
+        if (const Opt preprocessedSrc = PreprocessSource(src->GetAsString())) {
             CompilationDetails d;
             d.environment = env;
             d.optimizationLvl = optimizationLvl;
             d.preprocessedSrc = *preprocessedSrc;
 
-            if (auto compiledSpirV = CompileToSpirV(d)) {
+            if (Result compiledSpirV = CompileToSpirV(d)) {
                 return compiledSpirV;
             }
             else {
-
+                return compiledSpirV.GetError();
             }
         }
         else {

@@ -15,10 +15,10 @@ namespace Kiwi {
         }
 
         if (!m_newProject) {
-            m_activeProject = Project::Open(m_activeProjectPath);
+            m_activeProject = *Project::Open(m_activeProjectPath);
         }
         else {
-            m_activeProject = Project::CreateNew("Hui", m_activeProjectPath);
+            m_activeProject = *Project::CreateNew("Hui", m_activeProjectPath);
         }
 
         if (!m_activeProject) {

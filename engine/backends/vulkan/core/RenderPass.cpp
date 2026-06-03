@@ -16,10 +16,7 @@ namespace Kiwi::Vulkan {
 
         VkResult err = vkCreateRenderPass(createInfo.device->GetDevice(), &rpCreateInfo, nullptr, &result.renderPass);
         if (err != VK_SUCCESS) {
-            return Error {
-                .kind = EGeneralError::CREATE_FAIL,
-                .desc = string_VkResult(err)
-            };
+            return Error::Create(EGeneralError::CREATION_FAILED, string_VkResult(err));
         }
 
         return Success(result);

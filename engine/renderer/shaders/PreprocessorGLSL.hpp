@@ -4,11 +4,12 @@
 
 #include <misc/ParserBase.hpp>
 
+#include <common/Errors.hpp>
+
 
 namespace Kiwi {
-    // Struct(instead of enum class) reserved for the future purposes
-    struct GlslPreprocessError {
-        enum EErrorKind {
+    namespace EShaderPreprocessError {
+        enum Type : u16 {
             NONE,
             INCORRECT_STAGE_NAME,
             END_OF_STAGE_MISSED,
@@ -17,21 +18,32 @@ namespace Kiwi {
             SHADER_VERSION_MISSING,
         };
 
-        EErrorKind kind = EErrorKind::NONE;
+        KIWI_NODISCARD String ToString(Type type);
+    }
+
+
+    template<>
+    struct ErrorDescription<EShaderPreprocessError::Type> {
+        static constexpr StringView ERROR_CATEGORY_NAME = "Shaders";
+
+        KIWI_NODISCARD static String Describe(u16 t) {
+            return EShaderPreprocessError::ToString(static_cast<EShaderPreprocessError::Type>(t));
+        }
     };
+
 
 
     class PreprocessorGLSL : protected Misc::ParserBase {
     public:
         using SourcesMap = HashMap<EShaderStage, String>;
-        using PreprocessResult = std::expected<SourcesMap, GlslPreprocessError>;
+        using PreprocessResult = Result<SourcesMap>;
         using PreprocessorProperties= std::pair<String, Vector<String>>;
 
     public:
         PreprocessorGLSL() = default;
 
     public:
-        KIWI_NODISCARD PreprocessResult Preprocess(const String& src);
+        KIWI_NODISCARD Result<SourcesMap> Preprocess(const String& src);
 
     private:
         KIWI_NODISCARD Opt<size_t> FindPreprocessorPosition(StringView token);

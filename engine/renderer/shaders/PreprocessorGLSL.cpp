@@ -11,16 +11,35 @@ namespace {
 
 
 namespace Kiwi {
-    PreprocessorGLSL::PreprocessResult PreprocessorGLSL::Preprocess(const String& src) {
+    String EShaderPreprocessError::ToString(Type type) {
+        switch (type) {
+        case INCORRECT_STAGE_NAME:
+            return "INCORRECT_STAGE_NAME";
+        case END_OF_STAGE_MISSED:
+            return "END_OF_STAGE_MISSED";
+        case TOKEN_ALREADY_DECLARED:
+            return "TOKEN_ALREADY_DECLARED";
+        case INCORRECT_PREPROCESSOR_PROPERTIES_COUNT:
+            return "INCORRECT_PREPROCESSOR_PROPERTIES_COUNT";
+        case SHADER_VERSION_MISSING:
+            return "SHADER_VERSION_MISSING";
+        default:
+            return "NONE";
+        }
+    }
+    
+    
+
+    Result<PreprocessorGLSL::SourcesMap> PreprocessorGLSL::Preprocess(const String& src) {
         Reset(src.ToStringView());
 
         SourcesMap result;
 
         auto&& [_, versionProps] = ExtractPreprocessor(VERSION_TOKEN_NAME).value_or(PreprocessorProperties{});
         if (versionProps.empty()) {
-            return std::unexpected(GlslPreprocessError{
-                .kind = GlslPreprocessError::SHADER_VERSION_MISSING
-            });
+            return Error::Create(
+                EShaderPreprocessError::SHADER_VERSION_MISSING
+            );
         }
 
         while (true) {
@@ -35,25 +54,25 @@ namespace Kiwi {
             }
 
             if (preprocProps.size() != 1) {
-                return std::unexpected(GlslPreprocessError{
-                    .kind = GlslPreprocessError::INCORRECT_PREPROCESSOR_PROPERTIES_COUNT
-                });
+                return Error::Create(
+                    EShaderPreprocessError::INCORRECT_PREPROCESSOR_PROPERTIES_COUNT
+                );
             }
 
             Opt<EShaderStage> shaderStageName = String::ParseShaderStage(preprocProps.at(0).ToStringView());
             if (!shaderStageName) {
-                return std::unexpected(GlslPreprocessError{
-                    .kind = GlslPreprocessError::INCORRECT_STAGE_NAME
-                });
+                return Error::Create(
+                    EShaderPreprocessError::INCORRECT_STAGE_NAME
+                );
             }
 
-            auto stageCodeBeginPos = JumpToNextLine();
-            auto stageCodeEndPos = FindPreprocessorPosition(STAGE_END_TOKEN_NAME).value_or(StringView::npos);
+            const size_t stageCodeBeginPos = JumpToNextLine();
+            const size_t stageCodeEndPos = FindPreprocessorPosition(STAGE_END_TOKEN_NAME).value_or(StringView::npos);
 
             if (stageCodeEndPos == StringView::npos) {
-                return std::unexpected(GlslPreprocessError{
-                    .kind = GlslPreprocessError::END_OF_STAGE_MISSED
-                });
+                return Error::Create(
+                    EShaderPreprocessError::END_OF_STAGE_MISSED
+                );
             }
 
             String& shaderStageCode = result[*shaderStageName];
@@ -65,7 +84,7 @@ namespace Kiwi {
             m_currPos = stageCodeEndPos + 1;
         }
 
-        return result;
+        return Success(result);
     }
 
     Opt<size_t> PreprocessorGLSL::FindPreprocessorPosition(StringView token) {
@@ -89,7 +108,7 @@ namespace Kiwi {
     }
 
     Opt<PreprocessorGLSL::PreprocessorProperties> PreprocessorGLSL::ExtractPreprocessor(StringView token) {
-        auto pos = FindPreprocessorPosition(token).value_or(StringView::npos);
+        size_t pos = FindPreprocessorPosition(token).value_or(StringView::npos);
         if (pos == StringView::npos) {
             return nullopt;
         }
@@ -101,14 +120,13 @@ namespace Kiwi {
         }
 
         pos += foundPreprocessor.Size() + 1;
-        auto c = m_src.substr(pos);
 
         size_t endOfLinePos = m_src.find_first_of(Globals::Misc::END_OF_LINE, pos);
         if (endOfLinePos == StringView::npos) {
             return nullopt;
         }
 
-        auto properties = Tokenize(pos, endOfLinePos);
+        Opt<Vector<String>> properties = Tokenize(pos, endOfLinePos);
 
         m_currPos = pos + 1;
         return std::make_pair(

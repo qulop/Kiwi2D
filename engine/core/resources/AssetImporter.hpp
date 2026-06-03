@@ -15,7 +15,7 @@ namespace Kiwi {
         KIWI_CREATE_OBJECT(AssetImporter, AObject)
 
     public:
-        KIWI_NODISCARD static Opt<AssetMetaData> OpenMetaData(const std::filesystem::path& assetPath);
+        KIWI_NODISCARD static Result<AssetMetaData> OpenMetaData(const std::filesystem::path& assetPath);
 
         KIWI_NODISCARD static std::shared_ptr<AAsset> ImportAsset(const AssetMetaData& assetMetaData);
 
