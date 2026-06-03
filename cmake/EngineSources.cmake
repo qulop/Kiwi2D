@@ -73,6 +73,7 @@ set(ENGINE_LIBRARY_SRC
     engine/common/Debug.cpp
     engine/common/UUID.cpp
     engine/common/Numeric.cpp
+    engine/common/Errors.cpp
     engine/common/types/String.cpp
 )
 
