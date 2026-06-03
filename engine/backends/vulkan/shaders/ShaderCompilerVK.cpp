@@ -2,7 +2,7 @@
 
 
 namespace Kiwi::Vulkan {
-    UniquePtr<AShader> ShaderCompilerVK::CompileFile(const File& sourceFile) {
+    std::shared_ptr<AShader> ShaderCompilerVK::CompileFile(const File& sourceFile) {
         const auto spirV = PreprocessAndCompileToSpirV(sourceFile, ESpirVEnvironment::Vulkan, ESpirVOptimizationLevel::PERFORMANCE);
         if (spirV) {
 

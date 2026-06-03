@@ -17,7 +17,7 @@ namespace Kiwi::Vulkan {
         KIWI_NODISCARD bool SetupDebugLayerCallback(const PFN_DebugCallback& debugCallback) override { return true; }
 
 
-        KIWI_NODISCARD EGraphicAPI GetUsedAPI() const override;
+        KIWI_NODISCARD ERenderAPI::Type GetUsedAPI() const override;
 
         KIWI_NODISCARD ARenderPipeline* GetPipeline() override;
 

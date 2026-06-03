@@ -4,7 +4,7 @@
 
 #include <common/Definitions.hpp>
 
-#include <renderer/pipeline/GraphicAPI.hpp>
+#include <renderer/pipeline/RenderAPI.hpp>
 
 
 namespace Kiwi {

@@ -16,7 +16,7 @@ namespace {
 
 
 namespace Kiwi::OpenGL {
-    UniquePtr<AShader> ShaderCompilerGL::CompileFile(const File& sourceFile) {
+    std::shared_ptr<AShader> ShaderCompilerGL::CompileFile(const File& sourceFile) {
         FileContent src = sourceFile.ReadAll().ValueOr(FileContent{});
         if (src.IsEmpty()) {
             return nullptr;
@@ -57,7 +57,7 @@ namespace Kiwi::OpenGL {
             glDetachShader(shaderProgramId, module.moduleID);
         }
 
-        return UniquePtr<ShaderGL>(new ShaderGL(shaderProgramId, std::move(shaderModules)));
+        return std::shared_ptr<ShaderGL>(new ShaderGL(shaderProgramId, std::move(shaderModules)));
     }
 
     bool ShaderCompilerGL::CheckCompilationOrLinkingResult(GLuint target, EShaderStage type) const {

@@ -23,8 +23,8 @@ namespace Kiwi::Vulkan {
         return m_pipeline != nullptr;
     }
 
-    EGraphicAPI RenderContextVK::GetUsedAPI() const {
-        return EGraphicAPI::Vulkan;
+    ERenderAPI::Type RenderContextVK::GetUsedAPI() const {
+        return ERenderAPI::Vulkan;
     }
 
     ARenderPipeline* RenderContextVK::GetPipeline() {

@@ -60,7 +60,7 @@ namespace Kiwi {
 
         Path projectRoot = m_cliOptions
             .Get<Path>(OPT_PROJECT_ROOT)
-            .value_or(std::filesystem::current_path());
+            .value_or(std::filesystem::path{});
 
         // Logger initialization
         LoggerInitInfo loggerInfo {
@@ -71,15 +71,15 @@ namespace Kiwi {
             return false;
         }
 
-        // Project initialization
-        // RegisterSubsystem<ProjectSubsystem>(projectRoot, false);
-        // if (!GetSubsystem<ProjectSubsystem>()->Init()) {
-        //     return false;
-        // }
-
         // Window initialization
         RegisterSubsystem<WindowSubsystem>();
         GetSubsystem<WindowSubsystem>()->Init();
+
+        // Project initialization
+        RegisterSubsystem<ProjectSubsystem>(projectRoot);
+        if (!GetSubsystem<ProjectSubsystem>()->Init()) {
+            return false;
+        }
 
         m_engine = MakeShared<Engine>();
         if (!m_engine->Init(m_cliOptions)) {

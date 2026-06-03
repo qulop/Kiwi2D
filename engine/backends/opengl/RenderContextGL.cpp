@@ -49,8 +49,8 @@ namespace Kiwi::OpenGL {
         return true;
     }
 
-    EGraphicAPI RenderContextGL::GetUsedAPI() const {
-        return EGraphicAPI::OpenGL;
+    ERenderAPI::Type RenderContextGL::GetUsedAPI() const {
+        return ERenderAPI::OpenGL;
     }
 
     bool RenderContextGL::SetupDebugLayerCallback(const PFN_DebugCallback &debugCallback) {

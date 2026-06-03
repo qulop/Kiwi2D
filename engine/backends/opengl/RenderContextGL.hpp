@@ -45,7 +45,7 @@ namespace Kiwi::OpenGL {
 
     public:
         KIWI_NODISCARD bool Init() override;
-        KIWI_NODISCARD EGraphicAPI GetUsedAPI() const override;
+        KIWI_NODISCARD ERenderAPI::Type GetUsedAPI() const override;
 
         KIWI_NODISCARD bool SetupDebugLayerCallback(const PFN_DebugCallback& debugCallback) override;
 

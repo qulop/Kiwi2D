@@ -2,7 +2,7 @@
 
 #include <core/Object.hpp>
 
-#include <renderer/pipeline/GraphicAPI.hpp>
+#include <renderer/pipeline/RenderAPI.hpp>
 
 #include <common/Errors.hpp>
 
@@ -13,7 +13,7 @@ namespace Kiwi {
 }
 
 namespace Kiwi::Editor {
-    template<EGraphicAPI API>
+    template<ERenderAPI::Type API>
     struct InitImGuiForAPI;
 
 

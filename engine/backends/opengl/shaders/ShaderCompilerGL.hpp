@@ -15,7 +15,7 @@ namespace Kiwi::OpenGL {
         using SourcesMap = typename PreprocessorGLSL::SourcesMap;
 
     public:
-        KIWI_NODISCARD UniquePtr<AShader> CompileFile(const File& sourceFile) override;
+        KIWI_NODISCARD std::shared_ptr<AShader> CompileFile(const File& sourceFile) override;
 
         KIWI_NODISCARD bool CheckCompilationOrLinkingResult(GLuint target, EShaderStage type) const;
 

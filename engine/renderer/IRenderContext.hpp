@@ -2,7 +2,7 @@
 
 #include <core/Object.hpp>
 
-#include <renderer/pipeline/GraphicAPI.hpp>
+#include <renderer/pipeline/RenderAPI.hpp>
 #include <renderer/pipeline/RenderPipeline.hpp>
 
 
@@ -28,7 +28,7 @@ namespace Kiwi {
 
         KIWI_NODISCARD virtual ARenderPipeline* GetPipeline() = 0;
 
-        KIWI_NODISCARD virtual EGraphicAPI GetUsedAPI() const = 0;
+        KIWI_NODISCARD virtual ERenderAPI::Type GetUsedAPI() const = 0;
 
         ~IRenderContext() override = default;
     };
