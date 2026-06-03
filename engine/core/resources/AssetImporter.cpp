@@ -59,16 +59,23 @@ namespace Kiwi {
     }
 
     std::shared_ptr<AAsset> AssetImporter::ImportShaderAsset(const AssetMetaData& assetMetaData) {
-        KIWI_MAYBE_UNUSED SharedPtr<Project> activeProject = GetSubsystem<ProjectSubsystem>()->GetActiveProject();
-        if (!activeProject) {
+        Result<File> shaderFile = File::OpenFileStatic(assetMetaData.assetPath, EFileOpenMode::WRITE);
+        if (!shaderFile) {
+            KIWI_LOG(ERROR, "Failed to import a shader asset, because provided path is invalid: {}",
+                assetMetaData.assetPath.string()
+            );
+
             return nullptr;
         }
 
+        std::unique_ptr<AShaderCompiler> shaderCompiler = AShaderCompiler::Create();
+        KIWI_ENSURE(shaderCompiler);
 
-        // AShaderCompiler::
+        if (std::shared_ptr<AShader> result = shaderCompiler->CompileFile(*shaderFile)) {
+            return std::static_pointer_cast<AAsset>(result);
+        }
 
-
-        KIWI_IGNORE_RETURN(assetMetaData);
+        KIWI_LOG(ERROR, "Failed to compile a shader");
         return nullptr;
     }
 
