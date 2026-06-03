@@ -36,7 +36,7 @@ namespace Kiwi {
 
         KIWI_NODISCARD std::array<std::filesystem::path, 4> GetDirectoryPaths() const;
 
-        KIWI_NODISCARD static Opt<ProjectConfig> ReadConfig(const std::filesystem::path& configPath);
+        KIWI_NODISCARD static Result<ProjectConfig> ReadConfig(const std::filesystem::path& configPath);
         KIWI_NODISCARD static ProjectConfig CreateNew(StringView projectName, const std::filesystem::path& projectPath);
     };
 
@@ -52,10 +52,10 @@ namespace Kiwi {
         static constexpr StringView CACHE_DIRECTORY_NAME = "DataCache";
 
     public:
-        KIWI_NODISCARD static std::shared_ptr<Project> FromConfig(const std::filesystem::path& projectPath, const ProjectConfig& config);
+        KIWI_NODISCARD static Result<std::shared_ptr<Project>> FromConfig(const std::filesystem::path& projectPath, const ProjectConfig& config);
 
-        KIWI_NODISCARD static std::shared_ptr<Project> Open(const std::filesystem::path& projectPath);
-        KIWI_NODISCARD static std::shared_ptr<Project> CreateNew(StringView projectName, const std::filesystem::path& projectPath);
+        KIWI_NODISCARD static Result<std::shared_ptr<Project>> Open(const std::filesystem::path& projectPath);
+        KIWI_NODISCARD static Result<std::shared_ptr<Project>> CreateNew(StringView projectName, const std::filesystem::path& projectPath);
 
 
     public:

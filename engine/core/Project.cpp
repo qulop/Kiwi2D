@@ -28,38 +28,52 @@ namespace Kiwi {
         };
     }
 
-    Opt<ProjectConfig> ProjectConfig::ReadConfig(const std::filesystem::path& configPath) {
-        if (!std::filesystem::exists(configPath) || !std::filesystem::is_regular_file(configPath)) {
-            return nullopt;
+   Result<ProjectConfig> ProjectConfig::ReadConfig(const std::filesystem::path& configPath) {
+        if (!std::filesystem::exists(configPath)) {
+            return Error::Create(
+                EErrorIO::DOES_NOT_EXIST,
+                String::Format("Specified path does not exist: {}", configPath.string())
+            );
+        }
+        if (!std::filesystem::is_regular_file(configPath)) {
+            return Error::Create(
+                EErrorIO::NOT_A_FILE,
+                String::Format("Specified path is not a regular file: {}", configPath.string())
+            );
         }
 
-        const String content = File::LoadFromFile(configPath, EFileOpenMode::READ | EFileOpenMode::BINARY)
-            .ValueOr(FileContent())
-            .GetAsString();
-        if (content.IsEmpty()) {
-            return nullopt;
-        }
+        if (const Result content = File::LoadFromFile(configPath, EFileOpenMode::READ | EFileOpenMode::BINARY)) {
+            nlohmann::json jsonConfig = nlohmann::json::parse(content.GetValue().GetAsString(), nullptr, false);
+            if (jsonConfig.is_discarded() || jsonConfig.empty()) {
+                return Error::Create(
+                    EGeneralError::PARSE_ERROR,
+                    String::Format("Failed to parse project config file: {}", configPath.string())
+                );
+            }
 
-        nlohmann::json jsonConfig = nlohmann::json::parse(content, nullptr, false);
-        if (jsonConfig.is_discarded() || jsonConfig.empty()) {
-            return nullopt;
-        }
+            ProjectConfig result;
+            if (const Opt<UUID> uuid = UUID::FromString(jsonConfig.value(Keys::PROJECT_UUID, std::string()))) {
+                result.projectUUID = *uuid;
+            }
+            else {
+                return Error::Create(
+                    EGeneralError::PARSE_ERROR,
+                    String::Format("Failed to parse project config file: {}", configPath.string())
+                );
+            }
 
-        ProjectConfig result;
-        if (const Opt<UUID> uuid = UUID::FromString(jsonConfig[Keys::PROJECT_UUID].get<std::string>())) {
-            result.projectUUID = *uuid;
+            result.projectName = jsonConfig.value(Keys::PROJECT_NAME, std::string());
+
+            result.engineDataDirectoryPath = jsonConfig.value(Keys::ENGINE_DATA_DIRECTORY, std::filesystem::path());
+            result.assetRegistryPath = jsonConfig.value(Keys::PROJECT_ASSET_REGISTRY, std::filesystem::path());
+            result.cacheDirectoryPath = jsonConfig.value(Keys::PROJECT_CACHE, std::filesystem::path());
+            result.assetsPath = jsonConfig.value(Keys::ASSETS_DIRECTORY, std::filesystem::path());
+
+            return Success(result);
         }
         else {
-            return nullopt;
+            return content.GetError();
         }
-
-        result.projectName = jsonConfig[Keys::PROJECT_NAME].get<std::string>();
-        result.engineDataDirectoryPath = jsonConfig[Keys::ENGINE_DATA_DIRECTORY].get<std::filesystem::path>();
-        result.assetRegistryPath = jsonConfig[Keys::PROJECT_ASSET_REGISTRY].get<std::filesystem::path>();
-        result.cacheDirectoryPath = jsonConfig[Keys::PROJECT_CACHE].get<std::filesystem::path>();
-        result.assetsPath = jsonConfig[Keys::ASSETS_DIRECTORY].get<std::filesystem::path>();
-
-        return result;
     }
 
     ProjectConfig ProjectConfig::CreateNew(StringView projectName, const std::filesystem::path& projectPath) {
@@ -78,14 +92,14 @@ namespace Kiwi {
 
 
 
-    std::shared_ptr<Project> Project::FromConfig(const std::filesystem::path& projectPath, const ProjectConfig& config) {
+    Result<std::shared_ptr<Project>> Project::FromConfig(const std::filesystem::path& projectPath, const ProjectConfig& config) {
         for (const auto& directory : config.GetDirectoryPaths()) {
             if (!std::filesystem::exists(directory)) {
                 std::error_code ec;
                 std::filesystem::create_directories(directory, ec);
 
                 if (ec) {
-                    return nullptr;
+                    return Error::Create(EGeneralError::CREATION_FAILED, ec.message());
                 }
 
                 ec.clear();
@@ -99,53 +113,53 @@ namespace Kiwi {
             project->m_config = config;
             project->m_assetManager = std::move(assetManager);
 
-            return project;
+            return Success(project);
         }
 
-        return nullptr;
+        return Error::Create(EGeneralError::CREATION_FAILED, "Failed to bind asset manager to the provided asset registry");
     }
 
-    std::shared_ptr<Project> Project::Open(const std::filesystem::path& projectPath) {
+    Result<std::shared_ptr<Project>> Project::Open(const std::filesystem::path& projectPath) {
         const bool isCorrectPath = std::filesystem::exists(projectPath) && std::filesystem::is_directory(projectPath);
         if (projectPath.empty() || !isCorrectPath) {
-            return nullptr;
+            return Error::Create(EErrorIO::INVALID_PATH, "Provided path either empty or is not correct(not exists or is directory)");
         }
 
         for (const std::filesystem::directory_entry& entry : std::filesystem::directory_iterator(projectPath)) {
             if (entry.is_regular_file() && entry.path().extension() == KIWI_PROJECT_EXTENSION) {
-                const Opt<ProjectConfig> config = ProjectConfig::ReadConfig(entry.path());
+                const Result<ProjectConfig> config = ProjectConfig::ReadConfig(entry.path());
                 if (!config) {
-                    return nullptr;
+                    return config.GetError();
                 }
 
                 return FromConfig(projectPath, *config);
             }
         }
 
-        return nullptr;
+        return Error::Create(EErrorIO::DOES_NOT_EXIST, "Failed to find a project file by the provided path");
     }
 
-    std::shared_ptr<Project> Project::CreateNew(StringView projectName, const std::filesystem::path& projectPath) {
+    Result<std::shared_ptr<Project>> Project::CreateNew(StringView projectName, const std::filesystem::path& projectPath) {
         if (projectPath.empty()) {
-            return nullptr;
+            return Error::Create(EErrorIO::INVALID_PATH, "Provided path is empty");
         }
 
         std::error_code ec;
         std::filesystem::create_directories(projectPath, ec);
         if (ec) {
-            return nullptr;
+            return Error::Create(EErrorIO::IO_ERROR, ec.message());
         }
 
         const ProjectConfig config = ProjectConfig::CreateNew(projectName, projectPath);
         const String projectConfigFileName = String::Format("{}{}", projectName, KIWI_PROJECT_EXTENSION);
 
-        const Result<void, EErrorIO> saveResult = File::SaveInFile(
+        const Result<void> saveResult = File::SaveInFile(
             projectPath / projectConfigFileName.ToStdString(),
             config.ToJSON().dump(4),
             true
         );
         if (!saveResult) {
-            return nullptr;
+            return saveResult.GetError();
         }
 
         return FromConfig(projectPath, config);
