@@ -17,10 +17,54 @@
 #endif
 
 
+namespace {
+    void BindStdStreamsToConsole() noexcept {
+        const HANDLE hOut = CreateFileW(
+            L"CONOUT$", GENERIC_READ | GENERIC_WRITE, 
+            FILE_SHARE_READ | FILE_SHARE_WRITE, nullptr, 
+            OPEN_EXISTING, 0, nullptr
+        );
+        if (hOut != INVALID_HANDLE_VALUE) {
+            SetStdHandle(STD_OUTPUT_HANDLE, hOut);
+            SetStdHandle(STD_ERROR_HANDLE, hOut);
+        }
+
+        const HANDLE hIn = CreateFileW(
+            L"CONIN$", GENERIC_READ | GENERIC_WRITE, 
+            FILE_SHARE_READ | FILE_SHARE_WRITE, nullptr, 
+            OPEN_EXISTING, 0, nullptr
+        );
+        if (hIn != INVALID_HANDLE_VALUE) {
+            SetStdHandle(STD_INPUT_HANDLE, hIn);
+        }
+
+        FILE* f = nullptr;
+        freopen_s(&f, "CONOUT$", "w", stdout);
+        freopen_s(&f, "CONOUT$", "w", stderr);
+        freopen_s(&f, "CONIN$", "r", stdin);
+
+        SetConsoleOutputCP(CP_UTF8);
+        SetConsoleCP(CP_UTF8);
+    }
+}
+
+
 
 namespace Kiwi::Platform {
     bool CreateDebugConsole() noexcept {
-        return (AttachConsole(ATTACH_PARENT_PROCESS) == TRUE) || CreateConsole();
+        const HANDLE stdOut = GetStdHandle(STD_OUTPUT_HANDLE);
+        const bool isStdOutAlreadyAttached = stdOut != nullptr && stdOut != INVALID_HANDLE_VALUE;
+        if (isStdOutAlreadyAttached) {
+            SetConsoleOutputCP(CP_UTF8);
+            return true;
+        }
+
+        if (AttachConsole(ATTACH_PARENT_PROCESS) == TRUE) {
+            BindStdStreamsToConsole();
+            return true;
+        }
+
+        return CreateConsole();
     }
 
     bool CreateConsole() noexcept {
@@ -28,13 +72,7 @@ namespace Kiwi::Platform {
             return false;
         }
 
-        // Redirect the STD strems to the new console
-        FILE* cOut;
-        freopen_s(&cOut, "CONOUT$", "w", stdout);
-
-        FILE* cErr;
-        freopen_s(&cErr, "CONOUT$", "w", stderr);
-
+        BindStdStreamsToConsole();
         return true;
     }
 
@@ -136,12 +174,39 @@ namespace Kiwi::Platform {
         return Path{ path };
     }
 
-    Path GetTemporaryDirectoryPath() noexcept {
+    Path GetPathToSysTemp() noexcept {
         wchar_t path[MAX_PATH];
         GetTempPathW(MAX_PATH, path);
 
         return Path{ path };
     }
+
+    String WideToUTF8(const wchar_t* wstr) noexcept {
+        if (!wstr || CWideString::StrLen(wstr) == 0) {
+            return String::EmptyString();
+        }
+
+        const i32 wideLen = static_cast<i32>(CWideString::StrLen(wstr));
+
+        const i32 bytesNeeded = ::WideCharToMultiByte(
+            CP_UTF8, 0, wstr, wideLen, nullptr, 0, nullptr, nullptr
+        );
+        if (bytesNeeded <= 0) {
+            return String::EmptyString();
+        }
+
+        String utf8(static_cast<size_t>(bytesNeeded), '\0');
+        
+        const i32 written = ::WideCharToMultiByte(
+            CP_UTF8, 0, wstr, wideLen, utf8.GetMutableRaw(), bytesNeeded, nullptr, nullptr
+        );
+        if (written <= 0) {
+            return String::EmptyString();
+        }
+
+        return utf8;
+    }
+
 
     void Breakpoint() {
         DebugBreak();
@@ -156,7 +221,7 @@ namespace Kiwi::Platform {
 namespace Kiwi::Platform::Memory {
     void* NativeHeapAlloc(size_t sz) {
         HANDLE heap = GetProcessHeap();
-        if (heap == BasicCast::UnsafeCast<HANDLE>(NULL)) {
+        if (heap == nullptr) {
             return nullptr;
         }
 
@@ -165,7 +230,7 @@ namespace Kiwi::Platform::Memory {
     
     void NativeHeapFree(void* addr, KIWI_MAYBE_UNUSED size_t sz) {
         HANDLE heap = GetProcessHeap();
-        if (heap == BasicCast::UnsafeCast<HANDLE>(NULL)) {
+        if (heap == nullptr) {
             return;
         }
 

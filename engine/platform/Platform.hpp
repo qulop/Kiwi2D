@@ -58,7 +58,9 @@ namespace Kiwi::Platform {
     KIWI_NODISCARD Vector<String> GetApplicationArguments() noexcept;
 
     KIWI_NODISCARD Path GetApplicationPath() noexcept;
-    KIWI_NODISCARD Path GetTemporaryDirectoryPath() noexcept;
+    KIWI_NODISCARD Path GetPathToSysTemp() noexcept;
+
+    KIWI_NODISCARD String WideToUTF8(const wchar_t* wstr) noexcept;
 
     void Breakpoint();
 
