@@ -4,133 +4,163 @@
 
 
 namespace Kiwi {
-    enum class EGeneralError {
-        NOT_FOUND,
-        OUT_OF_MEMORY,
-        IS_NOT_COMPLETE,
-        BUFF_OVERFLOW,
-        INITIALIZE_FAILED,
-        INVALID_ARGUMENT,
-        OUT_OF_RANGE,
-        BAD_FORMAT,
-        COMPILE_ERROR,
-        CREATE_FAIL
-    };
-
-    enum class EErrorIO {
-        UNKNOWN,
-        DOES_NOT_EXIST,
-        PERMISSION_DENIED,
-        INVALID_ARGUMENT,
-        TOO_MANY_OPEN_FILES,
-        IS_DIRECTORY,
-        NO_SPACE_LEFT,
-        UNEXPECTED_EOF,
-    };
-
-
-    template<>
-    struct CastTraits<EGeneralError> {
-        KIWI_NODISCARD KIWI_FORCEINLINE static String ToString(EGeneralError v) {
-            switch (v) {
-                case EGeneralError::NOT_FOUND:
-                    return "NOT_FOUND";
-                case EGeneralError::OUT_OF_MEMORY:
-                    return "OUT_OF_MEMORY";
-                case EGeneralError::IS_NOT_COMPLETE:
-                    return "IS_NOT_COMPLETE";
-                case EGeneralError::BUFF_OVERFLOW:
-                    return "OVERFLOW";
-                case EGeneralError::INITIALIZE_FAILED:
-                    return "INITIALIZE_FAILED";
-                default:
-                    std::unreachable();
-            }
-        }
-    };
-
-    template<>
-    struct CastTraits<EErrorIO> {
-        KIWI_NODISCARD KIWI_FORCEINLINE static String ToString(EErrorIO v) {
-            switch (v) {
-                case EErrorIO::DOES_NOT_EXIST:
-                    return "DOES_NOT_EXIST";
-                case EErrorIO::PERMISSION_DENIED:
-                    return "PERMISSION_DENIED";
-                case EErrorIO::INVALID_ARGUMENT:
-                    return "INVALID_ARGUMENT";
-                case EErrorIO::TOO_MANY_OPEN_FILES:
-                    return "TOO_MANY_OPEN_FILES";
-                case EErrorIO::IS_DIRECTORY:
-                    return "IS_DIRECTORY";
-                case EErrorIO::NO_SPACE_LEFT:
-                    return "NO_SPACE_LEFT";
-                default:
-                    return "UNKNOWN";
-            }
-        }
-
-        KIWI_NODISCARD KIWI_FORCEINLINE static EErrorIO FromPosixCodes(errno_t v) {
-            switch (v) {
-            case ENOENT:
-                return EErrorIO::DOES_NOT_EXIST;
-            case EACCES:
-                return EErrorIO::PERMISSION_DENIED;
-            case EINVAL:
-                return EErrorIO::INVALID_ARGUMENT;
-            case EMFILE:
-                return EErrorIO::TOO_MANY_OPEN_FILES;
-            case EISDIR:
-                return EErrorIO::IS_DIRECTORY;
-            case ENOSPC:
-                return EErrorIO::NO_SPACE_LEFT;
-            default:
-                return EErrorIO::UNKNOWN;
-            }
-        }
-    };
-
-
     template<Concepts::Enumeration EErrorEnum>
-    struct Error {
-        using ErrorEnumeration = EErrorEnum;
+    struct ErrorDescription;
 
-        EErrorEnum kind;
-        Opt<String> desc;
-    
-    public:
-        KIWI_NODISCARD static Error Create(ErrorEnumeration e, Opt<String> d = nullopt) {
-            return Error {
-                .kind = e,
-                .desc = d
-            };
+}
+
+
+namespace Kiwi::Concepts {
+    template<typename T>
+    concept ErrorEnumeration =
+        Enumeration<T> &&
+        std::same_as<std::underlying_type_t<T>, u16> &&
+        requires(T e) {
+            { ErrorDescription<T>::Describe(e) } -> SameAs<String>;
+        };
+}
+
+
+namespace Kiwi {
+    namespace EGeneralError {
+        enum Type : u16 {
+            UNKNOWN = 0,
+
+            // Initialization & State
+            INITIALIZE_FAILED,
+            CREATION_FAILED,
+            INCOMPLETE,
+            UNSUPPORTED,
+
+            // Memory & Data
+            OUT_OF_MEMORY,
+            OUT_OF_RANGE,
+            BUFF_OVERFLOW,
+            ALLOC_FAILED,
+
+            // Arguments & Input
+            INVALID_ARGUMENT,
+            INVALID_FORMAT,
+
+            // Resources & IO
+            NOT_FOUND,
+            ALREADY_EXISTS,
+            TIMEOUT,
+            COMPILE_ERROR,
+            PARSE_ERROR,
+        };
+
+
+        KIWI_NODISCARD String ToString(Type t);
+    }
+
+
+    namespace EErrorIO {
+        enum Type : u16 {
+            // Core states
+            UNKNOWN = 0,
+            IO_ERROR,
+
+            // Path
+            DOES_NOT_EXIST,
+            INVALID_PATH,
+            IS_DIRECTORY,
+            NOT_A_FILE,
+
+            // Access & Permission
+            PERMISSION_DENIED,
+            ACCESS_DENIED,
+
+            // Resource limits
+            TOO_MANY_OPEN_FILES,
+            NO_SPACE_LEFT,
+
+            // Data
+            INVALID_ARGUMENT,
+            UNEXPECTED_EOF,
+        };
+
+
+        KIWI_NODISCARD String ToString(Type t);
+        KIWI_NODISCARD Type FromPosixCode(errno_t v);
+    }
+
+
+    template<>
+    struct ErrorDescription<EGeneralError::Type> {
+        static constexpr StringView ERROR_CATEGORY_NAME = "General";
+
+        KIWI_NODISCARD static String Describe(u16 t) {
+            return EGeneralError::ToString(static_cast<EGeneralError::Type>(t));
         }
+    };
 
-        KIWI_NODISCARD static Error FromKind(ErrorEnumeration v)
-            requires requires(ErrorEnumeration e) { { Cast<ErrorEnumeration>::ToString(e) } -> std::convertible_to<String>; }
-        {
+    template<>
+    struct ErrorDescription<EErrorIO::Type> {
+        static constexpr StringView ERROR_CATEGORY_NAME = "IO";
+
+        KIWI_NODISCARD static String Describe(u16 t) {
+            return EErrorIO::ToString(static_cast<EErrorIO::Type>(t));
+        }
+    };
+
+
+
+    class Error {
+        using ErrorCategoryDescriptionFN = String(*)(u16);
+
+    public:
+        template<Concepts::ErrorEnumeration EErrorEnum>
+        KIWI_NODISCARD static Error Create(EErrorEnum err, Opt<String> desc = nullopt) {
             return {
-                .kind = v,
-                .desc = Cast<ErrorEnumeration>::ToString(v)
+                &ErrorDescription<EErrorEnum>::Describe,
+                static_cast<u16>(err),
+                std::move(desc)
             };
         }
 
     public:
-        KIWI_NODISCARD Opt<String> GetDescription() const {
+        Error() = default;
+
+
+        template<Concepts::ErrorEnumeration EErrorEnum>
+        KIWI_NODISCARD bool Is(EErrorEnum err) const {
+            return (categoryDescriptionFn == &ErrorDescription<EErrorEnum>::Describe) && (code == static_cast<u16>(err));
+        }
+
+        template<Concepts::ErrorEnumeration EErrorEnum>
+        KIWI_NODISCARD bool InCategory() const {
+            return categoryDescriptionFn == &ErrorDescription<EErrorEnum>::Describe;
+        }
+
+        template<Concepts::ErrorEnumeration EErrorEnum>
+        KIWI_NODISCARD Opt<EErrorEnum> GetAsEnum() const {
+            if (InCategory<EErrorEnum>()) {
+                return static_cast<EErrorEnum>(code);
+            }
+
+            return nullopt;
+        }
+
+        KIWI_NODISCARD String GetDescription() const {
             if (desc) {
                 return *desc;
             }
 
-            if constexpr (Concepts::CanBeCastedToString<EErrorEnum>) {
-                return Cast<ErrorEnumeration>::ToString();
-            }
-            else {
-                return nullopt;
-            }
+            return categoryDescriptionFn(code);
         }
 
-        KIWI_NODISCARD bool operator==(const Error& other) const noexcept {
-            return kind == other.kind && desc == other.desc;
-        }
+        KIWI_NODISCARD bool operator==(const Error& other) const noexcept = default;
+
+    private:
+        Error(ErrorCategoryDescriptionFN categoryDescFn, u16 code, Opt<String> desc) :
+            categoryDescriptionFn(categoryDescFn),
+            code(code),
+            desc(std::move(desc))
+        {}
+
+        ErrorCategoryDescriptionFN categoryDescriptionFn = nullptr;
+        u16 code = 0;
+        Opt<String> desc;
     };
 }

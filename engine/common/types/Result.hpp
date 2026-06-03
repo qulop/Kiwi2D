@@ -36,11 +36,11 @@ namespace Kiwi {
 
 
 
-    template<typename TSuccess, Concepts::Enumeration TErrEnum = EGeneralError>
+    template<typename TSuccess>
     class Result final {
     public:
         using SuccessType = TSuccess;
-        using ErrorEnumeration = TErrEnum;
+        using ErrorType = Error;
 
     public:
         constexpr Result() = default;
@@ -54,7 +54,7 @@ namespace Kiwi {
         {}
 
         template<typename E>
-            requires std::same_as<std::remove_cvref_t<E>, Error<ErrorEnumeration>>
+            requires std::same_as<std::remove_cvref_t<E>, Error>
         constexpr Result(E&& err) :
             m_result(std::unexpected(std::forward<E>(err)))
         {}
@@ -93,13 +93,13 @@ namespace Kiwi {
             return std::move(m_result).value();
         }
 
-        KIWI_NODISCARD constexpr Error<ErrorEnumeration> GetError() const& {
+        KIWI_NODISCARD constexpr Error GetError() const& {
             KIWI_ENSURE(HasError());
 
             return m_result.error();
         }
 
-        KIWI_NODISCARD constexpr Error<ErrorEnumeration> StealError() {
+        KIWI_NODISCARD constexpr Error StealError() {
             KIWI_ENSURE(HasError());
 
             return std::move(m_result).error();
@@ -133,16 +133,16 @@ namespace Kiwi {
         ~Result() = default;
 
     private:
-        std::expected<SuccessType, Error<ErrorEnumeration>> m_result;
+        std::expected<SuccessType, ErrorType> m_result;
     };
 
 
     // Partial specialization where is no success value(for `void` cases)
-    template<Concepts::Enumeration TErrEnum>
-    class Result<void, TErrEnum> final {
+    template<>
+    class Result<void> final {
     public:
         using SuccessType = void;
-        using ErrorEnumeration = TErrEnum;
+        using ErrorType = Error;
 
     public:
         constexpr Result() = default;
@@ -154,7 +154,7 @@ namespace Kiwi {
         {}
 
         template<typename E>
-            requires std::same_as<std::remove_cvref_t<E>, Error<ErrorEnumeration>>
+            requires std::same_as<std::remove_cvref_t<E>, Error>
         constexpr Result(E&& err) :
             m_result(std::unexpected(std::forward<E>(err)))
         {}
@@ -167,13 +167,13 @@ namespace Kiwi {
             return !HasValue();
         }
 
-        KIWI_NODISCARD constexpr Error<ErrorEnumeration> GetError() const& {
+        KIWI_NODISCARD constexpr Error GetError() const& {
             KIWI_ENSURE(HasError());
 
             return m_result.error();
         }
 
-        KIWI_NODISCARD constexpr Error<ErrorEnumeration> StealError() {
+        KIWI_NODISCARD constexpr Error StealError() {
             KIWI_ENSURE(HasError());
 
             return std::move(m_result).error();
@@ -186,6 +186,6 @@ namespace Kiwi {
         ~Result() = default;
 
     private:
-        std::expected<void, Error<ErrorEnumeration>> m_result;
+        std::expected<void, ErrorType> m_result;
     };
 }
