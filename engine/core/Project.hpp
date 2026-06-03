@@ -4,6 +4,8 @@
 
 #include <core/Object.hpp>
 
+#include <renderer/pipeline/RenderAPI.hpp>
+
 #include <nlohmann/json.hpp>
 
 
@@ -11,9 +13,18 @@ namespace Kiwi {
     class AssetManager;
 
 
+    struct ProjectCreateInfo {
+        StringView projectName;
+        std::filesystem::path projectPath;
+        ERenderAPI::Type renderAPI = ERenderAPI::NONE;
+    };
+
+
+
     struct ProjectConfig {
         String projectName;
         UUID projectUUID;
+        ERenderAPI::Type renderAPI = ERenderAPI::NONE;
 
         // Folders inside the `.kiwi`
         std::filesystem::path engineDataDirectoryPath;
@@ -30,6 +41,7 @@ namespace Kiwi {
             static constexpr StringView PROJECT_ASSET_REGISTRY = "AssetRegistryDirectory";
             static constexpr StringView PROJECT_CACHE = "DataCacheDirectory";
             static constexpr StringView ASSETS_DIRECTORY = "AssetsDirectory";
+            static constexpr StringView RENDERER = "Renderer";
         };
 
         KIWI_NODISCARD nlohmann::ordered_json ToJSON() const;
@@ -37,8 +49,10 @@ namespace Kiwi {
         KIWI_NODISCARD std::array<std::filesystem::path, 4> GetDirectoryPaths() const;
 
         KIWI_NODISCARD static Result<ProjectConfig> ReadConfig(const std::filesystem::path& configPath);
-        KIWI_NODISCARD static ProjectConfig CreateNew(StringView projectName, const std::filesystem::path& projectPath);
+        KIWI_NODISCARD static ProjectConfig CreateNew(const ProjectCreateInfo& createInfo);
     };
+
+
 
     class Project final : public AObject {
         KIWI_CREATE_OBJECT(Project, AObject)
@@ -55,7 +69,7 @@ namespace Kiwi {
         KIWI_NODISCARD static Result<std::shared_ptr<Project>> FromConfig(const std::filesystem::path& projectPath, const ProjectConfig& config);
 
         KIWI_NODISCARD static Result<std::shared_ptr<Project>> Open(const std::filesystem::path& projectPath);
-        KIWI_NODISCARD static Result<std::shared_ptr<Project>> CreateNew(StringView projectName, const std::filesystem::path& projectPath);
+        KIWI_NODISCARD static Result<std::shared_ptr<Project>> CreateNew(const ProjectCreateInfo& createInfo);
 
 
     public:

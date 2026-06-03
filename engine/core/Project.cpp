@@ -16,6 +16,7 @@ namespace Kiwi {
             { Keys::PROJECT_ASSET_REGISTRY, assetRegistryPath },
             { Keys::PROJECT_CACHE, cacheDirectoryPath },
             { Keys::ASSETS_DIRECTORY, assetsPath },
+            { Keys::RENDERER, ERenderAPI::ToString(renderAPI).ToStdString() },
         };
     }
 
@@ -68,6 +69,9 @@ namespace Kiwi {
             result.assetRegistryPath = jsonConfig.value(Keys::PROJECT_ASSET_REGISTRY, std::filesystem::path());
             result.cacheDirectoryPath = jsonConfig.value(Keys::PROJECT_CACHE, std::filesystem::path());
             result.assetsPath = jsonConfig.value(Keys::ASSETS_DIRECTORY, std::filesystem::path());
+            result.renderAPI = ERenderAPI::FromString(
+                jsonConfig.value(Keys::RENDERER, std::string())
+            );
 
             return Success(result);
         }
@@ -76,16 +80,18 @@ namespace Kiwi {
         }
     }
 
-    ProjectConfig ProjectConfig::CreateNew(StringView projectName, const std::filesystem::path& projectPath) {
+    ProjectConfig ProjectConfig::CreateNew(const ProjectCreateInfo& createInfo) {
         ProjectConfig result;
-        result.projectName = projectName;
+        result.projectName = createInfo.projectName;
         result.projectUUID = UUID::Generate();
 
-        result.engineDataDirectoryPath = projectPath / Project::ENGINE_DATA_DIRECTORY_NAME;
+        result.engineDataDirectoryPath = createInfo.projectPath / Project::ENGINE_DATA_DIRECTORY_NAME;
         result.assetRegistryPath = result.engineDataDirectoryPath / Project::ASSETS_REGISTRY_DIRECTORY_NAME;
         result.cacheDirectoryPath = result.engineDataDirectoryPath / Project::CACHE_DIRECTORY_NAME;
 
-        result.assetsPath = projectPath / Project::ASSETS_DIRECTORY_NAME;
+        result.assetsPath = createInfo.projectPath / Project::ASSETS_DIRECTORY_NAME;
+
+        result.renderAPI = createInfo.renderAPI;
 
         return result;
     }
@@ -139,22 +145,22 @@ namespace Kiwi {
         return Error::Create(EErrorIO::DOES_NOT_EXIST, "Failed to find a project file by the provided path");
     }
 
-    Result<std::shared_ptr<Project>> Project::CreateNew(StringView projectName, const std::filesystem::path& projectPath) {
-        if (projectPath.empty()) {
+    Result<std::shared_ptr<Project>> Project::CreateNew(const ProjectCreateInfo& createInfo) {
+        if (createInfo.projectPath.empty()) {
             return Error::Create(EErrorIO::INVALID_PATH, "Provided path is empty");
         }
 
         std::error_code ec;
-        std::filesystem::create_directories(projectPath, ec);
+        std::filesystem::create_directories(createInfo.projectPath, ec);
         if (ec) {
             return Error::Create(EErrorIO::IO_ERROR, ec.message());
         }
 
-        const ProjectConfig config = ProjectConfig::CreateNew(projectName, projectPath);
-        const String projectConfigFileName = String::Format("{}{}", projectName, KIWI_PROJECT_EXTENSION);
+        const ProjectConfig config = ProjectConfig::CreateNew(createInfo);
+        const String projectConfigFileName = String::Format("{}{}", createInfo.projectName, KIWI_PROJECT_EXTENSION);
 
         const Result<void> saveResult = File::SaveInFile(
-            projectPath / projectConfigFileName.ToStdString(),
+            createInfo.projectPath / projectConfigFileName.ToStdString(),
             config.ToJSON().dump(4),
             true
         );
@@ -162,7 +168,7 @@ namespace Kiwi {
             return saveResult.GetError();
         }
 
-        return FromConfig(projectPath, config);
+        return FromConfig(createInfo.projectPath, config);
     }
 
     const ProjectConfig& Project::GetConfig() const {
