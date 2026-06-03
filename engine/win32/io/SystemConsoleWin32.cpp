@@ -24,10 +24,17 @@ namespace Kiwi::Platform::Win32 {
             return;
         }
 
-        DWORD written = 0;
-        WriteConsoleA(hnd, str.data(),
-            BasicCast::To<DWORD>(str.size()), &written, nullptr
-        );
+        const char* data = str.data();
+        DWORD remaining = static_cast<DWORD>(str.size());
+        while (remaining > 0) {
+            DWORD written = 0;
+            if (!WriteFile(hnd, data, remaining, &written, nullptr) || written == 0) {
+                break;
+            }
+
+            data += written;
+            remaining -= written;
+        }
     }
 
     void SystemConsoleWin32::WriteLine(StringView str) {
@@ -51,7 +58,7 @@ namespace Kiwi::Platform::Win32 {
         char buffer[READ_BUFFER_SIZE];
         DWORD readCount = 0;
 
-        if (!ReadConsoleA(hnd, buffer, READ_BUFFER_SIZE, &readCount, nullptr)) {
+        if (!ReadConsoleA(hnd, buffer, READ_BUFFER_SIZE - 1, &readCount, nullptr)) {
             return nullopt;
         }
 
@@ -77,8 +84,8 @@ namespace Kiwi::Platform::Win32 {
 
     void SystemConsoleWin32::SetCursorPosition(u16 x, u16 y) {
         SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), {
-            BasicCast::To<SHORT>(x),
-            BasicCast::To<SHORT>(y)
+            static_cast<SHORT>(x),
+            static_cast<SHORT>(y)
         });
     }
 
@@ -114,6 +121,6 @@ namespace Kiwi::Platform::Win32 {
     }
 
     void SystemConsoleWin32::FlushInput() {
-        FlushConsoleInputBuffer(GetStdHandle(STD_OUTPUT_HANDLE));
+        FlushConsoleInputBuffer(GetStdHandle(STD_INPUT_HANDLE));
     }
 }
