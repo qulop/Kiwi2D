@@ -11,17 +11,14 @@ namespace Kiwi {
         KIWI_CREATE_OBJECT(ProjectSubsystem, ASubsystem)
 
     public:
-        explicit ProjectSubsystem(const std::filesystem::path& activeProjectPath, bool newProject);
+        explicit ProjectSubsystem(std::filesystem::path projectPath);
 
-    public:
         KIWI_NODISCARD bool Init() override;
-
         KIWI_NODISCARD std::shared_ptr<Project> GetActiveProject() const;
 
     private:
-        std::shared_ptr<Project> m_activeProject;
-
         std::filesystem::path m_activeProjectPath;
-        bool m_newProject = false;
+
+        std::shared_ptr<Project> m_activeProject;
     };
 }

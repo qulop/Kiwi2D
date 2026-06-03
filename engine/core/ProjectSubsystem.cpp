@@ -2,11 +2,12 @@
 
 #include <core/Project.hpp>
 
+#include <platform/Platform.hpp>
+
 
 namespace Kiwi {
-    ProjectSubsystem::ProjectSubsystem(const std::filesystem::path& activeProjectPath, const bool newProject) :
-        m_activeProjectPath(activeProjectPath),
-        m_newProject(newProject)
+    ProjectSubsystem::ProjectSubsystem(std::filesystem::path projectPath) :
+        m_activeProjectPath(std::move(projectPath))
     {}
 
     bool ProjectSubsystem::Init() {
@@ -14,25 +15,21 @@ namespace Kiwi {
             return false;
         }
 
-        if (!m_newProject) {
-            m_activeProject = *Project::Open(m_activeProjectPath);
+        if (m_activeProjectPath.empty()) {
+            m_activeProjectPath = Platform::GetApplicationPath();
+        }
+
+        if (Result<std::shared_ptr<Project>> project = Project::Open(m_activeProjectPath)) {
+            m_activeProject = *project;
+            return true;
         }
         else {
-            m_activeProject = *Project::CreateNew("Hui", m_activeProjectPath);
-        }
-
-        if (!m_activeProject) {
-            if (m_newProject) {
-                KIWI_LOG(CRITICAL, "Failed to create a new project by the path: {}", m_activeProjectPath.string());
-            }
-            else {
-                KIWI_LOG(CRITICAL, "Failed to open a project by the path: {}", m_activeProjectPath.string());
-            }
-
+            KIWI_LOG(CRITICAL, "Failed to open project by the path: {}. Reason: {}",
+                m_activeProjectPath.string(),
+                project.GetError().GetDescription()
+            );
             return false;
         }
-
-        return true;
     }
 
     std::shared_ptr<Project> ProjectSubsystem::GetActiveProject() const {
