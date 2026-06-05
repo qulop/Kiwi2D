@@ -40,7 +40,7 @@ namespace Kiwi {
                 .ToStringView()
         );
 
-        res.assetPath = mainIniFileSection[AssetMetaData::IniKeys::ASSET_TYPE].As<std::filesystem::path>();
+        res.assetPath = mainIniFileSection[AssetMetaData::IniKeys::ASSET_PATH].As<std::filesystem::path>();
 
         return Success(res);
     }
@@ -59,7 +59,7 @@ namespace Kiwi {
     }
 
     std::shared_ptr<AAsset> AssetImporter::ImportShaderAsset(const AssetMetaData& assetMetaData) {
-        Result<File> shaderFile = File::OpenFileStatic(assetMetaData.assetPath, EFileOpenMode::WRITE);
+        Result<File> shaderFile = File::OpenFileStatic(assetMetaData.assetPath, EFileOpenMode::READ);
         if (!shaderFile) {
             KIWI_LOG(ERROR, "Failed to import a shader asset, because provided path is invalid: {}",
                 assetMetaData.assetPath.string()
