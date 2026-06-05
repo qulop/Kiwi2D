@@ -128,7 +128,7 @@ namespace Kiwi {
     Result<std::shared_ptr<Project>> Project::Open(const std::filesystem::path& projectPath) {
         const bool isCorrectPath = std::filesystem::exists(projectPath) && std::filesystem::is_directory(projectPath);
         if (projectPath.empty() || !isCorrectPath) {
-            return Error::Create(EErrorIO::INVALID_PATH, "Provided path either empty or is not correct(not exists or is directory)");
+            return Error::Create(EErrorIO::INVALID_PATH, "Provided path either empty or is not correct(not exists or not a directory)");
         }
 
         for (const std::filesystem::directory_entry& entry : std::filesystem::directory_iterator(projectPath)) {

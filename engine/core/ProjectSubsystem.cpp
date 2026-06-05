@@ -16,7 +16,7 @@ namespace Kiwi {
         }
 
         if (m_activeProjectPath.empty()) {
-            m_activeProjectPath = Platform::GetApplicationPath();
+            m_activeProjectPath = Platform::GetApplicationPath().parent_path();
         }
 
         if (Result<std::shared_ptr<Project>> project = Project::Open(m_activeProjectPath)) {
