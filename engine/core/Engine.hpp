@@ -26,8 +26,8 @@ namespace Kiwi {
         ~Engine() override = default;
 
     private:
-        SharedPtr<AWindow> m_window;
-        SharedPtr<Renderer> m_renderer;
+        std::shared_ptr<AWindow>  m_window;
+        std::shared_ptr<Renderer> m_renderer;
 
         EngineConfig m_engineConfig;
 

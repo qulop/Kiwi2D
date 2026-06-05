@@ -7,15 +7,14 @@
 
 namespace Kiwi {
     Vector<CmdLineOption> EngineConfig::GetCommandLineOptions() {
-        return Vector<CmdLineOption> {
-            CmdLineOption(OPT_VSYNC_ENABLE, EOptionArgType::BOOL),
-            CmdLineOption(OPT_FULL_SCREEN, EOptionArgType::BOOL),
-            CmdLineOption(OPT_MAX_FPS, EOptionArgType::INT),
-            CmdLineOption(OPT_ENGINE_OUT_DIR, EOptionArgType::PATH),
-            CmdLineOption(OPT_APPLICATION_OUT_DIR, EOptionArgType::PATH),
-            CmdLineOption(OPT_PROJECT_ROOT, EOptionArgType::PATH),
-            CmdLineOption(OPT_WINDOW_NAME, EOptionArgType::STRING),
-            CmdLineOption(OPT_LOG_NAME, EOptionArgType::STRING)
+        return Vector {
+            CmdLineOption(CmdLine::VSYNC_ENABLE, EOptionArgType::BOOL),
+            CmdLineOption(CmdLine::FULL_SCREEN, EOptionArgType::BOOL),
+            CmdLineOption(CmdLine::MAX_FPS, EOptionArgType::INT),
+            CmdLineOption(CmdLine::ENGINE_OUT_DIR, EOptionArgType::PATH),
+            CmdLineOption(CmdLine::APPLICATION_OUT_DIR, EOptionArgType::PATH),
+            CmdLineOption(CmdLine::WINDOW_NAME, EOptionArgType::STRING),
+            CmdLineOption(CmdLine::LOG_NAME, EOptionArgType::STRING)
         };
     }
 

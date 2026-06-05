@@ -55,12 +55,8 @@ namespace Kiwi {
         }
 
         s_applicationOutputDirectory = m_cliOptions
-            .Get<Path>(OPT_APPLICATION_OUT_DIR)
+            .Get<Path>(CmdLine::APPLICATION_OUT_DIR)
             .value_or(Platform::GetPathToSysTemp());
-
-        Path projectRoot = m_cliOptions
-            .Get<Path>(OPT_PROJECT_ROOT)
-            .value_or(std::filesystem::path{});
 
         // Logger initialization
         LoggerInitInfo loggerInfo {
@@ -75,11 +71,6 @@ namespace Kiwi {
         RegisterSubsystem<WindowSubsystem>();
         GetSubsystem<WindowSubsystem>()->Init();
 
-        // Project initialization
-        RegisterSubsystem<ProjectSubsystem>(projectRoot);
-        if (!GetSubsystem<ProjectSubsystem>()->Init()) {
-            return false;
-        }
 
         m_engine = MakeShared<Engine>();
         if (!m_engine->Init(m_cliOptions)) {

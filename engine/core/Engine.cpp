@@ -11,17 +11,18 @@
 
 namespace Kiwi {
     bool Engine::Init(const ProgramOptions& opts) {
-        m_vsyncEnable = opts.Get<bool>(OPT_VSYNC_ENABLE).value_or(m_vsyncEnable);
+        m_vsyncEnable = opts.Get<bool>(CmdLine::VSYNC_ENABLE).value_or(m_vsyncEnable);
 
-        auto windowSubsystem = GetSubsystem<WindowSubsystem>();
+        std::shared_ptr<WindowSubsystem> windowSubsystem = GetSubsystem<WindowSubsystem>();
 
-        String wndTitle = opts.Get<String>(OPT_WINDOW_NAME).value_or(EngineConfig::ENGINE_NAME);
+        String wndTitle = opts.Get<String>(CmdLine::WINDOW_NAME).value_or(EngineConfig::ENGINE_NAME);
         if (!windowSubsystem->CreateMainWindow(wndTitle.ToStringView())) {
             return false;
         }
 
-        windowSubsystem->GetMainWindow()->SetVSyncEnable(m_vsyncEnable);
-        windowSubsystem->GetMainWindow()->MaximizeWindow(true);
+        m_window = windowSubsystem->GetMainWindow();
+        m_window->SetVSyncEnable(m_vsyncEnable);
+        m_window->MaximizeWindow(true);
 
         m_renderer = MakeShared<Renderer>();
         if (!m_renderer->Init()) {
