@@ -167,7 +167,7 @@ namespace Kiwi::Platform {
     }
 
     Path GetApplicationPath() noexcept {
-        TCHAR* path = nullptr;
+        TCHAR path[MAX_PATH];
         GetModuleFileName(nullptr, path, MAX_PATH);
         KIWI_ASSERT(GetLastError() != ERROR_INSUFFICIENT_BUFFER, "Failed to get application path buffer: ERROR_INSUFFICIENT_BUFFER");
 
