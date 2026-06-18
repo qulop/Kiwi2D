@@ -8,6 +8,8 @@
 
 #include <renderer/Texture.hpp>
 
+#include <input/InputSubsystem.hpp>
+
 
 #ifdef KIWI_WIN32_USED
     #define GLFW_EXPOSE_NATIVE_WIN32
@@ -31,7 +33,16 @@ namespace Kiwi {
 
         // TODO: resizability should be configurable from the command line
 	    glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
-	    glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
+
+	    // Request an OpenGL 4.6 Core Profile context (no vendor-specific extensions).
+	    glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_API);
+	    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+	    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
+	    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+	    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GLFW_TRUE);
+	#ifdef KIWI_DEBUG_BUILD
+	    glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GLFW_TRUE);
+	#endif
 
 	    GLFWmonitor* monitor = MapToGLFWmonitor(display);
         if (!monitor) {
@@ -49,6 +60,10 @@ namespace Kiwi {
 	    }
 
         glfwSetWindowPos(m_window, monitorX, monitorY);
+
+	    // The OpenGL context must be current on this thread before GLAD can load
+	    // function pointers in RenderContextGL::Init().
+	    glfwMakeContextCurrent(m_window);
 
 	    glfwSetWindowUserPointer(m_window, this);
 	    SetupCallbacks();
@@ -199,48 +214,28 @@ namespace Kiwi {
 	}
 
 	void GLFWWindow::SetupCallbacks() {
-        // TODO
-        // glfwSetErrorCallback([](int err, const char* desc) {
-        //     KIWI_CTX_LOG(ERROR, "The error code: {}, description: {}", err, desc);
-        // });
+        glfwSetErrorCallback([](int err, const char* desc) {
+            KIWI_LOG(ERROR, "GLFW error code: {}, description: {}", err, desc);
+        });
 
-		// glfwSetKeyCallback(m_window, [](GLFWwindow* glfwWindow, int key, int scancode, int action, int mods) {
-  //           auto* window = (GLFWWindow*)glfwGetWindowUserPointer(glfwWindow);
-  //           auto eventSubsystem = window->GetSubsystem<EventSubsystem>();
-  //
-		// 	if (action == GLFW_PRESS) {
-  //               eventSubsystem->Excite(KeyboardKeyPressed{ key, action });
-  //           }
-  //           else {
-  //               eventSubsystem->Excite(KeyboardKeyReleased{ key, action });
-  //           }
-  //       });
-  //
-  //
-		// glfwSetMouseButtonCallback(m_window, [](GLFWwindow* glfwWindow, int button, int action, int mods) {
-		//     auto* window = (GLFWWindow*)glfwGetWindowUserPointer(glfwWindow);
-  //           auto eventSubsystem = window->GetSubsystem<EventSubsystem>();
-  //
-		// 	if (action == GLFW_PRESS) {
-  //               eventSubsystem->Excite(MousePressEvent{ button });
-  //           }
-		// 	else {
-  //               eventSubsystem->Excite(MouseReleaseEvent{ button });
-  //           }
-		// });
-  //
-  //
-		// glfwSetCursorPosCallback(m_window, [](GLFWwindow* glfwWindow, double xpos, double ypos) {
-  //           auto eventSubsystem = ((GLFWWindow*)glfwGetWindowUserPointer(glfwWindow))->GetSubsystem<EventSubsystem>();
-  //
-  //           eventSubsystem->Excite(MouseMoveEvent{ xpos, ypos });
-  //       });
-  //
-  //
-		// glfwSetScrollCallback(m_window, [](GLFWwindow* glfwWindow, double xpos, double ypos) {
-		//     auto eventSubsystem = ((GLFWWindow*)glfwGetWindowUserPointer(glfwWindow))->GetSubsystem<EventSubsystem>();
-  //
-  //           eventSubsystem->Excite(MouseScrollEvent{ xpos, ypos });
-  //       });
+        glfwSetKeyCallback(m_window, [](GLFWwindow* glfwWindow, int key, int scancode, int action, int mods) {
+            auto inputSubsystem = GetSubsystem<InputSubsystem>();
+            inputSubsystem->UpdateKeyState(key, action);
+        });
+
+        glfwSetCharCallback(m_window, [](GLFWwindow* glfwWindow, unsigned int codepoint) {
+            auto inputSubsystem = GetSubsystem<InputSubsystem>();
+            inputSubsystem->UpdateCharInput(codepoint);
+        });
+
+        glfwSetMouseButtonCallback(m_window, [](GLFWwindow* glfwWindow, int button, int action, int mods) {
+            auto inputSubsystem = GetSubsystem<InputSubsystem>();
+            inputSubsystem->UpdateMouseState(button, action);
+        });
+
+        glfwSetCursorPosCallback(m_window, [](GLFWwindow* glfwWindow, double xpos, double ypos) {
+            auto inputSubsystem = GetSubsystem<InputSubsystem>();
+            inputSubsystem->UpdateMousePosition(Vec2{ static_cast<f32>(xpos), static_cast<f32>(ypos) });
+        });
 	}
 }

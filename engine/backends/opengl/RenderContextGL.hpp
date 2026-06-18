@@ -49,6 +49,13 @@ namespace Kiwi::OpenGL {
 
         KIWI_NODISCARD bool SetupDebugLayerCallback(const PFN_DebugCallback& debugCallback) override;
 
+        KIWI_NODISCARD ARenderPipeline* GetPipeline() override;
+
+        void SetViewport(i32 x, i32 y, u32 width, u32 height) override;
+        void SetClearColor(const Vec4& color) override;
+        void Clear() override;
+        void DrawIndexed(const SharedPtr<IVertexArray>& vertexArray, u32 indexCount) override;
+
         KIWI_NODISCARD constexpr EOpenGLLoaderVendor GetLoaderVendor() const;
 
         KIWI_NODISCARD bool CheckExtensionForSupport(const char* ext) const;
@@ -61,6 +68,7 @@ namespace Kiwi::OpenGL {
     private:
         bool m_contextLoaded = false;
         HashMap<EOpenGLExtensions, ExtensionSupportInfo> m_extensions;
+        SharedPtr<ARenderPipeline> m_pipeline;
     };
 }
 

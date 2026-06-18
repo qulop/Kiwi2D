@@ -38,6 +38,9 @@ namespace Kiwi {
     bool Engine::Update() {
         // KIWI_PROFILE_ZONE_NAME("Engine::Update");
 
+        // Poll input + present the frame. The app layer is responsible for clearing
+        // and drawing (Renderer::BeginScene clears) before this runs; see
+        // Application::Run() which calls the app's frame hooks around this.
         return m_window->Update();
     }
 

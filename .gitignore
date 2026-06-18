@@ -1,4 +1,7 @@
 CMakeSettings.json
+.claude/
+claude/
+.cache/
 
 # IDE's folders
 build/

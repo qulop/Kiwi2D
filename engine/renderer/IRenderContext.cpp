@@ -1,10 +1,10 @@
 #include "IRenderContext.hpp"
 
-#include <backends/vulkan/RenderContextVK.hpp>
+#include <backends/opengl/RenderContextGL.hpp>
 
 
 namespace Kiwi {
     SharedPtr<IRenderContext> IRenderContext::Create() {
-        return MakeShared<Vulkan::RenderContextVK>();
+        return MakeShared<OpenGL::RenderContextGL>();
     }
 }

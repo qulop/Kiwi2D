@@ -64,6 +64,8 @@ namespace Kiwi {
     public:
         KIWI_NODISCARD static std::shared_ptr<ATexture2D> Create(const ImageDesc& desc);
 
+        virtual void Bind(u32 slot = 0) const = 0;
+
 
         ~ATexture2D() override = default;
     };

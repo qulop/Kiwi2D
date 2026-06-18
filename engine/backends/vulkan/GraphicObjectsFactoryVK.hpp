@@ -12,6 +12,12 @@ namespace Kiwi::Vulkan {
 
         KIWI_NODISCARD SharedPtr<AShaderCompiler> CreateShaderCompiler() const override;
 
+        KIWI_NODISCARD SharedPtr<IVertexArray> CreateVertexArray() const override;
+
+        KIWI_NODISCARD SharedPtr<IVertexBuffer> CreateVertexBuffer(u32 size) const override;
+
+        KIWI_NODISCARD SharedPtr<IIndexBuffer> CreateIndexBuffer(u32* indices, u32 count) const override;
+
         ~GraphicObjectsFactoryVK() override = default;
     };
 }

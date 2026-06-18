@@ -21,12 +21,24 @@ set(ENGINE_LIBRARY_SRC
     engine/platform/window/GLFWWindow.cpp
     engine/platform/PlatformVars.cpp
 
+    engine/input/InputSubsystem.cpp
+
+    # --- BEGIN: Scene / ECS ---
+    engine/scene/Entity.cpp
+    engine/scene/Scene.cpp
+    engine/scene/SceneSerializer.cpp
+    engine/scene/components/Transform2D.cpp
+    # --- END ---
+
     # --- BEGIN: OpenGL backend ---
     engine/backends/opengl/RenderContextGL.cpp
     engine/backends/opengl/GraphicObjectsFactoryGL.cpp
     engine/backends/opengl/TextureGL.cpp
     engine/backends/opengl/shaders/ShaderGL.cpp
     engine/backends/opengl/shaders/ShaderCompilerGL.cpp
+    engine/backends/opengl/buffers/VertexBufferGL.cpp
+    engine/backends/opengl/buffers/IndexBufferGL.cpp
+    engine/backends/opengl/buffers/VertexArrayGL.cpp
     # --- END ---
 
     # --- BEGIN: Vulkan backend ---
@@ -50,6 +62,7 @@ set(ENGINE_LIBRARY_SRC
 
     # --- BEGIN: Renderer ---
     engine/renderer/Renderer.cpp
+    engine/renderer/Camera2D.cpp
     engine/renderer/IRenderContext.cpp
     engine/renderer/IGraphicObjectsFactory.cpp
     engine/renderer/pipeline/RenderPipeline.cpp

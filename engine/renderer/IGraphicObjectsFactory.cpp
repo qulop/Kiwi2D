@@ -7,6 +7,6 @@
 
 namespace Kiwi {
     SharedPtr<IGraphicObjectsFactory> IGraphicObjectsFactory::Create() {
-        return MakeShared<Vulkan::GraphicObjectsFactoryVK>();
+        return MakeShared<OpenGL::GraphicObjectsFactoryGL>();
     }
 }

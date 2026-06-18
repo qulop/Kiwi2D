@@ -35,6 +35,7 @@ namespace Kiwi {
 
     public:
         KIWI_NODISCARD virtual std::shared_ptr<AShader> CompileFile(const File& sourceFile) = 0;
+        KIWI_NODISCARD virtual std::shared_ptr<AShader> CompileSource(const String& src) = 0;
 
         ~AShaderCompiler() override = default;
     };

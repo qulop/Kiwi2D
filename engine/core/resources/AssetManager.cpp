@@ -3,6 +3,9 @@
 #include <core/resources/Asset.hpp>
 #include <core/resources/AssetImporter.hpp>
 
+#include <renderer/Texture.hpp>
+#include <renderer/shaders/Shader.hpp>
+
 
 namespace Kiwi {
    bool AssetManager::BindToRegistry(const std::filesystem::path& registryPath) {
@@ -56,10 +59,55 @@ namespace Kiwi {
         if (IsAssetLoaded(assetUUID)) {
             return m_loadedAssets.at(assetUUID);   
         }
-        else {
-            const AssetMetaData& assetMetaData = m_registry.at(assetUUID);
-            return AssetImporter::ImportAsset(assetMetaData);
+
+        const AssetMetaData& assetMetaData = m_registry.at(assetUUID);
+        std::shared_ptr<AAsset> imported = AssetImporter::ImportAsset(assetMetaData);
+        if (imported) {
+            m_loadedAssets[assetUUID] = imported;
         }
+
+        return imported;
+    }
+
+    std::shared_ptr<ATexture2D> AssetManager::GetTexture(const std::filesystem::path& path) {
+        const UUID uuid = ResolveUUIDByPath(path);
+        if (uuid.IsEmpty()) {
+            KIWI_CTX_LOG(ERROR, "No texture asset registered for path: {}", path.string());
+            return nullptr;
+        }
+
+        return GetAsset<ATexture2D>(uuid);
+    }
+
+    std::shared_ptr<AShader> AssetManager::GetShader(const std::filesystem::path& path) {
+        const UUID uuid = ResolveUUIDByPath(path);
+        if (uuid.IsEmpty()) {
+            KIWI_CTX_LOG(ERROR, "No shader asset registered for path: {}", path.string());
+            return nullptr;
+        }
+
+        return GetAsset<AShader>(uuid);
+    }
+
+    UUID AssetManager::ResolveUUIDByPath(const std::filesystem::path& path) const {
+        std::error_code ec;
+        const std::filesystem::path target = std::filesystem::weakly_canonical(path, ec);
+
+        for (const auto& [uuid, metaData] : m_registry) {
+            std::error_code entryEc;
+            const std::filesystem::path candidate = std::filesystem::weakly_canonical(metaData.assetPath, entryEc);
+
+            if (!ec && !entryEc) {
+                if (candidate == target) {
+                    return uuid;
+                }
+            }
+            else if (metaData.assetPath == path) {
+                return uuid;
+            }
+        }
+
+        return UUID{};
     }
 }
 

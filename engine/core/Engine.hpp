@@ -23,6 +23,9 @@ namespace Kiwi {
 
         KIWI_NODISCARD bool IsRunning() const;
 
+        KIWI_NODISCARD SharedPtr<Renderer> GetRenderer() const { return m_renderer; }
+        KIWI_NODISCARD SharedPtr<AWindow> GetWindow() const { return m_window; }
+
         ~Engine() override = default;
 
     private:

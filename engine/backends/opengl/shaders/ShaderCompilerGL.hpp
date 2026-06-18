@@ -16,6 +16,7 @@ namespace Kiwi::OpenGL {
 
     public:
         KIWI_NODISCARD std::shared_ptr<AShader> CompileFile(const File& sourceFile) override;
+        KIWI_NODISCARD std::shared_ptr<AShader> CompileSource(const String& src) override;
 
         KIWI_NODISCARD bool CheckCompilationOrLinkingResult(GLuint target, EShaderStage type) const;
 

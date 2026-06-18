@@ -4,6 +4,8 @@
 #include <common/meta/TypeTraits.hpp>
 #include <common/cast/Cast.hpp>
 
+#include <renderer/buffers/IVertexArray.hpp>
+
 #include <glad/glad.h>
 #include <glfw/glfw3.h>
 
@@ -46,6 +48,12 @@ namespace Kiwi::OpenGL {
             isSupported = isExtensionSupported;
         }
 
+        // 2D rendering relies on straight-alpha blending; depth testing is not needed.
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+        m_pipeline = MakeShared<ARenderPipeline>();
+
         return true;
     }
 
@@ -55,6 +63,31 @@ namespace Kiwi::OpenGL {
 
     bool RenderContextGL::SetupDebugLayerCallback(const PFN_DebugCallback &debugCallback) {
         return true;
+    }
+
+    ARenderPipeline* RenderContextGL::GetPipeline() {
+        return m_pipeline.get();
+    }
+
+    void RenderContextGL::SetViewport(i32 x, i32 y, u32 width, u32 height) {
+        glViewport(x, y, static_cast<GLsizei>(width), static_cast<GLsizei>(height));
+    }
+
+    void RenderContextGL::SetClearColor(const Vec4& color) {
+        glClearColor(color.x, color.y, color.z, color.w);
+    }
+
+    void RenderContextGL::Clear() {
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    }
+
+    void RenderContextGL::DrawIndexed(const SharedPtr<IVertexArray>& vertexArray, u32 indexCount) {
+        if (!vertexArray || indexCount == 0) {
+            return;
+        }
+
+        vertexArray->Bind();
+        glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(indexCount), GL_UNSIGNED_INT, nullptr);
     }
 
     bool RenderContextGL::CheckExtensionForSupport(const char *ext) const {

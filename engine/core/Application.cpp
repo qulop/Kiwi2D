@@ -15,6 +15,8 @@
 
 #include <misc/WindowSubsystem.hpp>
 
+#include <input/InputSubsystem.hpp>
+
 
 
 namespace Kiwi {
@@ -71,12 +73,18 @@ namespace Kiwi {
         RegisterSubsystem<WindowSubsystem>();
         GetSubsystem<WindowSubsystem>()->Init();
 
+        // Input initialization (must precede window creation so GLFW callbacks can route events)
+        RegisterSubsystem<InputSubsystem>();
+        GetSubsystem<InputSubsystem>()->Init();
+
 
         m_engine = MakeShared<Engine>();
         if (!m_engine->Init(m_cliOptions)) {
             KIWI_CTX_LOG(ERROR, "Failed to initialize the engine instance");
             return false;
         }
+
+        Time::SetInitializationPoint();
 
         m_isInitialized.store(true);
         return true;
@@ -91,7 +99,9 @@ namespace Kiwi {
 
         BeforeRun();
 
-        while (true) {
+        while (m_isRunning.load(MEM_ORDER_ACQUIRE)) {
+            Time::UpdateTime();
+
             BeforeFrameBegin();
 
             this->Update();
@@ -109,6 +119,6 @@ namespace Kiwi {
     }
 
     void Application::Stop() {
-        // m_isRunning.store(false, MEM_ORDER_SEQ_CST);
+        m_isRunning.store(false, MEM_ORDER_SEQ_CST);
     }
 }

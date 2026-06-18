@@ -21,6 +21,11 @@ namespace Kiwi::Vulkan {
 
         KIWI_NODISCARD ARenderPipeline* GetPipeline() override;
 
+        void SetViewport(i32 x, i32 y, u32 width, u32 height) override {}
+        void SetClearColor(const Vec4& color) override {}
+        void Clear() override {}
+        void DrawIndexed(const SharedPtr<IVertexArray>& vertexArray, u32 indexCount) override {}
+
         ~RenderContextVK() override = default;
 
     private:

@@ -32,8 +32,12 @@ namespace Kiwi {
 
         ~Application() override = default;
 
+    protected:
+        KIWI_NODISCARD SharedPtr<Engine> GetEngine() const { return m_engine; }
+
     private:
         std::atomic<bool> m_isInitialized = false;
+        std::atomic<bool> m_isRunning = true;
 
         static Path s_applicationOutputDirectory;
 

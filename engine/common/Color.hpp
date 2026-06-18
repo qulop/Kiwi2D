@@ -64,6 +64,25 @@ namespace Kiwi {
             return BasicCast::To<Tx>(255);
         }
 
+    private:
+        // These constexpr helpers are defined before the constructors that use them:
+        // a constexpr function must be defined prior to its use in a constant
+        // expression (enforced by Clang), otherwise the COLOR_* constants below fail.
+        template<typename Tx>
+        KIWI_NODISCARD constexpr VecType ClampColorValues(Tx r, Tx g, Tx b, Tx a) const noexcept {
+            auto min = static_cast<Tx>(0);
+            auto max = GetMaxNumericValueForType<Tx>();
+
+            return VecType(std::clamp(r, min, max),
+                           std::clamp(g, min, max),
+                           std::clamp(b, min, max),
+                           std::clamp(a, min, max));
+        }
+
+        KIWI_NODISCARD constexpr i32 FloatColorValueToByte(f32 value) const noexcept {
+            return BasicCast::To<i32>(255 * value);
+        }
+
     public:
         explicit constexpr Color(VecType color) :
             m_color(std::move(color)) 
@@ -140,23 +159,6 @@ namespace Kiwi {
         KIWI_NODISCARD constexpr i32 AlphaAsBytes() const noexcept {
             return FloatColorValueToByte(m_color.a);
         }
-
-    private:
-        template<typename Tx>
-        KIWI_NODISCARD constexpr VecType ClampColorValues(Tx r, Tx g, Tx b, Tx a) const noexcept {
-            auto min = static_cast<Tx>(0);
-            auto max = GetMaxNumericValueForType<Tx>();
-
-            return VecType(std::clamp(r, min, max),
-                           std::clamp(g, min, max),
-                           std::clamp(b, min, max),
-                           std::clamp(a, min, max));
-        }
-
-        KIWI_NODISCARD constexpr i32 FloatColorValueToByte(f32 value) const noexcept {
-            return BasicCast::To<i32>(255 * value);
-        }
-
 
     private:
         VecType m_color;

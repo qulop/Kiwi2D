@@ -13,14 +13,24 @@ namespace Kiwi::Editor {
         }
 
         RegisterSubsystem<ImGuiSubsystem>();
-        auto imGuiSubsystem = GetSubsystem<ImGuiSubsystem>();
-        if (!imGuiSubsystem->Init()) {
+        m_imGuiSubsystem = GetSubsystem<ImGuiSubsystem>();
+        if (!m_imGuiSubsystem->Init()) {
             return false;
         }
 
-
-
+        return true;
     }
 
+    void Editor::BeforeFrameBegin() {
+        if (m_imGuiSubsystem) {
+            m_imGuiSubsystem->BeginFrame();
+        }
+    }
+
+    void Editor::BeforeFrameEnd() {
+        if (m_imGuiSubsystem) {
+            m_imGuiSubsystem->EndFrame();
+        }
+    }
 }
 

@@ -17,4 +17,16 @@ namespace Kiwi::Vulkan {
     SharedPtr<AShaderCompiler> GraphicObjectsFactoryVK::CreateShaderCompiler() const {
         return nullptr;
     }
+
+    SharedPtr<IVertexArray> GraphicObjectsFactoryVK::CreateVertexArray() const {
+        return nullptr;
+    }
+
+    SharedPtr<IVertexBuffer> GraphicObjectsFactoryVK::CreateVertexBuffer(u32 size) const {
+        return nullptr;
+    }
+
+    SharedPtr<IIndexBuffer> GraphicObjectsFactoryVK::CreateIndexBuffer(u32* indices, u32 count) const {
+        return nullptr;
+    }
 }

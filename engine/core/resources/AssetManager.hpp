@@ -7,6 +7,8 @@
 
 namespace Kiwi {
     class AAsset;
+    class ATexture2D;
+    class AShader;
     struct AssetMetaData;
 
 
@@ -30,6 +32,12 @@ namespace Kiwi {
         }
 
         KIWI_NODISCARD std::shared_ptr<AAsset> GetAsset(UUID assetUUID);
+
+        KIWI_NODISCARD std::shared_ptr<ATexture2D> GetTexture(const std::filesystem::path& path);
+        KIWI_NODISCARD std::shared_ptr<AShader> GetShader(const std::filesystem::path& path);
+
+    private:
+        KIWI_NODISCARD UUID ResolveUUIDByPath(const std::filesystem::path& path) const;
 
     private:
         std::map<UUID, AssetMetaData> m_registry;

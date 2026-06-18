@@ -22,7 +22,11 @@ namespace Kiwi::OpenGL {
             return nullptr;
         }
 
-        auto optPreprocessedSrc = PreprocessSource(src.GetAsString());
+        return CompileSource(src.GetAsString());
+    }
+
+    std::shared_ptr<AShader> ShaderCompilerGL::CompileSource(const String& src) {
+        auto optPreprocessedSrc = PreprocessSource(src);
         if (!optPreprocessedSrc) {
             return nullptr;
         }
@@ -97,49 +101,30 @@ namespace Kiwi::OpenGL {
                     "Either EShaderStage::SHADER_PROGRAM or EShaderStage::NONE passed here"
         );
 
-        Hash64 hashedShaderSource = Hash64::FromData(src).value_or(Hash64{});
-        if (hashedShaderSource.IsEmpty()) {
-            KIWI_CTX_LOG(ERROR, "Failed to cast integer hash of the shader source into the string");
+        const Opt<GLenum> glStage = Cast<EShaderStage>::ToGLenum(stage);
+        if (!glStage) {
+            KIWI_CTX_LOG(ERROR, "Unsupported shader stage passed to CompileShaderStage");
             return KIWI_GL_UNDEFINED_ID;
         }
 
-        // TODO:
-        // ShaderCacheManager& shaderCacheManager = ShaderCacheManager::GetInstance();
-        // if (auto shaderCacheEntry = shaderCacheManager.TryToFindCachedShader(hashedShaderSource); shaderCacheEntry) {
-        //     if (!shaderCacheManager.IsInLocalCache(hashedShaderSource)) {
-        //         if (!shaderCacheManager.AddToLocalCache(hashedShaderSource, shaderCacheEntry.value())) KIWI_UNLIKELY {
-        //             KIWI_CTX_LOG(ERROR, "Failed to add cache entry into the local cache");
-        //         }
-        //     }
-        //
-        //     return CreateFromSpirVByteCode(stage, "main", shaderCacheEntry.value().spriVByteCode);
-        // }
+        const GlID id = glCreateShader(*glStage);
+        if (id == KIWI_GL_UNDEFINED_ID) {
+            KIWI_CTX_LOG(ERROR, "glCreateShader failed to create a shader object");
+            return KIWI_GL_UNDEFINED_ID;
+        }
 
+        // StringView is not guaranteed to be null-terminated, so the length is provided explicitly.
+        const GLchar* sourcePtr = src.data();
+        const GLint sourceLen = BasicCast::To<GLint>(src.size());
+        glShaderSource(id, 1, &sourcePtr, &sourceLen);
+        glCompileShader(id);
 
-        // Path outputFilePath = shaderCacheManager.GetCacheDirAbsolutePath() / hashedShaderSource.ToString().ToStdString();
+        if (!CheckCompilationOrLinkingResult(id, stage)) {
+            glDeleteShader(id);
+            return KIWI_GL_UNDEFINED_ID;
+        }
 
-        // SpirV::CompilationDetails cDetails;
-        // cDetails.stage = stage;
-        // cDetails.src = src;
-        // cDetails.environment = ESpirVEnvironment::OpenGL;
-        // cDetails.optimizationLevel = ESpirVOptimizationLevel::PERFORMANCE;
-        // cDetails.outputFile = outputFilePath.string();
-        //
-        // Vector<u32> byteCode = SpirV::CompileGLSL(cDetails).ValueOr(Vector<u32>{});
-        // GlID id = CreateFromSpirVByteCode(stage, "main", byteCode);
-        // if (id == KIWI_GL_UNDEFINED_ID) {
-        //     return KIWI_GL_UNDEFINED_ID;
-        // }
-        //
-        // if (!shaderCacheManager.AddToCache(hashedShaderSource, ShaderCacheEntry{ byteCode })) KIWI_UNLIKELY {
-        //     KIWI_CTX_LOG(WARNING, "Failed to add {} in to the local or global cache!",
-        //         hashedShaderSource
-        //     );
-        // }
-
-        // return id;
-
-        return 0;
+        return id;
     }
 
 

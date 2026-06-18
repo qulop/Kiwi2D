@@ -11,4 +11,9 @@ namespace Kiwi::Vulkan {
         return nullptr;
     }
 
+    std::shared_ptr<AShader> ShaderCompilerVK::CompileSource(const String& src) {
+        // The Vulkan backend compiles via the SPIR-V toolchain from files; in-memory
+        // GLSL source compilation is not supported here.
+        return nullptr;
+    }
 }

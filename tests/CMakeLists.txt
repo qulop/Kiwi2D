@@ -4,6 +4,10 @@ project("Tests" LANGUAGES CXX)
 set(TESTS_SRC
     common/Result.test.cpp
     common/UUID.test.cpp
+
+    scene/Entity.test.cpp
+    scene/Scene.test.cpp
+    scene/Transform2D.test.cpp
 )
 
 set(BUILD_GMOCK OFF CACHE BOOL "" FORCE)
@@ -16,6 +20,7 @@ add_executable("Tests" ${TESTS_SRC})
 target_include_directories("Tests"
     PRIVATE ${CMAKE_SOURCE_DIR}/engine/
     PRIVATE ${CMAKE_SOURCE_DIR}/third_party/gtest/googletest/include
+    PRIVATE ${CMAKE_SOURCE_DIR}/third_party/glm/
 )
 
 target_link_libraries("Tests"

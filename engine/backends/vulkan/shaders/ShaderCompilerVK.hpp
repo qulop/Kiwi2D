@@ -9,6 +9,7 @@ namespace Kiwi::Vulkan {
 
     public:
         KIWI_NODISCARD std::shared_ptr<AShader> CompileFile(const File& sourceFile) override;
+        KIWI_NODISCARD std::shared_ptr<AShader> CompileSource(const String& src) override;
 
         ~ShaderCompilerVK() override = default;
     };

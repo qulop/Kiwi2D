@@ -4746,13 +4746,13 @@ namespace Kiwi {
                         *remainder = *this;
                     }
 
-                    operator=(static_cast<std::uint8_t>(UINT8_C(0)));
+                    operator=(uintwide_t(static_cast<std::uint8_t>(UINT8_C(0))));
                 }
                 else if (left_is_equal_to_right)
                 {
                     // If the denominator is equal to the numerator,
                     // then the result of the division is one.
-                    operator=(static_cast<std::uint8_t>(UINT8_C(1)));
+                    operator=(uintwide_t(static_cast<std::uint8_t>(UINT8_C(1))));
 
                     if (remainder != nullptr)
                     {

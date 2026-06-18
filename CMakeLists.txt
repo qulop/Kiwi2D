@@ -8,6 +8,7 @@ project("KiwiEngine" LANGUAGES CXX)
 
 option(KIWI_BUILD_ONLY_LIBRARY "Allows to build only the engine library without compiling the editor code" OFF)
 option(KIWI_BUILD_TESTS "Build all engine tests" ON)
+option(KIWI_BUILD_EXAMPLES "Build the example games (examples/)" ON)
 option(KIWI_ENABLE_PROFILING "Enable engine profiling with Tracy" ON)
 
 if (CMAKE_BUILD_TYPE STREQUAL "Release")
@@ -30,6 +31,10 @@ set(ENGINE_LIBRARY_NAME "KiwiLib")
 
 if (WIN32)
     add_compile_definitions(KIWI_WIN32_USED)
+    # Some third-party libraries (e.g. shaderc/libshaderc_util) call CRT functions
+    # like strncpy that MSVC's headers mark deprecated; without this they are
+    # promoted to hard errors under -Werror on the Clang/MSVC toolchain.
+    add_compile_definitions(_CRT_SECURE_NO_WARNINGS)
 elseif(UNIX)
     add_compile_definitions(KIWI_LINUX_USED)
 endif()
@@ -133,4 +138,11 @@ endif()
 
 if (${KIWI_BUILD_TESTS})
     add_subdirectory(tests)
+endif()
+
+if (${KIWI_BUILD_EXAMPLES} AND NOT ${KIWI_BUILD_ONLY_LIBRARY})
+    add_subdirectory(examples/arkanoid)
+    add_subdirectory(examples/pacman)
+    add_subdirectory(examples/snake)
+    add_subdirectory(examples/benchmark)
 endif()
