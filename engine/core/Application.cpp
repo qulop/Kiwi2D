@@ -34,18 +34,15 @@ namespace Kiwi {
         }
     #endif
 
-        s_subsystems = KIWI_NOTHROW_NEW SubsystemHolderType();
+        s_subsystems = KIWI_NOTHROW_NEW AObject::SubsystemHolder();
         if (!s_subsystems) {
             Console::WriteLine("Failed to allocate memory for the subsystems holder");
             return false;
         }
 
-    #if 0
         if (EngineProfiler::IsEnabled() && !EngineProfiler::IsConnectedToServer()) {
             Console::WriteLine("Connection to the profiler server failed to establish");
-            return false;
         }
-    #endif
 
         if (Opt options = ProgramOptions::Parse(Platform::GetApplicationArguments()); options) {
            m_cliOptions = std::move(*options);
@@ -83,7 +80,10 @@ namespace Kiwi {
     }
 
     void Application::BeforeShutdown() {
+        ShutdownAllSubsystems();
         delete s_subsystems;
+
+        Console::WriteLine("All subsystems deleted");
     }
 
     i32 Application::Run() {
@@ -106,9 +106,5 @@ namespace Kiwi {
         BeforeShutdown();
 
         return KIWI_EXIT_SUCCESS;
-    }
-
-    void Application::Stop() {
-        // m_isRunning.store(false, MEM_ORDER_SEQ_CST);
     }
 }

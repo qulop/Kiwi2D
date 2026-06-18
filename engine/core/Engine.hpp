@@ -17,6 +17,9 @@ namespace Kiwi {
         KIWI_CREATE_OBJECT(Engine, AObject)
 
     public:
+        static constexpr bool DEFAULT_VSYNC_ENABLED = false;
+
+    public:
         KIWI_NODISCARD bool Init(const ProgramOptions& opts);
 
         KIWI_NODISCARD bool Update();
@@ -32,8 +35,5 @@ namespace Kiwi {
         EngineConfig m_engineConfig;
 
         Atomic<bool> m_isRunning = true;
-
-        bool m_vsyncEnable = true;
-        u16 m_fpsLimit = 120;
     };
 }

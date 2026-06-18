@@ -27,7 +27,6 @@ namespace Kiwi {
         virtual void BeforeFrameEnd() {}
 
         KIWI_NODISCARD i32 Run();
-        virtual void Stop();
         virtual void Update() {}
 
         ~Application() override = default;

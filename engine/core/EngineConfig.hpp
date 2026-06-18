@@ -1,7 +1,7 @@
 #pragma once
 
-#include <common/ProgramOptions.hpp>
 #include <common/Definitions.hpp>
+#include <common/types/String.hpp>
 
 #include <common/Version.hpp>
 
@@ -18,6 +18,10 @@ namespace Kiwi::CmdLine {
 
 
 namespace Kiwi {
+    class ProgramOptions;
+    struct CmdLineOption;
+
+
     struct EngineConfig {
     public:
         static constexpr Version ENGINE_VERSION = Version(1, 0, 0);
@@ -28,6 +32,14 @@ namespace Kiwi {
     #else
         static constexpr bool ENABLE_DEBUG_CAPABILITIES = false;
     #endif
+
+    public:
+        bool vsyncEnabled = false;
+        bool fullScreen = true;
+        u16 maxFPS = 60;
+        std::filesystem::path engineOutDir;
+        String windowName;
+        String logFileTemplateName;
 
     public:
         KIWI_NODISCARD static Vector<CmdLineOption> GetCommandLineOptions();

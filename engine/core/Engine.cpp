@@ -11,7 +11,9 @@
 
 namespace Kiwi {
     bool Engine::Init(const ProgramOptions& opts) {
-        m_vsyncEnable = opts.Get<bool>(CmdLine::VSYNC_ENABLE).value_or(m_vsyncEnable);
+        m_engineConfig.vsyncEnabled = opts
+            .Get<bool>(CmdLine::VSYNC_ENABLE)
+            .value_or(m_engineConfig.vsyncEnabled);
 
         std::shared_ptr<WindowSubsystem> windowSubsystem = GetSubsystem<WindowSubsystem>();
 
@@ -21,7 +23,7 @@ namespace Kiwi {
         }
 
         m_window = windowSubsystem->GetMainWindow();
-        m_window->SetVSyncEnable(m_vsyncEnable);
+        m_window->SetVSyncEnable(m_engineConfig.vsyncEnabled);
         m_window->MaximizeWindow(true);
 
         m_renderer = MakeShared<Renderer>();
@@ -36,7 +38,7 @@ namespace Kiwi {
     }
 
     bool Engine::Update() {
-        // KIWI_PROFILE_ZONE_NAME("Engine::Update");
+        KIWI_PROFILE_ZONE_NAME("Engine::Update");
 
         return m_window->Update();
     }
