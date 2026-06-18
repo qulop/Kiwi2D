@@ -3,6 +3,8 @@
 #include <platform/window/GLFWWindow.hpp>
 #include <platform/Platform.hpp>
 
+#include <profiler/EngineProfiler.hpp>
+
 
 namespace Kiwi {
     SharedPtr<AWindow> AWindow::CreateWindowImpl() {
@@ -29,6 +31,8 @@ namespace Kiwi {
     }
 
     bool AWindow::Update() {
+        KIWI_PROFILE_ZONE;
+
         PollEvents();
         SwapBuffers();
 
