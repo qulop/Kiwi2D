@@ -62,9 +62,8 @@ namespace Kiwi {
     class ASubsystem;
 
 
-
     class AObject {
-        using SubsystemHolderType = HashMap<Hash64, SharedPtr<ASubsystem>>;
+        using SubsystemHolder = std::vector<std::shared_ptr<ASubsystem>>;
 
     public:
         using SelfType = AObject;
@@ -79,6 +78,15 @@ namespace Kiwi {
     protected:
         KIWI_NODISCARD const AObject* GetObjectBase() const;
 
+        void RegisterSubsystem(ASubsystem* subsystem);
+        void DestroySubsystem(Hash64 subsystemStaticTypeHash);
+        static std::shared_ptr<ASubsystem> GetSubsystem(Hash64 subsystemStaticTypeHash);
+
+        template<Concepts::DerivedFrom<ASubsystem> T>
+        void RegisterSubsystem(T* subsystem) {
+            RegisterSubsystem(BasicCast::HierarchyCast<ASubsystem*>(subsystem));
+        }
+
         template<Concepts::DerivedFrom<ASubsystem> T, typename... Args>
         void RegisterSubsystem(Args&&... args) {
             ASubsystem* subsystem = KIWI_NOTHROW_NEW T(std::forward<Args>(args)...);
@@ -86,31 +94,13 @@ namespace Kiwi {
         }
 
         template<Concepts::DerivedFrom<ASubsystem> T>
-        void RegisterSubsystem(T* subsystem) {
-            RegisterSubsystem(BasicCast::HierarchyCast<ASubsystem*>(subsystem));
-        }
-
-        void RegisterSubsystem(ASubsystem* subsystem);
-
-        template<Concepts::DerivedFrom<ASubsystem> T>
         void DestroySubsystem() {
-            KIWI_ASSERT_BASIC(s_subsystems);
-            KIWI_ASSERT(ThisThread::IsMainThread(), "You must call this function only from the main thread");
-
-            auto it = s_subsystems->find(T::GetStaticType());
-            if (it == std::ranges::end(*s_subsystems)) {
-                return;
-            }
-
-            it->second.reset();
+            DestroySubsystem(T::GetStaticType());
         }
 
         template<Concepts::DerivedFrom<ASubsystem> T>
-        KIWI_NODISCARD static SharedPtr<T> GetSubsystem() {
-            KIWI_ASSERT_BASIC(s_subsystems && s_subsystems->contains(T::GetStaticType()));
-
-            SharedPtr<ASubsystem> baseSubsystemPtr = s_subsystems->at(T::GetStaticType());
-            return std::static_pointer_cast<T>(baseSubsystemPtr);
+        KIWI_NODISCARD static std::shared_ptr<T> GetSubsystem() {
+            return std::static_pointer_cast<T>(GetSubsystem(T::GetStaticType()));
         }
 
         template<typename... Args>
@@ -132,13 +122,14 @@ namespace Kiwi {
         virtual void DirectInheritanceChecker(AObject*) = 0;
 
     private:
+        void ShutdownAllSubsystems();
         static void LogImpl(ELogLevel lvl, const String& msg);
 
     private:
         friend class Application;
 
         TypeMetaInfo m_typeMetaInfo;
-        static SubsystemHolderType* s_subsystems;
+        static SubsystemHolder* s_subsystems;
     };
 
 
