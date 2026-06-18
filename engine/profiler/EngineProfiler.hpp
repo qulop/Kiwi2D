@@ -17,8 +17,13 @@ namespace Kiwi {
         #endif
         }
 
-
-        KIWI_NODISCARD static bool IsConnectedToServer();
+        KIWI_NODISCARD static bool IsConnectedToServer() {
+        #ifdef TRACY_ENABLE
+            return tracy::GetProfiler().IsConnected();
+        #else
+            return false;
+        #endif
+        }
     };
 }
 
