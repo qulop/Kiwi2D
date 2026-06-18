@@ -14,6 +14,9 @@ set(ENGINE_LIBRARY_SRC
     engine/core/resources/AssetManager.cpp
     engine/core/resources/AssetImporter.cpp
 
+    engine/imgui/ImGuiSubsystem.cpp
+    engine/imgui/ImGuiBackend.cpp
+
     engine/misc/Window.cpp
     engine/misc/ParserBase.cpp
     engine/misc/WindowSubsystem.cpp
@@ -45,8 +48,6 @@ set(ENGINE_LIBRARY_SRC
     engine/backends/vulkan/shaders/ShaderCompilerVK.cpp
     engine/backends/vulkan/shaders/ShaderVK.cpp
     # --- END ---
-
-    engine/profiler/EngineProfiler.cpp
 
     # --- BEGIN: Renderer ---
     engine/renderer/Renderer.cpp
@@ -80,7 +81,6 @@ set(ENGINE_LIBRARY_SRC
 set(ENGINE_APPLICATION_SRC
     editor/Main.cpp
     editor/app/Editor.cpp
-    editor/gui/ImGuiSubsystem.cpp
 )
 
 
