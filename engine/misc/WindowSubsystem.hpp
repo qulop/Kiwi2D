@@ -13,13 +13,13 @@ namespace Kiwi {
         bool Init() override;
         KIWI_NODISCARD bool CreateMainWindow(StringView title);
 
-        KIWI_NODISCARD SharedPtr<AWindow> GetMainWindow();
+        KIWI_NODISCARD std::shared_ptr<AWindow> GetMainWindow();
 
-        KIWI_NODISCARD Vector<const char*> GetVulkanExtensionsForWindow(SharedPtr<AWindow> window);
+        KIWI_NODISCARD std::vector<const char*> GetVulkanExtensionsForWindow(std::shared_ptr<AWindow> window);
 
 
 
     private:
-        SharedPtr<AWindow> m_mainWindow;
+        std::shared_ptr<AWindow> m_mainWindow;
     };
 }

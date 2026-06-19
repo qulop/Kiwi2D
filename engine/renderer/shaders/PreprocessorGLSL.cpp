@@ -44,7 +44,7 @@ namespace Kiwi {
 
         while (true) {
             auto&& [preprocName, preprocProps] = ExtractPreprocessor(STAGE_BEGIN_TOKEN_NAME)
-                .value_or(std::make_pair(String{}, Vector<String>{}));
+                .value_or(std::make_pair(String{}, std::vector<String>{}));
 
             if (preprocName.IsEmpty() || preprocName != STAGE_BEGIN_TOKEN_NAME) {
                 if (preprocName.IsEmpty()) {
@@ -126,7 +126,7 @@ namespace Kiwi {
             return nullopt;
         }
 
-        Opt<Vector<String>> properties = Tokenize(pos, endOfLinePos);
+        Opt<std::vector<String>> properties = Tokenize(pos, endOfLinePos);
 
         m_currPos = pos + 1;
         return std::make_pair(

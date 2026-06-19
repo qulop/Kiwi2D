@@ -13,7 +13,7 @@ namespace Kiwi::Vulkan {
 
 
     struct RenderPassCreateInfo {
-        SharedPtr<Device> device;
+        std::shared_ptr<Device> device;
 
         std::span<VkAttachmentDescription> attachments;
 

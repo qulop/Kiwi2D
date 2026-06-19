@@ -26,8 +26,8 @@ namespace Kiwi {
         ~Renderer() override = default;
 
     private:
-        SharedPtr<IGraphicObjectsFactory> m_factory;
+        std::shared_ptr<IGraphicObjectsFactory> m_factory;
 
-        SharedPtr<IRenderContext> m_renderContext;
+        std::shared_ptr<IRenderContext> m_renderContext;
     };
 }

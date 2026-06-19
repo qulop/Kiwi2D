@@ -214,7 +214,7 @@ namespace Kiwi {
         KIWI_NODISCARD String CreateSlice(size_t from, size_t to = STR_END, size_t step = 1) const;
         KIWI_NODISCARD StringView CreateSliceView(size_t from, size_t to = STR_END) const;
 
-        KIWI_NODISCARD Vector<String> Split(StringView delimiter = " ") const;
+        KIWI_NODISCARD std::vector<String> Split(StringView delimiter = " ") const;
 
         KIWI_NODISCARD index_t FindFirstCharacter(ValueType c, size_t offset = 0) const;
     
@@ -222,7 +222,7 @@ namespace Kiwi {
 
         KIWI_NODISCARD ValueType* GetMutableRaw();
     
-        KIWI_NODISCARD Path ToPath() const;
+        KIWI_NODISCARD std::filesystem::path ToPath() const;
     
         KIWI_NODISCARD StringView ToStringView() const;
         
@@ -257,7 +257,7 @@ namespace Kiwi {
         String& operator+=(const ValueType* str);
 
     private:
-        KIWI_NODISCARD static Vector<size_t> GetPrefixVector(StringView str);
+        KIWI_NODISCARD static std::vector<size_t> GetPrefixVector(StringView str);
 
     private:
         std::string m_data;

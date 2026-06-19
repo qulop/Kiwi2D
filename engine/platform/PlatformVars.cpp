@@ -4,5 +4,5 @@
 namespace Kiwi::Globals::Platform {
     std::mutex g_consoleIOMutex = std::mutex();
 
-    Vector<String> g_applicationArguments = Vector<String>();
+    std::vector<String> g_applicationArguments = std::vector<String>();
 }

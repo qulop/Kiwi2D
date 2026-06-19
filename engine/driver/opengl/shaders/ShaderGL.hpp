@@ -50,7 +50,7 @@ namespace Kiwi::OpenGL {
         ~ShaderGL() override;
 
     private:
-        ShaderGL(GlID programId, Map<EShaderStage, ShaderModuleGL>&& shaderModules);
+        ShaderGL(GlID programId, std::map<EShaderStage, ShaderModuleGL>&& shaderModules);
 
     private:
         friend class ShaderCompilerGL;

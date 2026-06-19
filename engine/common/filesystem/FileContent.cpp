@@ -4,7 +4,7 @@
 
 
 namespace Kiwi {
-    FileContent::FileContent(EFileContentDataFormat format, const Vector<u32>& bytesStream) :
+    FileContent::FileContent(EFileContentDataFormat format, const std::vector<u32>& bytesStream) :
         m_format(format),
         m_contentByteSize((bytesStream.size() * sizeof(u32)) / sizeof(raw_byte))
     {
@@ -16,7 +16,7 @@ namespace Kiwi {
         );
     }
 
-    FileContent::FileContent(EFileContentDataFormat format, const Vector<u8>& bytesStream) :
+    FileContent::FileContent(EFileContentDataFormat format, const std::vector<u8>& bytesStream) :
         m_format(format),
         m_contentByteSize((bytesStream.size() * sizeof(u8)) / sizeof(raw_byte))
     {

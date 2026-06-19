@@ -40,6 +40,6 @@ namespace Kiwi {
     public:
         KIWI_NODISCARD static Result<String> PreprocessGLSL(const PreprocessDetails& details);
 
-        KIWI_NODISCARD static Result<Vector<u32>> CompileGLSL(const CompilationDetails& details);
+        KIWI_NODISCARD static Result<std::vector<u32>> CompileGLSL(const CompilationDetails& details);
     };
 }

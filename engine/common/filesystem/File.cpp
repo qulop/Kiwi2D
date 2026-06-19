@@ -176,7 +176,7 @@ namespace Kiwi {
             m_stream.flush();
         }
         else {
-            const Vector<u8> bytesStream = data.GetAsBytesStream();
+            const std::vector<u8> bytesStream = data.GetAsBytesStream();
             const size_t bytesToWrite = bytesStream.size();
             if (bytesToWrite == 0) {
                 return {};
@@ -217,7 +217,7 @@ namespace Kiwi {
         return fileBytes.GetError();
     }
 
-    Result<SharedPtr<byte>> File::ReadAsBytes(bool rewindOnEnd) const {
+    Result<std::shared_ptr<byte>> File::ReadAsBytes(bool rewindOnEnd) const {
         KIWI_ASSERT_BASIC(m_stream.is_open());
 
         byte* buffer = KIWI_NOTHROW_NEW byte[m_fileSize + 1];
@@ -248,7 +248,7 @@ namespace Kiwi {
             Rewind();
         }
 
-        return Success(MakeShared<byte>(buffer, [](byte* ptr) {
+        return Success(std::shared_ptr<byte>(buffer, [](byte* ptr) {
             delete[] ptr;
         }));
     }

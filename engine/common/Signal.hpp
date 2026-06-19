@@ -12,7 +12,7 @@ namespace Kiwi {
     public:
         Signal() = default;
 
-        Signal(ForwardList<ListenerType> listeners)
+        Signal(std::forward_list<ListenerType> listeners)
         : listeners(listeners)
         {}
 
@@ -38,6 +38,6 @@ namespace Kiwi {
         }
         
     private:
-        ForwardList<ListenerType> listeners;
+        std::forward_list<ListenerType> listeners;
     };
 }

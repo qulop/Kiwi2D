@@ -73,7 +73,7 @@ namespace Kiwi {
     }
 
 
-    Result<Vector<u32>> SpirV::CompileGLSL(const CompilationDetails& details) {
+    Result<std::vector<u32>> SpirV::CompileGLSL(const CompilationDetails& details) {
         KIWI_ASSERT_BASIC(details.environment == ESpirVEnvironment::OpenGL || details.environment == ESpirVEnvironment::Vulkan);
 
         auto shadercKind = Cast<EShaderStage>::ToShaderCKind(details.stage);
@@ -95,7 +95,7 @@ namespace Kiwi {
         }
 
         return Success(
-            Vector<u32> { result.begin(), result.end() }
+            std::vector<u32> { result.begin(), result.end() }
         );
     }
 }

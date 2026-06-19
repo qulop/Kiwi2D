@@ -20,8 +20,8 @@ namespace Kiwi::Vulkan {
     private:
         friend class GraphicObjectsFactoryVK;
 
-        SharedPtr<Device> m_vulkanDevice;
+        std::shared_ptr<Device> m_vulkanDevice;
 
-        SharedPtr<Surface> m_surface;
+        std::shared_ptr<Surface> m_surface;
     };
 }

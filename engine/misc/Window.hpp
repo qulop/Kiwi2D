@@ -20,7 +20,7 @@ namespace Kiwi {
         KIWI_CREATE_OBJECT(AWindow, AObject);
 
     public:
-        KIWI_NODISCARD static SharedPtr<AWindow> CreateWindowImpl();
+        KIWI_NODISCARD static std::shared_ptr<AWindow> CreateWindowImpl();
 
     public:
         KIWI_NODISCARD virtual bool Init(StringView windowName, const Platform::DisplayInfo& display) { return true; }
@@ -36,7 +36,7 @@ namespace Kiwi {
         virtual void SwapBuffers() = 0;
         virtual void PollEvents() = 0;
 
-        KIWI_NODISCARD virtual Vector<const char*> GetVulkanExtensions() const = 0;
+        KIWI_NODISCARD virtual std::vector<const char*> GetVulkanExtensions() const = 0;
 
         KIWI_NODISCARD virtual EWindowVendor GetVendor() const = 0;
         KIWI_NODISCARD virtual void* GetNativeWindowPtr() const = 0;

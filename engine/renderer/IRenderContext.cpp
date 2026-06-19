@@ -4,7 +4,7 @@
 
 
 namespace Kiwi {
-    SharedPtr<IRenderContext> IRenderContext::Create() {
-        return MakeShared<Vulkan::RenderContextVK>();
+    std::shared_ptr<IRenderContext> IRenderContext::Create() {
+        return std::make_shared<Vulkan::RenderContextVK>();
     }
 }

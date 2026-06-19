@@ -18,7 +18,7 @@
 
 
 namespace {
-    Kiwi::Vector<VkLayerProperties> s_availableValidationLayers = {};
+    std::vector<VkLayerProperties> s_availableValidationLayers = {};
 }
 
 
@@ -104,9 +104,9 @@ namespace Kiwi::Vulkan {
         appInfo.engineVersion = engineVersionFlags;
         appInfo.apiVersion = VULKAN_API_VERSION;
 
-        const SharedPtr<WindowSubsystem> windowSubsystem = GetSubsystem<WindowSubsystem>();
+        const std::shared_ptr<WindowSubsystem> windowSubsystem = GetSubsystem<WindowSubsystem>();
 
-        Vector<const char*> extensions = windowSubsystem->GetMainWindow()->GetVulkanExtensions();
+        std::vector<const char*> extensions = windowSubsystem->GetMainWindow()->GetVulkanExtensions();
         if constexpr (EngineConfig::ENABLE_DEBUG_CAPABILITIES) {
             extensions.emplace_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
         }
@@ -171,18 +171,18 @@ namespace Kiwi::Vulkan {
     }
 
     bool VulkanSubsystem::CreateVulkanDevice() {
-        device = MakeShared<Device>();
+        device = std::make_shared<Device>();
 
         return device->Init(TypeTags::UseVulkanSubsystemForInit{});
     }
 
     bool VulkanSubsystem::CreateSwapChain() {
-        swapChain = MakeShared<SwapChain>();
+        swapChain = std::make_shared<SwapChain>();
 
         return swapChain->Init(TypeTags::UseVulkanSubsystemForInit{});
     }
 
-    Vector<VkLayerProperties> VulkanSubsystem::GetAvailableValidationLayers() {
+    std::vector<VkLayerProperties> VulkanSubsystem::GetAvailableValidationLayers() {
         if (!s_availableValidationLayers.empty()) {
             return s_availableValidationLayers;
         }
@@ -196,15 +196,15 @@ namespace Kiwi::Vulkan {
         return s_availableValidationLayers;
     }
 
-    Status<Vector<String>> VulkanSubsystem::CheckRequiredValidationLayersForSupport() {
-        const Vector<VkLayerProperties> availableLayers = GetAvailableValidationLayers();
+    Status<std::vector<String>> VulkanSubsystem::CheckRequiredValidationLayersForSupport() {
+        const std::vector<VkLayerProperties> availableLayers = GetAvailableValidationLayers();
 
-        Set<StringView> availableLayersNamesSet;
+        std::set<StringView> availableLayersNamesSet;
         for (const auto& layer : availableLayers) {
             availableLayersNamesSet.emplace(layer.layerName);
         }
 
-        Vector<String> unsupportedLayers;
+        std::vector<String> unsupportedLayers;
         for (auto requiredLayer : REQUIRED_VALIDATION_LAYERS) {
             if (!availableLayersNamesSet.contains(requiredLayer)) {
                 unsupportedLayers.emplace_back(requiredLayer);

@@ -27,7 +27,7 @@ namespace Kiwi {
             return nullopt;
         }
 
-        const Vector<String> uuidFragments = s.Split("-");
+        const std::vector<String> uuidFragments = s.Split("-");
         u64 low = 0;
         u64 high = 0;
 

@@ -80,7 +80,7 @@ namespace Kiwi {
             return KIWI_BAD_INDEX;
         }
 
-        const Vector<size_t> targetSubStrPrefixes = std::move(GetPrefixVector(targetSubStr));
+        const std::vector<size_t> targetSubStrPrefixes = std::move(GetPrefixVector(targetSubStr));
         index_t index = KIWI_BAD_INDEX;
         size_t j = 0;
 
@@ -230,9 +230,9 @@ namespace Kiwi {
         return StringView(ToCString(), (to == STR_END ? Size() : to) - from);
     }
 
-    Vector<String> String::Split(StringView delimiter) const {
+    std::vector<String> String::Split(StringView delimiter) const {
         return std::views::split(m_data, delimiter)
-            | std::ranges::to<Vector<String>>();
+            | std::ranges::to<std::vector<String>>();
     }
 
     index_t String::FindFirstCharacter(const ValueType c, const size_t offset) const {
@@ -247,7 +247,7 @@ namespace Kiwi {
         return m_data.data();
     }
 
-    Path String::ToPath() const {
+    std::filesystem::path String::ToPath() const {
         return { m_data };
     }
 
@@ -326,8 +326,8 @@ namespace Kiwi {
     }
 
 
-    Vector<size_t> String::GetPrefixVector(StringView str) {
-        Vector<size_t> pi(str.size(), 0);
+    std::vector<size_t> String::GetPrefixVector(StringView str) {
+        std::vector<size_t> pi(str.size(), 0);
         size_t j = 0;
 
         for (size_t i = 1; i < str.size(); i++) {

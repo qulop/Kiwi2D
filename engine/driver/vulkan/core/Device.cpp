@@ -160,7 +160,7 @@ namespace Kiwi::Vulkan {
     bool Device::CreatePhysicalDevice(VkInstance vkInstance, VkSurfaceKHR surface) {
         using ScoredPhysicalDevice = std::pair<PhysicalDeviceDesc, PhysicalDeviceSwapChainSupportDetails>;
 
-        Vector<VkPhysicalDevice> physicalDevices = EnumerateVulkanArray<VkPhysicalDevice>(
+        std::vector<VkPhysicalDevice> physicalDevices = EnumerateVulkanArray<VkPhysicalDevice>(
             [&](u32* c, VkPhysicalDevice* a) { return vkEnumeratePhysicalDevices(vkInstance, c, a); }
         );
 
@@ -217,8 +217,8 @@ namespace Kiwi::Vulkan {
     bool Device::CreateLogicalDevice(VkInstance vkInstance, std::span<const char* const> requiredValidationLayers) {
         constexpr float queuePriority = 1.0f;
 
-        Vector<VkDeviceQueueCreateInfo> queueCreateInfos;
-        Set<i32> uniqueFamilyIndices = m_physicalDeviceDesc.queueFamilyIndices.GetUniqueIndices();
+        std::vector<VkDeviceQueueCreateInfo> queueCreateInfos;
+        std::set<i32> uniqueFamilyIndices = m_physicalDeviceDesc.queueFamilyIndices.GetUniqueIndices();
         for (auto& idx : uniqueFamilyIndices) {
             queueCreateInfos.push_back(DeviceQueues::GetCreateInfo(idx, &queuePriority));
         }
@@ -279,11 +279,11 @@ namespace Kiwi::Vulkan {
     }
 
     bool Device::CheckDeviceExtensionSupport(VkPhysicalDevice device) const {
-        Vector<VkExtensionProperties> availableExt = EnumerateVulkanArray<VkExtensionProperties>(
+        std::vector<VkExtensionProperties> availableExt = EnumerateVulkanArray<VkExtensionProperties>(
             [&](u32* c, VkExtensionProperties* a) { return vkEnumerateDeviceExtensionProperties(device, nullptr, c, a); }
         );
 
-        Set<const char*> requiredExt(VulkanSubsystem::REQUIRED_DEVICE_EXTENSIONS.begin(), VulkanSubsystem::REQUIRED_DEVICE_EXTENSIONS.end());
+        std::set<const char*> requiredExt(VulkanSubsystem::REQUIRED_DEVICE_EXTENSIONS.begin(), VulkanSubsystem::REQUIRED_DEVICE_EXTENSIONS.end());
         for (const VkExtensionProperties& availSingleExt : availableExt) {
             auto it = std::ranges::find_if(requiredExt, [&](const char* ext) {
                 return CString::StrCmpBool(availSingleExt.extensionName, ext);

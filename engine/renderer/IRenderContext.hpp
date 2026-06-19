@@ -20,7 +20,7 @@ namespace Kiwi {
         using PFN_DebugCallback = std::function<void(StringView)>;
 
     public:
-        KIWI_NODISCARD static SharedPtr<IRenderContext> Create();
+        KIWI_NODISCARD static std::shared_ptr<IRenderContext> Create();
 
     public:
         KIWI_NODISCARD virtual bool Init() = 0;

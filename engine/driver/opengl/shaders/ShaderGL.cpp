@@ -5,7 +5,7 @@
 
 
 namespace Kiwi::OpenGL {
-    ShaderGL::ShaderGL(GlID programId, Map<EShaderStage, ShaderModuleGL>&& shaderModules) :
+    ShaderGL::ShaderGL(GlID programId, std::map<EShaderStage, ShaderModuleGL>&& shaderModules) :
         Super(std::move(shaderModules)),
         m_programId(programId)
     {}
@@ -79,7 +79,7 @@ namespace Kiwi::OpenGL {
     }
 
     ShaderGL::~ShaderGL() {
-        for (const UniquePtr<IShaderModule>& id : std::views::values(m_shaderModules)) {
+        for (const std::unique_ptr<IShaderModule>& id : std::views::values(m_shaderModules)) {
             auto* nativeId = CastTo<const GlID*>(id->GetNativeHandle());
             glDeleteShader(*nativeId);
         }

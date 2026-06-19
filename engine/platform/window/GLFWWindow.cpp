@@ -111,11 +111,11 @@ namespace Kiwi {
         glfwPollEvents();
     }
 
-    Vector<const char*> GLFWWindow::GetVulkanExtensions() const {
+    std::vector<const char*> GLFWWindow::GetVulkanExtensions() const {
         u32 extCount = 0;
         const char** extensions = glfwGetRequiredInstanceExtensions(&extCount);
 
-        Vector<const char*> res(extensions, extensions + extCount);
+        std::vector<const char*> res(extensions, extensions + extCount);
         return res;
     }
 

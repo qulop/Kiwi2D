@@ -60,7 +60,7 @@ namespace Kiwi::OpenGL {
 
     private:
         bool m_contextLoaded = false;
-        HashMap<EOpenGLExtensions, ExtensionSupportInfo> m_extensions;
+        std::unordered_map<EOpenGLExtensions, ExtensionSupportInfo> m_extensions;
     };
 }
 
@@ -88,7 +88,7 @@ namespace Kiwi {
         }
 
 
-        KIWI_NODISCARD KIWI_FORCEINLINE static Vector<OpenGL::EOpenGLExtensions> Enumerate() {
+        KIWI_NODISCARD KIWI_FORCEINLINE static std::vector<OpenGL::EOpenGLExtensions> Enumerate() {
             using namespace OpenGL;
 
             return {

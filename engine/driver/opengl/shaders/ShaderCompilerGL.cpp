@@ -6,7 +6,7 @@
 
 
 namespace {
-    void ReleaseShaderResources(Kiwi::OpenGL::GlID programId, const Kiwi::Map<Kiwi::EShaderStage, Kiwi::OpenGL::ShaderModuleGL>& modules) {
+    void ReleaseShaderResources(Kiwi::OpenGL::GlID programId, const std::map<Kiwi::EShaderStage, Kiwi::OpenGL::ShaderModuleGL>& modules) {
         for (const auto& module : std::views::values(modules)) {
             glDeleteShader(module.moduleID);
         }
@@ -28,7 +28,7 @@ namespace Kiwi::OpenGL {
         }
 
         bool completedWithoutErrors = true;
-        Map<EShaderStage, ShaderModuleGL> shaderModules;
+        std::map<EShaderStage, ShaderModuleGL> shaderModules;
         GlID shaderProgramId = glCreateProgram();
 
         for (const auto& [stage, src] : *optPreprocessedSrc) {
@@ -116,7 +116,7 @@ namespace Kiwi::OpenGL {
         // }
 
 
-        // Path outputFilePath = shaderCacheManager.GetCacheDirAbsolutePath() / hashedShaderSource.ToString().ToStdString();
+        // std::filesystem::path outputFilePath = shaderCacheManager.GetCacheDirAbsolutePath() / hashedShaderSource.ToString().ToStdString();
 
         // SpirV::CompilationDetails cDetails;
         // cDetails.stage = stage;
@@ -125,7 +125,7 @@ namespace Kiwi::OpenGL {
         // cDetails.optimizationLevel = ESpirVOptimizationLevel::PERFORMANCE;
         // cDetails.outputFile = outputFilePath.string();
         //
-        // Vector<u32> byteCode = SpirV::CompileGLSL(cDetails).ValueOr(Vector<u32>{});
+        // std::vector<u32> byteCode = SpirV::CompileGLSL(cDetails).ValueOr(std::vector<u32>{});
         // GlID id = CreateFromSpirVByteCode(stage, "main", byteCode);
         // if (id == KIWI_GL_UNDEFINED_ID) {
         //     return KIWI_GL_UNDEFINED_ID;
@@ -143,7 +143,7 @@ namespace Kiwi::OpenGL {
     }
 
 
-    GlID ShaderCompilerGL::CreateFromSpirVByteCode(EShaderStage stage, StringView entryPoint, const Vector<u32>& byteCode) const {
+    GlID ShaderCompilerGL::CreateFromSpirVByteCode(EShaderStage stage, StringView entryPoint, const std::vector<u32>& byteCode) const {
         if (byteCode.empty()) {
             return KIWI_GL_UNDEFINED_ID;
         }

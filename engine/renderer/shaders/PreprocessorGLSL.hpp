@@ -35,9 +35,9 @@ namespace Kiwi {
 
     class PreprocessorGLSL : protected Misc::ParserBase {
     public:
-        using SourcesMap = HashMap<EShaderStage, String>;
+        using SourcesMap = std::unordered_map<EShaderStage, String>;
         using PreprocessResult = Result<SourcesMap>;
-        using PreprocessorProperties= std::pair<String, Vector<String>>;
+        using PreprocessorProperties= std::pair<String, std::vector<String>>;
 
     public:
         PreprocessorGLSL() = default;

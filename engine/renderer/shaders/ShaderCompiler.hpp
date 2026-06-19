@@ -29,9 +29,9 @@ namespace Kiwi {
         KIWI_NODISCARD static std::unique_ptr<AShaderCompiler> Create();
 
         KIWI_NODISCARD static Opt<PreprocessorGLSL::SourcesMap> PreprocessSource(const String& src);
-        KIWI_NODISCARD static Result<Map<EShaderStage, Vector<u32>>> CompileToSpirV(const CompilationDetails& compilationDetails);
+        KIWI_NODISCARD static Result<std::map<EShaderStage, std::vector<u32>>> CompileToSpirV(const CompilationDetails& compilationDetails);
 
-        KIWI_NODISCARD static Result<Map<EShaderStage, Vector<u32>>> PreprocessAndCompileToSpirV(const File& sourceFile, ESpirVEnvironment env, ESpirVOptimizationLevel optimizationLvl);
+        KIWI_NODISCARD static Result<std::map<EShaderStage, std::vector<u32>>> PreprocessAndCompileToSpirV(const File& sourceFile, ESpirVEnvironment env, ESpirVOptimizationLevel optimizationLvl);
 
     public:
         KIWI_NODISCARD virtual std::shared_ptr<AShader> CompileFile(const File& sourceFile) = 0;

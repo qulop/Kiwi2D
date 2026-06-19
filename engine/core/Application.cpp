@@ -16,10 +16,10 @@
 
 
 namespace Kiwi {
-    Path Application::s_applicationOutputDirectory = Path{};
+    std::filesystem::path Application::s_applicationOutputDirectory = std::filesystem::path{};
 
 
-    Path Application::GetApplicationOutputDirectory() {
+    std::filesystem::path Application::GetApplicationOutputDirectory() {
         KIWI_ASSERT_BASIC(!s_applicationOutputDirectory.empty());
 
         return s_applicationOutputDirectory;
@@ -50,7 +50,7 @@ namespace Kiwi {
         }
 
         s_applicationOutputDirectory = m_cliOptions
-            .Get<Path>(CmdLine::APPLICATION_OUT_DIR)
+            .Get<std::filesystem::path>(CmdLine::APPLICATION_OUT_DIR)
             .value_or(Platform::GetPathToSysTemp());
 
         // Logger initialization
@@ -67,7 +67,7 @@ namespace Kiwi {
         GetSubsystem<WindowSubsystem>()->Init();
 
 
-        m_engine = MakeShared<Engine>();
+        m_engine = std::make_shared<Engine>();
         if (!m_engine->Init(m_cliOptions)) {
             KIWI_CTX_LOG(ERROR, "Failed to initialize the engine instance");
             return false;

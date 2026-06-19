@@ -9,7 +9,7 @@
 
 
 namespace Kiwi::Vulkan::Editor {
-    ExpectedStatus<Error<EGeneralError>> InitPlatformForImGui(SharedPtr<AWindow> mainWindow) {
+    ExpectedStatus<Error<EGeneralError>> InitPlatformForImGui(std::shared_ptr<AWindow> mainWindow) {
         KIWI_ASSERT_BASIC(mainWindow);
 
         if (mainWindow->GetVendor() == EWindowVendor::GLFW) {

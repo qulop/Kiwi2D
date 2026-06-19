@@ -49,16 +49,16 @@ namespace Kiwi::Platform {
     KIWI_NODISCARD bool CreateConsole() noexcept;
     void DestroyConsole() noexcept;
 
-    KIWI_NODISCARD Vector<DisplayInfo> EnumerateDisplays() noexcept;
+    KIWI_NODISCARD std::vector<DisplayInfo> EnumerateDisplays() noexcept;
     KIWI_NODISCARD Opt<DisplayInfo> GetPrimaryDisplay() noexcept;
     KIWI_NODISCARD size_t GetDisplaysCount() noexcept;
     KIWI_NODISCARD bool IsDisplayCurrentlyActive(const DisplayInfo& info) noexcept;
     KIWI_NODISCARD bool IsUnderDebug() noexcept;
 
-    KIWI_NODISCARD Vector<String> GetApplicationArguments() noexcept;
+    KIWI_NODISCARD std::vector<String> GetApplicationArguments() noexcept;
 
-    KIWI_NODISCARD Path GetApplicationPath() noexcept;
-    KIWI_NODISCARD Path GetPathToSysTemp() noexcept;
+    KIWI_NODISCARD std::filesystem::path GetApplicationPath() noexcept;
+    KIWI_NODISCARD std::filesystem::path GetPathToSysTemp() noexcept;
 
     KIWI_NODISCARD String WideToUTF8(const wchar_t* wstr) noexcept;
 

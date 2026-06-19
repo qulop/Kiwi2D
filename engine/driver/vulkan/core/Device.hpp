@@ -30,8 +30,8 @@ namespace Kiwi::Vulkan {
 
     struct PhysicalDeviceSwapChainSupportDetails {
         VkSurfaceCapabilitiesKHR surfaceCapabilities;
-        Vector<VkSurfaceFormatKHR> surfaceFormats;
-        Vector<VkPresentModeKHR> presentModes;
+        std::vector<VkSurfaceFormatKHR> surfaceFormats;
+        std::vector<VkPresentModeKHR> presentModes;
 
 
         KIWI_NODISCARD static PhysicalDeviceSwapChainSupportDetails Query(VkPhysicalDevice physicalDevice, VkSurfaceKHR surface);

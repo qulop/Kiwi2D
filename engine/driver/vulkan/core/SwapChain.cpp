@@ -24,7 +24,7 @@ namespace Kiwi::Vulkan {
         );
     }
 
-    bool SwapChain::Init(SharedPtr<Device> device, VkSurfaceKHR surface) {
+    bool SwapChain::Init(std::shared_ptr<Device> device, VkSurfaceKHR surface) {
         KIWI_CTX_LOG(INFO, "Starting a swapchain creation...");
 
         m_parentDevice = device;

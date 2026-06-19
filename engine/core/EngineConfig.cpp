@@ -5,8 +5,8 @@
 
 
 namespace Kiwi {
-    Vector<CmdLineOption> EngineConfig::GetCommandLineOptions() {
-        return Vector {
+    std::vector<CmdLineOption> EngineConfig::GetCommandLineOptions() {
+        return std::vector {
             CmdLineOption(CmdLine::VSYNC_ENABLE, EOptionArgType::BOOL),
             CmdLineOption(CmdLine::FULL_SCREEN, EOptionArgType::BOOL),
             CmdLineOption(CmdLine::MAX_FPS, EOptionArgType::INT),

@@ -78,35 +78,6 @@ namespace Kiwi::Traits {
 namespace Kiwi {
     using StringView = std::string_view;
 
-    using Path = std::filesystem::path;
-
-    template<typename Tx, typename Ty>
-    using Map = std::map<Tx, Ty>;
-
-    template<typename Tx, typename Ty>
-    using HashMap = std::unordered_map<Tx, Ty>;
-
-    template<typename Tx>
-    using Set = std::set<Tx>;
-
-    template<typename Tx, typename Allocator=std::allocator<Tx>>
-    using List = std::list<Tx, Allocator>;
-
-    template<typename Tx, typename Allocator=std::allocator<Tx>>
-    using ForwardList = std::forward_list<Tx, Allocator>;
-
-    template<typename Tx>
-    using HashSet = std::unordered_set<Tx>;
-
-    template<typename Tx, typename Allocator=std::allocator<Tx>>
-    using Vector = std::vector<Tx>;
-
-    template<typename Tx>
-    using SharedPtr = std::shared_ptr<Tx>;
-
-    template<typename Tx>
-    using UniquePtr = std::unique_ptr<Tx>;
-   
     template<typename Tx>
     using Opt = std::optional<Tx>;
 
@@ -122,31 +93,6 @@ namespace Kiwi {
     using NullOptType = std::nullopt_t;
     constexpr inline NullOptType nullopt = std::nullopt;
 
-    template<typename Tx, typename... Args>
-    SharedPtr<Tx> MakeShared(Args&&... args) {
-        return std::make_shared<Tx>(std::forward<Args>(args)...);
-    }
-
-    template<typename Tx, typename Deleter>
-    SharedPtr<Tx> MakeShared(Tx* ptr, Deleter&& deleter) {
-        auto ret = SharedPtr<Tx>{ ptr, std::forward<Deleter>(deleter) };
-        return ret;
-    }
-
-    template<typename Tx>
-    SharedPtr<Tx> MakeShared(size_t size) {
-        return std::make_shared<Tx>(size);
-    }
-
-    template<typename Tx, typename... Args>
-    UniquePtr<Tx> MakeUnique(Args&&... args) {
-        return std::make_unique<Tx>(std::forward<Args>(args)...);
-    }
-
-    template<typename Tx>
-    UniquePtr<Tx> MakeUnique(size_t size) {
-        return std::make_unique<Tx>(size);
-    }
 
     template<size_t N>
     struct StringLiteral {

@@ -53,11 +53,11 @@ namespace Kiwi {
 
 
     class KIWI_API ProgramOptions {
-        using ArgumentType = std::variant<std::monostate, i32, bool, String, Path>;
-        using ArgumentsMapType = HashMap<String, ArgumentType>;
+        using ArgumentType = std::variant<std::monostate, i32, bool, String, std::filesystem::path>;
+        using ArgumentsMapType = std::unordered_map<String, ArgumentType>;
 
     public:
-        KIWI_NODISCARD static Opt<ProgramOptions> Parse(const Vector<String>& args);
+        KIWI_NODISCARD static Opt<ProgramOptions> Parse(const std::vector<String>& args);
 
     public:
         ProgramOptions() = default;

@@ -25,7 +25,7 @@ namespace Kiwi::Vulkan {
 
 
     bool RenderPipelineVK::CreatePipelineLayout(const RenderPipelineInitInfo& initInfo) {
-        SharedPtr<VulkanSubsystem> vulkanSubsystem = GetSubsystem<VulkanSubsystem>();
+        std::shared_ptr<VulkanSubsystem> vulkanSubsystem = GetSubsystem<VulkanSubsystem>();
         KIWI_ENSURE(vulkanSubsystem);
 
         VkPipelineLayoutCreateInfo c = { .sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO };
@@ -44,8 +44,8 @@ namespace Kiwi::Vulkan {
     }
 
     RenderPipelineVK::PipelineState RenderPipelineVK::PreparePipelineState(const RenderPipelineInitInfo& initInfo) {
-        SharedPtr<VulkanSubsystem> vkSubsystem = GetSubsystem<VulkanSubsystem>();
-        SharedPtr<WindowSubsystem> wndSubsystem = GetSubsystem<WindowSubsystem>();
+        std::shared_ptr<VulkanSubsystem> vkSubsystem = GetSubsystem<VulkanSubsystem>();
+        std::shared_ptr<WindowSubsystem> wndSubsystem = GetSubsystem<WindowSubsystem>();
         KIWI_ENSURE(vkSubsystem && wndSubsystem);
 
         PipelineState state;

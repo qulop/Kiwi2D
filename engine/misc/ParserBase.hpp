@@ -28,9 +28,9 @@ namespace Kiwi::Misc {
 
         KIWI_NODISCARD size_t JumpToNextLine();
         
-        KIWI_NODISCARD Opt<Vector<String>> Tokenize(size_t begin, size_t end = StringView::npos, StringView delim = Globals::Misc::END_OF_TOKEN) const;
-        KIWI_NODISCARD Opt<Vector<String>> Tokenize(size_t end, StringView delim = Globals::Misc::END_OF_TOKEN) const;
-        KIWI_NODISCARD Opt<Vector<String>> Tokenize(StringView delim = Globals::Misc::END_OF_TOKEN) const;
+        KIWI_NODISCARD Opt<std::vector<String>> Tokenize(size_t begin, size_t end = StringView::npos, StringView delim = Globals::Misc::END_OF_TOKEN) const;
+        KIWI_NODISCARD Opt<std::vector<String>> Tokenize(size_t end, StringView delim = Globals::Misc::END_OF_TOKEN) const;
+        KIWI_NODISCARD Opt<std::vector<String>> Tokenize(StringView delim = Globals::Misc::END_OF_TOKEN) const;
 
     protected:
         StringView m_src;

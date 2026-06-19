@@ -12,7 +12,7 @@
 
 
 namespace Kiwi::Vulkan {
-    Expected<VkSurfaceKHR, VkResult> CreateWindowSurface(VkInstance instance, SharedPtr<AWindow> wnd) {
+    Expected<VkSurfaceKHR, VkResult> CreateWindowSurface(VkInstance instance, std::shared_ptr<AWindow> wnd) {
         VkSurfaceKHR surface = VK_NULL_HANDLE;
 
         if (wnd->GetVendor() == EWindowVendor::GLFW) {

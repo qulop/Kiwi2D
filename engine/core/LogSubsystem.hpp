@@ -11,7 +11,7 @@
 
 namespace Kiwi {
     struct LoggerInitInfo {
-        Path loggerPathDirectory;
+        std::filesystem::path loggerPathDirectory;
         StringView fileNameTemplate;
         StringView loggerCoreName;
     };
@@ -26,7 +26,7 @@ namespace Kiwi {
         static constexpr StringView DEFAULT_LOGS_DIRECTORY_NAME = "logs";
 
     private:
-        using LoggerPtrType = SharedPtr<spdlog::logger>;
+        using LoggerPtrType = std::shared_ptr<spdlog::logger>;
 
     public:
         explicit LogSubsystem(LoggerInitInfo info);
@@ -53,6 +53,6 @@ namespace Kiwi {
 
         String m_fileNameTemplate;
         String m_loggerName;
-        Path m_loggerPathDir;
+        std::filesystem::path m_loggerPathDir;
     };
 }

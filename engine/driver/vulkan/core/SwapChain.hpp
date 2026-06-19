@@ -20,7 +20,7 @@ namespace Kiwi::Vulkan {
         SwapChain() = default;
 
         KIWI_NODISCARD bool Init(TypeTags::UseVulkanSubsystemForInit);
-        KIWI_NODISCARD bool Init(SharedPtr<Device> device, VkSurfaceKHR surface);
+        KIWI_NODISCARD bool Init(std::shared_ptr<Device> device, VkSurfaceKHR surface);
 
         KIWI_NODISCARD VkSwapchainKHR GetSwapChain() const;
 
@@ -33,7 +33,7 @@ namespace Kiwi::Vulkan {
         KIWI_NODISCARD Result<VkImageView> CreateViewFromImage(VkImage image) const;
 
     private:
-        SharedPtr<Device> m_parentDevice;
+        std::shared_ptr<Device> m_parentDevice;
 
         VkSurfaceFormatKHR m_surfaceFormat = {};
         VkPresentModeKHR m_presentMode = {};
@@ -42,7 +42,7 @@ namespace Kiwi::Vulkan {
 
         VkSwapchainKHR m_swapChain = VK_NULL_HANDLE;
 
-        Vector<VkImage> m_images;
-        Vector<VkImageView> m_imageViews;
+        std::vector<VkImage> m_images;
+        std::vector<VkImageView> m_imageViews;
     };
 }

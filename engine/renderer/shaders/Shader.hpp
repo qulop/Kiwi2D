@@ -55,9 +55,9 @@ namespace Kiwi {
 
     protected:
         template<Concepts::DerivedFrom<IShaderModule> THandle>
-        explicit AShader(Map<EShaderStage, THandle>&& shaderModules) {
+        explicit AShader(std::map<EShaderStage, THandle>&& shaderModules) {
             for (auto& [stage, module] : shaderModules) {
-                m_shaderModules[stage] = MakeUnique<THandle>(std::move(module));
+                m_shaderModules[stage] = std::make_unique<THandle>(std::move(module));
             }
         }
 
@@ -65,6 +65,6 @@ namespace Kiwi {
 
         UUID m_shaderUUID = UUID::Generate();
         std::filesystem::path m_assetPath;
-        Map<EShaderStage, UniquePtr<IShaderModule>> m_shaderModules;
+        std::map<EShaderStage, std::unique_ptr<IShaderModule>> m_shaderModules;
     };
 }

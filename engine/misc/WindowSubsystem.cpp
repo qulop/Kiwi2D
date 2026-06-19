@@ -11,7 +11,7 @@ namespace Kiwi {
     bool WindowSubsystem::CreateMainWindow(StringView title) {
         KIWI_ASSERT(!m_mainWindow, "Main window already created!");
 
-        Vector<Platform::DisplayInfo> displayInfos = Platform::EnumerateDisplays();
+        std::vector<Platform::DisplayInfo> displayInfos = Platform::EnumerateDisplays();
         if (displayInfos.empty()) {
             KIWI_CTX_LOG(ERROR, "Failed to enumerate system displays");
             return false;
@@ -41,13 +41,13 @@ namespace Kiwi {
         return true;
     }
 
-    SharedPtr<AWindow> WindowSubsystem::GetMainWindow() {
+    std::shared_ptr<AWindow> WindowSubsystem::GetMainWindow() {
         KIWI_ENSURE(m_mainWindow);
 
         return m_mainWindow;
     }
 
-    Vector<const char*> WindowSubsystem::GetVulkanExtensionsForWindow(SharedPtr<AWindow> window) {
+    std::vector<const char*> WindowSubsystem::GetVulkanExtensionsForWindow(std::shared_ptr<AWindow> window) {
         KIWI_ENSURE(window);
 
         return window->GetVulkanExtensions();

@@ -64,8 +64,8 @@ namespace Kiwi {
         return nullopt;
     }
 
-    Result<Map<EShaderStage, Vector<u32>>> AShaderCompiler::CompileToSpirV(const CompilationDetails& compilationDetails) {
-        Map<EShaderStage, Vector<u32>> result;
+    Result<std::map<EShaderStage, std::vector<u32>>> AShaderCompiler::CompileToSpirV(const CompilationDetails& compilationDetails) {
+        std::map<EShaderStage, std::vector<u32>> result;
 
         for (const auto& [stage, src] : compilationDetails.preprocessedSrc) {
             SpirV::CompilationDetails details;
@@ -86,7 +86,7 @@ namespace Kiwi {
         return Success(result);
     }
 
-    Result<Map<EShaderStage, Vector<u32>>> AShaderCompiler::PreprocessAndCompileToSpirV(const File& sourceFile, ESpirVEnvironment env, ESpirVOptimizationLevel optimizationLvl) {
+    Result<std::map<EShaderStage, std::vector<u32>>> AShaderCompiler::PreprocessAndCompileToSpirV(const File& sourceFile, ESpirVEnvironment env, ESpirVOptimizationLevel optimizationLvl) {
         Result<FileContent> src = sourceFile.ReadAll();
         if (!src) {
             return Error::Create(

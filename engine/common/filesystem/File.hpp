@@ -53,7 +53,7 @@ namespace Kiwi {
         KIWI_NODISCARD Result<void> Write(StringView data) const;
 
         KIWI_NODISCARD Result<FileContent> ReadAll(bool rewindOnEnd = false) const;
-        KIWI_NODISCARD Result<SharedPtr<byte>> ReadAsBytes(bool rewindOnEnd = false) const;
+        KIWI_NODISCARD Result<std::shared_ptr<byte>> ReadAsBytes(bool rewindOnEnd = false) const;
 
         void Rewind() const;
 

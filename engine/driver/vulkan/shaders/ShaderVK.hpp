@@ -35,6 +35,6 @@ namespace Kiwi::Vulkan {
         ~ShaderVK() override;
 
     private:
-        ShaderVK(HashMap<EShaderStage, VkShaderModule>&& shaderModules);
+        ShaderVK(std::unordered_map<EShaderStage, VkShaderModule>&& shaderModules);
     };
 }

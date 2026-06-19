@@ -11,7 +11,7 @@ namespace Kiwi::Vulkan {
         u32 count = 0;
         vkGetPhysicalDeviceQueueFamilyProperties(physicalDevice, &count, nullptr);
 
-        Vector<VkQueueFamilyProperties> families(count);
+        std::vector<VkQueueFamilyProperties> families(count);
         vkGetPhysicalDeviceQueueFamilyProperties(physicalDevice, &count, families.data());
 
         for (i32 i : std::views::iota(0u, families.size())) {

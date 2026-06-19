@@ -6,7 +6,7 @@
 
 
 namespace Kiwi::OpenGL {
-    SharedPtr<AShaderCompiler> GraphicObjectsFactoryGL::CreateShaderCompiler() const {
-        return MakeShared<ShaderCompilerGL>();
+    std::shared_ptr<AShaderCompiler> GraphicObjectsFactoryGL::CreateShaderCompiler() const {
+        return std::make_shared<ShaderCompilerGL>();
     }
 }

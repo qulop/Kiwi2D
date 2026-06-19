@@ -75,11 +75,11 @@ namespace Kiwi::Vulkan {
 
 
     template<typename TResult, std::invocable<u32*, TResult*> TFunction>
-    KIWI_NODISCARD Vector<TResult> EnumerateVulkanArray(TFunction&& fn) {
+    KIWI_NODISCARD std::vector<TResult> EnumerateVulkanArray(TFunction&& fn) {
         u32 c = 0;
         std::invoke(std::forward<TFunction>(fn), &c, nullptr);
 
-        Vector<TResult> r(c);
+        std::vector<TResult> r(c);
         std::invoke(std::forward<TFunction>(fn), &c, r.data());
 
         return r;

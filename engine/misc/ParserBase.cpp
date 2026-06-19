@@ -44,7 +44,7 @@ namespace Kiwi::Misc {
         return m_currPos;
     }
 
-    KIWI_NODISCARD Opt<Vector<String>> ParserBase::Tokenize(size_t begin, size_t end, StringView delim) const {
+    KIWI_NODISCARD Opt<std::vector<String>> ParserBase::Tokenize(size_t begin, size_t end, StringView delim) const {
         if (end > m_src.size()) {
             return nullopt;
         }
@@ -53,7 +53,7 @@ namespace Kiwi::Misc {
             end = m_src.size();
         }
 
-        Vector<String> tokens;
+        std::vector<String> tokens;
         size_t curr = begin;
 
         while (curr < end) {
@@ -73,11 +73,11 @@ namespace Kiwi::Misc {
         return tokens;
     }
 
-    KIWI_NODISCARD Opt<Vector<String>> ParserBase::Tokenize(size_t end, StringView delim) const {
+    KIWI_NODISCARD Opt<std::vector<String>> ParserBase::Tokenize(size_t end, StringView delim) const {
         return Tokenize(m_currPos, end, delim);
     }
 
-    KIWI_NODISCARD Opt<Vector<String>> ParserBase::Tokenize(StringView delim) const {
+    KIWI_NODISCARD Opt<std::vector<String>> ParserBase::Tokenize(StringView delim) const {
         return Tokenize(0, StringView::npos, delim);
     }
 

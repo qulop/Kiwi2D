@@ -80,11 +80,11 @@ namespace Kiwi::Platform {
         FreeConsole();
     }
 
-    Vector<DisplayInfo> EnumerateDisplays() noexcept {
-        Vector<DisplayInfo> result;
+    std::vector<DisplayInfo> EnumerateDisplays() noexcept {
+        std::vector<DisplayInfo> result;
 
         auto&& callback = [](HMONITOR hMonitor, HDC, LPRECT, LPARAM lParam) -> BOOL {
-            auto* res = BasicCast::UnsafeCast<Vector<DisplayInfo>*>(lParam);
+            auto* res = BasicCast::UnsafeCast<std::vector<DisplayInfo>*>(lParam);
 
             MONITORINFOEX info;
             info.cbSize = sizeof(info);
@@ -116,7 +116,7 @@ namespace Kiwi::Platform {
     }
 
     Opt<DisplayInfo> GetPrimaryDisplay() noexcept {
-        Vector<DisplayInfo> monitors = EnumerateDisplays();
+        std::vector<DisplayInfo> monitors = EnumerateDisplays();
 
         auto it = std::ranges::find_if(monitors, [](DisplayInfo& m) {
             return m.isPrimary;
@@ -149,7 +149,7 @@ namespace Kiwi::Platform {
         return IsDebuggerPresent();
     }
 
-    Vector<String> GetApplicationArguments() noexcept {
+    std::vector<String> GetApplicationArguments() noexcept {
         if (!Globals::Platform::g_applicationArguments.empty()) {
             return Globals::Platform::g_applicationArguments;
         }
@@ -166,19 +166,19 @@ namespace Kiwi::Platform {
         return Globals::Platform::g_applicationArguments;
     }
 
-    Path GetApplicationPath() noexcept {
+    std::filesystem::path GetApplicationPath() noexcept {
         TCHAR path[MAX_PATH];
         GetModuleFileName(nullptr, path, MAX_PATH);
         KIWI_ASSERT(GetLastError() != ERROR_INSUFFICIENT_BUFFER, "Failed to get application path buffer: ERROR_INSUFFICIENT_BUFFER");
 
-        return Path{ path };
+        return std::filesystem::path{ path };
     }
 
-    Path GetPathToSysTemp() noexcept {
+    std::filesystem::path GetPathToSysTemp() noexcept {
         wchar_t path[MAX_PATH];
         GetTempPathW(MAX_PATH, path);
 
-        return Path{ path };
+        return std::filesystem::path{ path };
     }
 
     String WideToUTF8(const wchar_t* wstr) noexcept {

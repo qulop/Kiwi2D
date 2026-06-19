@@ -6,15 +6,15 @@
 
 
 namespace Kiwi::Vulkan {
-    SharedPtr<AGraphicDevice> GraphicObjectsFactoryVK::CreateGraphicDevice() const {
-        return MakeShared<GraphicDeviceVK>();
+    std::shared_ptr<AGraphicDevice> GraphicObjectsFactoryVK::CreateGraphicDevice() const {
+        return std::make_shared<GraphicDeviceVK>();
     }
 
-    SharedPtr<ARenderPipeline> GraphicObjectsFactoryVK::CreateRenderPipeline() const {
+    std::shared_ptr<ARenderPipeline> GraphicObjectsFactoryVK::CreateRenderPipeline() const {
         return nullptr;
     }
 
-    SharedPtr<AShaderCompiler> GraphicObjectsFactoryVK::CreateShaderCompiler() const {
+    std::shared_ptr<AShaderCompiler> GraphicObjectsFactoryVK::CreateShaderCompiler() const {
         return nullptr;
     }
 }

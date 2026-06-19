@@ -16,7 +16,7 @@ namespace Kiwi::Vulkan {
     class VulkanAllocator;
 
 
-    Expected<VkSurfaceKHR, VkResult> CreateWindowSurface(VkInstance instance, SharedPtr<AWindow> wnd);
+    Expected<VkSurfaceKHR, VkResult> CreateWindowSurface(VkInstance instance, std::shared_ptr<AWindow> wnd);
 
 
     class VulkanSubsystem : public ASubsystem {
@@ -70,9 +70,9 @@ namespace Kiwi::Vulkan {
         KIWI_NODISCARD bool CreateSwapChain();
 
 
-        KIWI_NODISCARD static Vector<VkLayerProperties> GetAvailableValidationLayers();
+        KIWI_NODISCARD static std::vector<VkLayerProperties> GetAvailableValidationLayers();
 
-        KIWI_NODISCARD static Status<Vector<String>> CheckRequiredValidationLayersForSupport();
+        KIWI_NODISCARD static Status<std::vector<String>> CheckRequiredValidationLayersForSupport();
 
         void DeInit() override;
 
@@ -82,8 +82,8 @@ namespace Kiwi::Vulkan {
 
         VkSurfaceKHR surface = VK_NULL_HANDLE;
 
-        SharedPtr<Device> device;
+        std::shared_ptr<Device> device;
 
-        SharedPtr<SwapChain> swapChain;
+        std::shared_ptr<SwapChain> swapChain;
     };
 }

@@ -22,6 +22,6 @@ namespace Kiwi::OpenGL {
     private:
         KIWI_NODISCARD GlID CompileShaderStage(EShaderStage stage, StringView src) const;
 
-        KIWI_NODISCARD GlID CreateFromSpirVByteCode(EShaderStage stage, StringView entryPoint, const Vector<u32>& byteCode) const;
+        KIWI_NODISCARD GlID CreateFromSpirVByteCode(EShaderStage stage, StringView entryPoint, const std::vector<u32>& byteCode) const;
     };
 }

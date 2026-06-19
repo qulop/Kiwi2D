@@ -7,10 +7,10 @@
 
 
 namespace Kiwi {
-    SharedPtr<AWindow> AWindow::CreateWindowImpl() {
+    std::shared_ptr<AWindow> AWindow::CreateWindowImpl() {
         // At the moment we have only implementation for GLFW 🥲
         if constexpr (GetCurrentPlatform() == ECurrentPlatform::WINDOWS) {
-            return MakeShared<GLFWWindow>();
+            return std::make_shared<GLFWWindow>();
         }
 
         std::unreachable();

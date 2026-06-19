@@ -42,6 +42,6 @@ namespace Kiwi {
         String logFileTemplateName;
 
     public:
-        KIWI_NODISCARD static Vector<CmdLineOption> GetCommandLineOptions();
+        KIWI_NODISCARD static std::vector<CmdLineOption> GetCommandLineOptions();
     };
 }

@@ -28,9 +28,9 @@ namespace Kiwi {
             }
         }
 
-        Path logFilePath = m_loggerPathDir / m_fileNameTemplate.ToStdString();
+        std::filesystem::path logFilePath = m_loggerPathDir / m_fileNameTemplate.ToStdString();
 
-        auto&& consoleSink = MakeShared<spdlog::sinks::ansicolor_stdout_sink_mt>(
+        auto&& consoleSink = std::make_shared<spdlog::sinks::ansicolor_stdout_sink_mt>(
             spdlog::color_mode::always
         );
         consoleSink->set_pattern("<%m-%d-%Y %H:%M:%S> %^[%l]: %v%$");
@@ -40,7 +40,7 @@ namespace Kiwi {
         consoleSink->set_color(spdlog::level::err, consoleSink->red);
         consoleSink->set_color(spdlog::level::critical, consoleSink->magenta);
 
-        auto&& dailySink = MakeShared<spdlog::sinks::daily_file_sink_mt>(
+        auto&& dailySink = std::make_shared<spdlog::sinks::daily_file_sink_mt>(
             logFilePath.string(),
             1,  // 01:00 AM
             0
@@ -48,9 +48,9 @@ namespace Kiwi {
         dailySink->set_pattern("[%l] <%m-%d-%Y %H:%M:%S> - [thread: %t] [PID: %P]: %v");
 
 
-        Vector<spdlog::sink_ptr> sinks = { std::move(consoleSink), std::move(dailySink) };
+        std::vector<spdlog::sink_ptr> sinks = { std::move(consoleSink), std::move(dailySink) };
 
-        m_logger = MakeShared<spdlog::logger>(m_loggerName.ToCString(), sinks.begin(), sinks.end());
+        m_logger = std::make_shared<spdlog::logger>(m_loggerName.ToCString(), sinks.begin(), sinks.end());
         m_logger->set_level(KIWI_LOG_LEVEL);
         m_logger->flush_on(KIWI_LOG_LEVEL);
         spdlog::register_logger(m_logger);

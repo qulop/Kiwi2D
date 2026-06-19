@@ -22,8 +22,8 @@ namespace Kiwi {
 
     public:
         FileContent() = default;
-        FileContent(EFileContentDataFormat format, const Vector<u32>& bytesStream);
-        FileContent(EFileContentDataFormat format, const Vector<u8>& bytesStream);
+        FileContent(EFileContentDataFormat format, const std::vector<u32>& bytesStream);
+        FileContent(EFileContentDataFormat format, const std::vector<u8>& bytesStream);
         FileContent(EFileContentDataFormat format, const u8* bytesStream, size_t bytesSize);
         FileContent(EFileContentDataFormat format, StringView data);
 
@@ -41,10 +41,10 @@ namespace Kiwi {
         
         template<typename TByteType = u8>
             requires Concepts::SameAs<TByteType, u32> || Concepts::SameAs<TByteType, u8>
-        KIWI_NODISCARD Vector<TByteType> GetAsBytesStream() const {
+        KIWI_NODISCARD std::vector<TByteType> GetAsBytesStream() const {
             KIWI_ASSERT_BASIC((m_contentByteSize % sizeof(TByteType)) == 0);
 
-            Vector<TByteType> res(m_contentByteSize / sizeof(TByteType));
+            std::vector<TByteType> res(m_contentByteSize / sizeof(TByteType));
             CMemoryTools::MemCpy(
                 (void*)res.data(),
                 (void*)m_content.data(),
@@ -58,7 +58,7 @@ namespace Kiwi {
         EFileContentDataFormat m_format = EFileContentDataFormat::PLAIN_TEXT;
 
         size_t m_contentByteSize = 0;
-        Vector<raw_byte> m_content;
+        std::vector<raw_byte> m_content;
     };
 
 
@@ -69,7 +69,7 @@ namespace Kiwi {
         }
 
         template<typename TByteType>
-        KIWI_NODISCARD KIWI_FORCEINLINE static Vector<TByteType> ToBytesStream(const FileContent& fc) {
+        KIWI_NODISCARD KIWI_FORCEINLINE static std::vector<TByteType> ToBytesStream(const FileContent& fc) {
             return fc.GetAsBytesStream<TByteType>();
         }
     };

@@ -6,11 +6,11 @@
 namespace Kiwi::Vulkan {
     class GraphicObjectsFactoryVK : public IGraphicObjectsFactory {
     public:
-        KIWI_NODISCARD SharedPtr<AGraphicDevice> CreateGraphicDevice() const override;
+        KIWI_NODISCARD std::shared_ptr<AGraphicDevice> CreateGraphicDevice() const override;
 
-        KIWI_NODISCARD SharedPtr<ARenderPipeline> CreateRenderPipeline() const override;
+        KIWI_NODISCARD std::shared_ptr<ARenderPipeline> CreateRenderPipeline() const override;
 
-        KIWI_NODISCARD SharedPtr<AShaderCompiler> CreateShaderCompiler() const override;
+        KIWI_NODISCARD std::shared_ptr<AShaderCompiler> CreateShaderCompiler() const override;
 
         ~GraphicObjectsFactoryVK() override = default;
     };

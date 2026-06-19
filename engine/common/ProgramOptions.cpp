@@ -44,9 +44,9 @@ namespace Kiwi {
         *this = std::move(other);
     }
 
-    Opt<ProgramOptions> ProgramOptions::Parse(const Vector<String>& args) {
+    Opt<ProgramOptions> ProgramOptions::Parse(const std::vector<String>& args) {
         ProgramOptions result;
-        Vector<CmdLineOption> existingOptions = EngineConfig::GetCommandLineOptions();
+        std::vector<CmdLineOption> existingOptions = EngineConfig::GetCommandLineOptions();
 
         for (size_t tokenIndex = 0; tokenIndex < args.size(); tokenIndex++) {
             const String& token = args.at(tokenIndex);
@@ -145,7 +145,7 @@ namespace Kiwi {
             return String::ParseBool(arg).value();
         }
         if (opt.type == EOptionArgType::PATH) {
-            return Path { arg };
+            return std::filesystem::path { arg };
         }
 
         return String{ arg };

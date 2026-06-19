@@ -15,7 +15,7 @@ namespace Kiwi {
         KIWI_CREATE_OBJECT(Application, AObject)
 
     public:
-        KIWI_NODISCARD static Path GetApplicationOutputDirectory();
+        KIWI_NODISCARD static std::filesystem::path GetApplicationOutputDirectory();
 
     public:
         KIWI_NODISCARD virtual bool Init();
@@ -34,9 +34,9 @@ namespace Kiwi {
     private:
         std::atomic<bool> m_isInitialized = false;
 
-        static Path s_applicationOutputDirectory;
+        static std::filesystem::path s_applicationOutputDirectory;
 
-        SharedPtr<Engine> m_engine;
+        std::shared_ptr<Engine> m_engine;
 
         ProgramOptions m_cliOptions;
     };
