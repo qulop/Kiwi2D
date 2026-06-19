@@ -63,9 +63,7 @@ set(ENGINE_LIBRARY_SRC
     engine/renderer/Texture.cpp
     # --- END ---
 
-    engine/sync/Mutex.cpp
-    engine/sync/Thread.cpp
-
+    engine/common/sync/Thread.cpp
     engine/common/filesystem/File.cpp
     engine/common/filesystem/FileContent.cpp
     engine/common/meta/TypeMetaInfo.cpp
