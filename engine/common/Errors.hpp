@@ -90,7 +90,7 @@ namespace Kiwi {
     struct ErrorDescription<EGeneralError::Type> {
         static constexpr StringView ERROR_CATEGORY_NAME = "General";
 
-        KIWI_NODISCARD static String Describe(u16 t) {
+        KIWI_NODISCARD static constexpr String Describe(u16 t) {
             return EGeneralError::ToString(static_cast<EGeneralError::Type>(t));
         }
     };
@@ -99,7 +99,7 @@ namespace Kiwi {
     struct ErrorDescription<EErrorIO::Type> {
         static constexpr StringView ERROR_CATEGORY_NAME = "IO";
 
-        KIWI_NODISCARD static String Describe(u16 t) {
+        KIWI_NODISCARD static constexpr String Describe(u16 t) {
             return EErrorIO::ToString(static_cast<EErrorIO::Type>(t));
         }
     };
@@ -111,7 +111,7 @@ namespace Kiwi {
 
     public:
         template<Concepts::ErrorEnumeration EErrorEnum>
-        KIWI_NODISCARD static Error Create(EErrorEnum err, Opt<String> desc = nullopt) {
+        KIWI_NODISCARD static constexpr Error Create(EErrorEnum err, Opt<String> desc = nullopt) {
             return {
                 &ErrorDescription<EErrorEnum>::Describe,
                 static_cast<u16>(err),
@@ -120,21 +120,21 @@ namespace Kiwi {
         }
 
     public:
-        Error() = default;
+        constexpr Error() = default;
 
 
         template<Concepts::ErrorEnumeration EErrorEnum>
-        KIWI_NODISCARD bool Is(EErrorEnum err) const {
+        KIWI_NODISCARD constexpr bool Is(EErrorEnum err) const {
             return (categoryDescriptionFn == &ErrorDescription<EErrorEnum>::Describe) && (code == static_cast<u16>(err));
         }
 
         template<Concepts::ErrorEnumeration EErrorEnum>
-        KIWI_NODISCARD bool InCategory() const {
+        KIWI_NODISCARD constexpr bool InCategory() const {
             return categoryDescriptionFn == &ErrorDescription<EErrorEnum>::Describe;
         }
 
         template<Concepts::ErrorEnumeration EErrorEnum>
-        KIWI_NODISCARD Opt<EErrorEnum> GetAsEnum() const {
+        KIWI_NODISCARD constexpr Opt<EErrorEnum> GetAsEnum() const {
             if (InCategory<EErrorEnum>()) {
                 return static_cast<EErrorEnum>(code);
             }
@@ -142,7 +142,7 @@ namespace Kiwi {
             return nullopt;
         }
 
-        KIWI_NODISCARD String GetDescription() const {
+        KIWI_NODISCARD constexpr String GetDescription() const {
             if (desc) {
                 return *desc;
             }
@@ -150,10 +150,10 @@ namespace Kiwi {
             return categoryDescriptionFn(code);
         }
 
-        KIWI_NODISCARD bool operator==(const Error& other) const noexcept = default;
+        KIWI_NODISCARD constexpr bool operator==(const Error& other) const noexcept = default;
 
     private:
-        Error(ErrorCategoryDescriptionFN categoryDescFn, u16 code, Opt<String> desc) :
+        constexpr Error(ErrorCategoryDescriptionFN categoryDescFn, u16 code, Opt<String> desc) :
             categoryDescriptionFn(categoryDescFn),
             code(code),
             desc(std::move(desc))
