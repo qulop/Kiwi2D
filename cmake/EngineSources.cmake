@@ -24,29 +24,29 @@ set(ENGINE_LIBRARY_SRC
     engine/platform/window/GLFWWindow.cpp
     engine/platform/PlatformVars.cpp
 
-    # --- BEGIN: OpenGL backend ---
-    engine/backends/opengl/RenderContextGL.cpp
-    engine/backends/opengl/GraphicObjectsFactoryGL.cpp
-    engine/backends/opengl/TextureGL.cpp
-    engine/backends/opengl/shaders/ShaderGL.cpp
-    engine/backends/opengl/shaders/ShaderCompilerGL.cpp
+    # --- BEGIN: OpenGL driver ---
+    engine/driver/opengl/RenderContextGL.cpp
+    engine/driver/opengl/GraphicObjectsFactoryGL.cpp
+    engine/driver/opengl/TextureGL.cpp
+    engine/driver/opengl/shaders/ShaderGL.cpp
+    engine/driver/opengl/shaders/ShaderCompilerGL.cpp
     # --- END ---
 
-    # --- BEGIN: Vulkan backend ---
-    engine/backends/vulkan/RenderContextVK.cpp
-    engine/backends/vulkan/core/VulkanSubsystem.cpp
-    engine/backends/vulkan/core/VulkanTypes.cpp
-    engine/backends/vulkan/core/QueueFamilies.cpp
-    engine/backends/vulkan/core/Device.cpp
-    engine/backends/vulkan/core/SwapChain.cpp
-    engine/backends/vulkan/core/Pipeline.cpp
-    engine/backends/vulkan/core/RenderPass.cpp
-    engine/backends/vulkan/pipeline/RenderPipelineVK.cpp
-    engine/backends/vulkan/memory/Allocator.cpp
-    engine/backends/vulkan/GraphicObjectsFactoryVK.cpp
-    engine/backends/vulkan/GraphicDeviceVK.cpp
-    engine/backends/vulkan/shaders/ShaderCompilerVK.cpp
-    engine/backends/vulkan/shaders/ShaderVK.cpp
+    # --- BEGIN: Vulkan driver ---
+    engine/driver/vulkan/RenderContextVK.cpp
+    engine/driver/vulkan/core/VulkanSubsystem.cpp
+    engine/driver/vulkan/core/VulkanTypes.cpp
+    engine/driver/vulkan/core/QueueFamilies.cpp
+    engine/driver/vulkan/core/Device.cpp
+    engine/driver/vulkan/core/SwapChain.cpp
+    engine/driver/vulkan/core/Pipeline.cpp
+    engine/driver/vulkan/core/RenderPass.cpp
+    engine/driver/vulkan/pipeline/RenderPipelineVK.cpp
+    engine/driver/vulkan/memory/Allocator.cpp
+    engine/driver/vulkan/GraphicObjectsFactoryVK.cpp
+    engine/driver/vulkan/GraphicDeviceVK.cpp
+    engine/driver/vulkan/shaders/ShaderCompilerVK.cpp
+    engine/driver/vulkan/shaders/ShaderVK.cpp
     # --- END ---
 
     # --- BEGIN: Renderer ---
@@ -86,7 +86,7 @@ set(ENGINE_APPLICATION_SRC
 
 if(WIN32)
     list(APPEND ENGINE_LIBRARY_SRC
-        engine/backends/vulkan/core/win32/ImplWin32.cpp
+        engine/driver/vulkan/core/win32/ImplWin32.cpp
 
         engine/win32/PlatformWin32.cpp
         engine/win32/io/SystemConsoleWin32.cpp
