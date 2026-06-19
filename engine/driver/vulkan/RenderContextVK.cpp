@@ -2,10 +2,10 @@
 
 #include <core/EngineConfig.hpp>
 
-#include <backends/vulkan/core/VulkanSubsystem.hpp>
-#include <backends/vulkan/core/Device.hpp>
+#include <driver/vulkan/core/VulkanSubsystem.hpp>
+#include <driver/vulkan/core/Device.hpp>
 
-#include <backends/vulkan/pipeline/RenderPipelineVK.hpp>
+#include <driver/vulkan/pipeline/RenderPipelineVK.hpp>
 
 
 namespace Kiwi::Vulkan {

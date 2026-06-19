@@ -9,8 +9,8 @@ namespace Kiwi {
 
 
 namespace Kiwi::Editor {
-    class Editor : public Application {
-        KIWI_CREATE_OBJECT(Editor, Application)
+    class EditorApp : public Application {
+        KIWI_CREATE_OBJECT(EditorApp, Application)
 
     public:
         KIWI_NODISCARD bool Init() override;
@@ -21,7 +21,7 @@ namespace Kiwi::Editor {
         void Update() override;
 
 
-        ~Editor() override = default;
+        ~EditorApp() override = default;
 
     private:
         std::shared_ptr<ImGuiSubsystem> m_imguiSubsystem;

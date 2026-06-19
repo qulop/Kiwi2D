@@ -26,7 +26,7 @@ namespace Kiwi {
         m_window->SetVSyncEnable(m_engineConfig.vsyncEnabled);
         m_window->MaximizeWindow(true);
 
-        m_renderer = MakeShared<Renderer>();
+        m_renderer = std::make_shared<Renderer>();
         if (!m_renderer->Init()) {
             KIWI_CTX_LOG(ERROR, "Failed to initialize the renderer");
             return false;

@@ -7,8 +7,8 @@
 #include <misc/WindowSubsystem.hpp>
 #include <math/Rect.hpp>
 
-#include <backends/vulkan/core/Device.hpp>
-#include <backends/vulkan/core/CreateInfo.hpp>
+#include <driver/vulkan/core/Device.hpp>
+#include <driver/vulkan/core/CreateInfo.hpp>
 
 #include <vulkan/vk_enum_string_helper.h>
 

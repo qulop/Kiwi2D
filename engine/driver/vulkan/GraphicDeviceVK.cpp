@@ -1,7 +1,7 @@
 #include "GraphicDeviceVK.hpp"
 
-#include <backends/vulkan/RenderContextVK.hpp>
-#include <backends/vulkan/core/Device.hpp>
+#include <driver/vulkan/RenderContextVK.hpp>
+#include <driver/vulkan/core/Device.hpp>
 
 
 namespace Kiwi::Vulkan {

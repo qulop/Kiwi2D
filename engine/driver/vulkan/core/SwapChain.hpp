@@ -2,7 +2,7 @@
 
 #include <core/Object.hpp>
 
-#include <backends/vulkan/core/VulkanTypes.hpp>
+#include <driver/vulkan/core/VulkanTypes.hpp>
 
 #include <common/types/Result.hpp>
 

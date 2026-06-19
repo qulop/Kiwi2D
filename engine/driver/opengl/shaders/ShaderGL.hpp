@@ -2,7 +2,7 @@
 
 #include <renderer/shaders/Shader.hpp>
 
-#include <backends/opengl/basic/TypesGL.hpp>
+#include <driver/opengl/basic/TypesGL.hpp>
 
 
 namespace Kiwi::OpenGL {

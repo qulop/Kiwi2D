@@ -7,7 +7,7 @@
 
 
 namespace Kiwi::Editor {
-    bool Editor::Init() {
+    bool EditorApp::Init() {
         if (!Super::Init()) {
             return false;
         }
@@ -24,19 +24,19 @@ namespace Kiwi::Editor {
         return true;
     }
 
-    void Editor::BeforeFrameBegin() {
+    void EditorApp::BeforeFrameBegin() {
         Super::BeforeFrameBegin();
 
         m_imguiSubsystem->BeginFrame();
     }
 
-    void Editor::BeforeFrameEnd() {
+    void EditorApp::BeforeFrameEnd() {
         Super::BeforeFrameEnd();
 
         m_imguiSubsystem->EndFrame();
     }
 
-    void Editor::Update() {
+    void EditorApp::Update() {
         Super::Update();
 
         if (ImGui::Begin("Hierarchy")) {

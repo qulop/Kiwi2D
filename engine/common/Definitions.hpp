@@ -65,6 +65,4 @@ namespace Kiwi {
 
     using byte = uint_least8_t;
     enum class raw_byte : unsigned char {};
-
-    using hash_t = u64;
 }

@@ -5,10 +5,10 @@
 #include <core/LogSubsystem.hpp>
 #include <core/EngineConfig.hpp>
 
-#include <backends/vulkan/core/Device.hpp>
-#include <backends/vulkan/core/SwapChain.hpp>
-#include <backends/vulkan/core/CreateInfo.hpp>
-#include <backends/vulkan/memory/Allocator.hpp>
+#include <driver/vulkan/core/Device.hpp>
+#include <driver/vulkan/core/SwapChain.hpp>
+#include <driver/vulkan/core/CreateInfo.hpp>
+#include <driver/vulkan/memory/Allocator.hpp>
 
 #include <vulkan/vk_enum_string_helper.h>
 

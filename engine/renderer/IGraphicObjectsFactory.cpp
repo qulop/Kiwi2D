@@ -1,7 +1,7 @@
 #include "IGraphicObjectsFactory.hpp"
 
-#include <backends/opengl/GraphicObjectsFactoryGL.hpp>
-#include <backends/vulkan/GraphicObjectsFactoryVK.hpp>
+#include <driver/opengl/GraphicObjectsFactoryGL.hpp>
+#include <driver/vulkan/GraphicObjectsFactoryVK.hpp>
 
 
 

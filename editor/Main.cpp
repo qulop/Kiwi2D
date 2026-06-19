@@ -11,6 +11,8 @@
 
 #include <sync/Thread.hpp>
 
+#include <app/Editor.hpp>
+
 
 namespace Kiwi {
     i32 EntryPoint(i32 argc, char** argv) {
@@ -21,7 +23,7 @@ namespace Kiwi {
 
         i32 exitCode = KIWI_EXIT_SUCCESS;
         {
-            auto app = MakeUnique<Application>();
+            std::unique_ptr<Application> app = std::make_unique<Editor::EditorApp>();
             if (!app->Init()) {
                 return KIWI_EXIT_FAILURE;
             }

@@ -1,7 +1,7 @@
 #include "GraphicObjectsFactoryGL.hpp"
 
-#include <backends/opengl/RenderContextGL.hpp>
-#include <backends/opengl/shaders/ShaderCompilerGL.hpp>
+#include <driver/opengl/RenderContextGL.hpp>
+#include <driver/opengl/shaders/ShaderCompilerGL.hpp>
 
 
 
