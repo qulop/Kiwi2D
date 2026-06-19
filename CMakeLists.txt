@@ -114,6 +114,7 @@ add_subdirectory(third_party/freetype2)
 add_subdirectory(third_party/ImGui)
 add_subdirectory(third_party/shaderc)
 add_subdirectory(third_party/tracy)
+add_subdirectory(third_party/sqlite3)
 
 set(CMAKE_POLICY_VERSION_MINIMUM 3.5)
 add_subdirectory(third_party/xxHash)

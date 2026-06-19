@@ -13,6 +13,7 @@ function(kiwi_target_include_directories TARGET_NAME)
         ${TARGET_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/third_party/xxHash
         ${TARGET_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/third_party/tracy/public
         ${TARGET_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/third_party/vma/include
+        ${TARGET_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/third_party/sqlite3
     )
 
     if (${TARGET_NAME} EQUAL ${ENGINE_EDITOR_NAME})
@@ -45,6 +46,7 @@ function(kiwi_setup_library TARGET_NAME)
         PRIVATE shaderc
         PRIVATE xxhash
         PRIVATE Tracy::TracyClient
+        PRIVATE SQLite3::SQLite3
     )
     if(WIN32)
         target_link_libraries(${TARGET_NAME} PRIVATE Winmm)
