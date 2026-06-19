@@ -55,19 +55,19 @@ TEST(Result_Test, InitializationWithSuccessValue) {
 TEST(Result_Test, InitializationWithError) {
     using namespace Kiwi;
 
-    constexpr auto testError = Error{ .kind = EGeneralError::INVALID_ARGUMENT };
+    constexpr Error testError = Error::Create(EGeneralError::INVALID_ARGUMENT);
     constexpr Result<u32> errorResult = testError;
 
     EXPECT_FALSE(errorResult);
     EXPECT_FALSE(errorResult.HasValue());
     EXPECT_TRUE(errorResult.HasError());
-    EXPECT_EQ(errorResult.GetError().kind, testError.kind);
+    EXPECT_EQ(errorResult.GetError(), testError);
 }
 
 TEST(Result_Test, ValueOrDefault) {
     using namespace Kiwi;
 
-    constexpr Result<u32> result = Error{ .kind = EGeneralError::INVALID_ARGUMENT };
+    constexpr Result<u32> result = Error::Create(EGeneralError::INVALID_ARGUMENT);
 
     EXPECT_EQ(result.ValueOr(TEST_INTEGER), TEST_INTEGER);
 }
@@ -110,7 +110,7 @@ TEST(Result_Test, PointerOperators) {
 TEST(Result_Test, GetValueDeathExpected) {
     using namespace Kiwi;
 
-    Result<u32> result = Error{ .kind = EGeneralError::INVALID_ARGUMENT };
+    constexpr Result<u32> result = Error::Create(EGeneralError::INVALID_ARGUMENT);
     EXPECT_DEATH(KIWI_IGNORE_RETURN(result.GetValue()), "");
 }
 
@@ -142,7 +142,7 @@ TEST(Result_Test, ValueSteal) {
 TEST(Result_Test, ErrorSteal) {
     using namespace Kiwi;
 
-    auto testError = Error{ .kind = EGeneralError::INVALID_ARGUMENT };
+    constexpr Error testError = Error::Create(EGeneralError::INVALID_ARGUMENT);
 
     Result<MoveOnlyData> result = testError;
     EXPECT_TRUE(result.HasError());
@@ -164,7 +164,7 @@ TEST(Result_Test, VoidPartialSpecializationWithValue) {
 TEST(Result_Test, VoidPartialSpecializationWithError) {
     using namespace Kiwi;
 
-    Result<void> result = Error{ .kind = EGeneralError::INVALID_ARGUMENT };
+    constexpr Result<void> result = Error::Create(EGeneralError::INVALID_ARGUMENT);
 
     EXPECT_TRUE(result.HasError());
 }
