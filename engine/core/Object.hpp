@@ -5,7 +5,7 @@
 #include <common/meta/TypeMetaInfo.hpp>
 #include <common/Debug.hpp>
 
-#include <sync/Thread.hpp>
+#include <common/sync/Thread.hpp>
 
 
 #define KIWI_CREATE_OBJECT(ClassName, ParentName)                                               \

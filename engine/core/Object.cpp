@@ -1,6 +1,6 @@
 #include "Object.hpp"
 
-#include <sync/Thread.hpp>
+#include <common/sync/Thread.hpp>
 
 #include <core/LogSubsystem.hpp>
 

@@ -1,13 +1,11 @@
 #pragma once
 
-#include <sync/Mutex.hpp>
-
 #include <common/meta/TypeTraits.hpp>
 #include <common/types/String.hpp>
 
 
 namespace Kiwi::Globals::Platform {
-    extern Sync::Mutex g_consoleIOMutex;
+    extern std::mutex g_consoleIOMutex;
 
     // Note: Call Platform::GetApplicationArguments() instead of directly use this variable
     extern Vector<String> g_applicationArguments;

@@ -1,7 +1,5 @@
 #include "Application.hpp"
 
-#include <sync/Atomic.hpp>
-
 #include <common/Time.hpp>
 
 #include <profiler/EngineProfiler.hpp>

@@ -2,7 +2,7 @@
 
 
 namespace Kiwi::Globals::Platform {
-    Sync::Mutex g_consoleIOMutex = Sync::Mutex();
+    std::mutex g_consoleIOMutex = std::mutex();
 
     Vector<String> g_applicationArguments = Vector<String>();
 }

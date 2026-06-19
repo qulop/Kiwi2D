@@ -1,7 +1,6 @@
 #include "Time.hpp"
 
-#include <sync/Atomic.hpp>
-#include <sync/Thread.hpp>
+#include <common/sync/Thread.hpp>
 
 
 #include <common/Debug.hpp>
@@ -19,7 +18,7 @@ namespace Kiwi {
 
     Time::DurationType Time::DeltaTimeNative() {
         return DurationType(
-            s_storage.deltaTime.load(MEM_ORDER_ACQUIRE)
+            s_storage.deltaTime.load(std::memory_order_acquire)
         );
     }
 
@@ -45,8 +44,8 @@ namespace Kiwi {
         const auto nowCount = NowAsCount();
 
         s_storage.deltaTime.store(
-            nowCount - s_storage.lastFrameTime.load(MEM_ORDER_RELAXED),
-            MEM_ORDER_RELEASE
+            nowCount - s_storage.lastFrameTime.load(std::memory_order_relaxed),
+            std::memory_order_release
         );
 
         s_storage.lastFrameTime.store(nowCount);

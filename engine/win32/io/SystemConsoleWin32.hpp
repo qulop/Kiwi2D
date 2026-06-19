@@ -4,7 +4,6 @@
 
 #include <common/meta/TypeTraits.hpp>
 #include <common/types/String.hpp>
-#include <sync/Mutex.hpp>
 
 
 namespace Kiwi::Platform::Win32 {

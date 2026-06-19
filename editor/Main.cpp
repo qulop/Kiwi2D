@@ -9,7 +9,7 @@
 
 #include <platform/Platform.hpp>
 
-#include <sync/Thread.hpp>
+#include <common/sync/Thread.hpp>
 
 #include <app/Editor.hpp>
 
@@ -18,7 +18,7 @@ namespace Kiwi {
     i32 EntryPoint(i32 argc, char** argv) {
         using namespace Kiwi;
 
-        Sync::Thread::RegisterThisThreadAsMain();
+        Sync::Thread::MakeMainThead();
 
 
         i32 exitCode = KIWI_EXIT_SUCCESS;

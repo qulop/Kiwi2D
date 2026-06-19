@@ -9,8 +9,6 @@
 
 #include <misc/Window.hpp>
 
-#include <sync/Atomic.hpp>
-
 
 namespace Kiwi {
     class Engine final : public AObject {
@@ -34,6 +32,6 @@ namespace Kiwi {
 
         EngineConfig m_engineConfig;
 
-        Atomic<bool> m_isRunning = true;
+        std::atomic<bool> m_isRunning = true;
     };
 }

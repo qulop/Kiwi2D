@@ -10,7 +10,7 @@ namespace Kiwi::Sync {
         using IDType = std::thread::id;
 
     public:
-        static void RegisterThisThreadAsMain();
+        static void MakeMainThead();
 
         KIWI_NODISCARD static bool IsMainThread();
 

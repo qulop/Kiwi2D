@@ -7,7 +7,7 @@ namespace Kiwi::Sync {
     Thread::IDType Thread::s_mainThreadID = Thread::IDType();
 
 
-    void Thread::RegisterThisThreadAsMain() {
+    void Thread::MakeMainThead() {
         KIWI_ASSERT(s_mainThreadID == IDType(), "You cannot register main thread twice!");
 
         s_mainThreadID = GetCurrentThreadID();
