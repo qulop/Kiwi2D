@@ -66,7 +66,9 @@ set(ENGINE_LIBRARY_SRC
     engine/common/sync/Thread.cpp
     engine/common/filesystem/File.cpp
     engine/common/filesystem/FileContent.cpp
+    engine/common/filesystem/FileOpenMode.cpp
     engine/common/meta/TypeMetaInfo.cpp
+    engine/common/database/SQLiteDatabase.cpp
     engine/common/Time.cpp
     engine/common/ProgramOptions.cpp
     engine/common/Debug.cpp
