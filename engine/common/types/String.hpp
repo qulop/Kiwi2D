@@ -10,6 +10,10 @@ namespace Kiwi {
 
 
 namespace Kiwi {
+    template<typename T>
+    class Opt;
+
+
     class String final {
     public:
         using ValueType = std::string::value_type;
@@ -74,7 +78,7 @@ namespace Kiwi {
             }
 
             if (res.ec != std::errc{} || res.ptr == nullptr) {
-                return nullopt;
+                return {};
             }
 
             return val;

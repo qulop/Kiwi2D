@@ -1,6 +1,7 @@
 #include "String.hpp"
 
 #include <common/Debug.hpp>
+#include <common/types/Opt.hpp>
 #include <platform/Platform.hpp>
 #include <renderer/shaders/ShaderStage.hpp>
 
@@ -25,7 +26,7 @@ namespace Kiwi {
             return false;
         }
 
-        return nullopt;
+        return ZERO_OPT;
     }
 
 
@@ -64,7 +65,7 @@ namespace Kiwi {
             return EShaderStage::COMPUTE;
         }
 
-        return nullopt;
+        return ZERO_OPT;
     }
 
     String String::FromWideString(const std::wstring& wstr) {
