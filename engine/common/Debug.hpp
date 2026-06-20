@@ -4,24 +4,24 @@
 #include <source_location>
 
 #include <common/Definitions.hpp>
-#include <common/types/String.hpp>
+
 
 namespace Kiwi {
     class Debug final {
     public:
         template<typename... Args>
-        static void AssertImpl(StringView expr, std::format_string<Args...> fmt, std::source_location loc = std::source_location::current(), Args&&... args) {
-            const String errMsg = String::Format(fmt, std::forward<Args>(args)...);
-            HandleAssert(expr, errMsg.ToStringView(), loc);
+        static void AssertImpl(std::string_view expr, std::format_string<Args...> fmt, std::source_location loc = std::source_location::current(), Args&&... args) {
+            const std::string errMsg = std::format(fmt, std::forward<Args>(args)...);
+            HandleAssert(expr, errMsg, loc);
         }
 
 
-        static void AssertImplBasic(StringView expr, std::source_location loc = std::source_location::current()) {
+        static void AssertImplBasic(std::string_view expr, std::source_location loc = std::source_location::current()) {
             HandleAssert(expr, "", loc);
         }
 
     private:
-        static void HandleAssert(StringView expr, StringView errMsg, std::source_location loc);
+        static void HandleAssert(std::string_view expr, std::string_view errMsg, std::source_location loc);
     };
 
 }

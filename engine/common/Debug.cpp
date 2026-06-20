@@ -6,7 +6,7 @@
 
 
 namespace Kiwi {
-    void Debug::HandleAssert(StringView expr, StringView errMsg, std::source_location loc) {
+    void Debug::HandleAssert(std::string_view expr, std::string_view errMsg, std::source_location loc) {
         Console::Write("Assertion failed:\n\t-- Expression: {}\n\t-- File: {}\n\t-- Line: {}\n",
             expr,
             loc.file_name(),
