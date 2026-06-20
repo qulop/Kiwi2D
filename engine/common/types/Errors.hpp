@@ -1,6 +1,7 @@
 #pragma once
 
 #include <common/types/String.hpp>
+#include <common/types/Opt.hpp>
 
 
 namespace Kiwi {
@@ -111,7 +112,7 @@ namespace Kiwi {
 
     public:
         template<Concepts::ErrorEnumeration EErrorEnum>
-        KIWI_NODISCARD static constexpr Error Create(EErrorEnum err, Opt<String> desc = nullopt) {
+        KIWI_NODISCARD static constexpr Error Create(EErrorEnum err, Opt<String> desc = ZERO_OPT) {
             return {
                 &ErrorDescription<EErrorEnum>::Describe,
                 static_cast<u16>(err),
@@ -139,7 +140,7 @@ namespace Kiwi {
                 return static_cast<EErrorEnum>(code);
             }
 
-            return nullopt;
+            return ZERO_OPT;
         }
 
         KIWI_NODISCARD constexpr String GetDescription() const {
