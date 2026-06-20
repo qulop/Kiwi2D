@@ -78,9 +78,6 @@ namespace Kiwi::Traits {
 namespace Kiwi {
     using StringView = std::string_view;
 
-    template<typename Tx>
-    using Opt = std::optional<Tx>;
-
     template<typename TType, typename TErrType>
     using Expected = std::expected<TType, TErrType>;
 
@@ -89,10 +86,6 @@ namespace Kiwi {
 
     template<typename TErrType>
     using Unexpected = std::unexpected<TErrType>;
-
-    using NullOptType = std::nullopt_t;
-    constexpr inline NullOptType nullopt = std::nullopt;
-
 
     template<size_t N>
     struct StringLiteral {
@@ -107,5 +100,5 @@ namespace Kiwi {
 }
 
 namespace Kiwi::Globals {
-    inline Traits::TypeTags::IgnoreAssignmentMetaClass ignore;
+    inline Traits::TypeTags::IgnoreAssignmentMetaClass IGNORE;
 }
