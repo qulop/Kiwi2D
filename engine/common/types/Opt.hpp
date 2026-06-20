@@ -1,6 +1,7 @@
 #pragma once
 
 #include <common/meta/Concepts.hpp>
+#include <common/Debug.hpp>
 
 
 namespace Kiwi::Details::Types {
@@ -63,15 +64,18 @@ namespace Kiwi {
 
     public:
         KIWI_NODISCARD constexpr ValueType& GetValue() {
+            KIWI_ENSURE(m_optional.has_value());
+            return *m_optional;
+        }
+
+        KIWI_NODISCARD constexpr const ValueType& GetValue() const {
+            KIWI_ENSURE(m_optional.has_value());
             return *m_optional;
         }
 
         KIWI_NODISCARD constexpr ValueType StealValue() {
+            KIWI_ENSURE(m_optional.has_value());
             return std::move(m_optional);
-        }
-
-        KIWI_NODISCARD constexpr const ValueType& GetValue() const {
-            return *m_optional;
         }
 
         KIWI_NODISCARD constexpr bool HasValue() const {
