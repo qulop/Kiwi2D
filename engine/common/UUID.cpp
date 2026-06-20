@@ -20,11 +20,11 @@ namespace Kiwi {
 
     Opt<UUID> UUID::FromString(const String& s) {
         if (s.Size() != UUID_STRING_LENGTH_WITH_DASHES) KIWI_UNLIKELY {
-            return nullopt;
+            return ZERO_OPT;
         }
 
         if (!std::ranges::all_of(UUID_DASH_POSITIONS, [&s](const size_t& idx) { return s.CharAt(idx) == '-'; })) {
-            return nullopt;
+            return ZERO_OPT;
         }
 
         const std::vector<String> uuidFragments = s.Split("-");

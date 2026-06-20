@@ -61,7 +61,7 @@ namespace Kiwi {
             break;
         }
 
-        return nullopt;
+        return ZERO_OPT;
     }
 
     Result<std::map<EShaderStage, std::vector<u32>>> AShaderCompiler::CompileToSpirV(const CompilationDetails& compilationDetails) {

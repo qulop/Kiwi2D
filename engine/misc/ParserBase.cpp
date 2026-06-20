@@ -1,10 +1,11 @@
 #include "ParserBase.hpp"
 
+#include <common/types/Opt.hpp>
+
 
 namespace Kiwi::Misc {
     ParserBase::ParserBase(StringView src) :
-        m_src(src),
-        m_currPos(0) 
+        m_src(src)
     {}
 
     void ParserBase::Reset(StringView src) {
@@ -14,12 +15,12 @@ namespace Kiwi::Misc {
 
     Opt<String> ParserBase::GetCurrentToken(size_t pos) const {
         size_t tokenBegin = m_src.find_first_not_of(Globals::Misc::WHITESPACE, pos);
-        if (tokenBegin == Kiwi::StringView::npos) {
-            return Kiwi::nullopt;
+        if (tokenBegin == StringView::npos) {
+            return ZERO_OPT;
         }
 
         size_t tokenEnd = m_src.find_first_of(Globals::Misc::END_OF_TOKEN, tokenBegin);
-        if (tokenEnd == Kiwi::StringView::npos) {
+        if (tokenEnd == StringView::npos) {
             tokenEnd = m_src.size();
         }
 
@@ -32,7 +33,7 @@ namespace Kiwi::Misc {
 
     Opt<String> ParserBase::GetSequenceUpTo(size_t extremePos) const {
         if (extremePos > m_src.size()) {
-            return nullopt;
+            return ZERO_OPT;
         }
 
         return String{ m_src.substr(m_currPos, extremePos - m_currPos) };
@@ -46,7 +47,7 @@ namespace Kiwi::Misc {
 
     KIWI_NODISCARD Opt<std::vector<String>> ParserBase::Tokenize(size_t begin, size_t end, StringView delim) const {
         if (end > m_src.size()) {
-            return nullopt;
+            return ZERO_OPT;
         }
 
         if (end == StringView::npos) {

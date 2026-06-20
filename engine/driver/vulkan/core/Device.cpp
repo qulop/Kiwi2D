@@ -255,7 +255,7 @@ namespace Kiwi::Vulkan {
         }
 
         m_deviceQueues = DeviceQueues::Create(m_vkDevice, m_physicalDeviceDesc.queueFamilyIndices)
-            .value_or(DeviceQueues{});
+            .GetOrDefault();
         if (!m_deviceQueues.IsValid()) {
             KIWI_CTX_LOG(CRITICAL, "Failed to create logical device queues");
             return false;

@@ -4,7 +4,7 @@
 
 #include <misc/ParserBase.hpp>
 
-#include <common/Errors.hpp>
+#include <common/types/Errors.hpp>
 
 
 namespace Kiwi {

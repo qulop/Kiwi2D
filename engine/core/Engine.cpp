@@ -13,11 +13,13 @@ namespace Kiwi {
     bool Engine::Init(const ProgramOptions& opts) {
         m_engineConfig.vsyncEnabled = opts
             .Get<bool>(CmdLine::VSYNC_ENABLE)
-            .value_or(m_engineConfig.vsyncEnabled);
+            .ValueOr(m_engineConfig.vsyncEnabled);
 
         std::shared_ptr<WindowSubsystem> windowSubsystem = GetSubsystem<WindowSubsystem>();
 
-        String wndTitle = opts.Get<String>(CmdLine::WINDOW_NAME).value_or(EngineConfig::ENGINE_NAME);
+        String wndTitle = opts
+            .Get<String>(CmdLine::WINDOW_NAME)
+            .ValueOr(EngineConfig::ENGINE_NAME);
         if (!windowSubsystem->CreateMainWindow(wndTitle.ToStringView())) {
             return false;
         }

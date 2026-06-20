@@ -23,6 +23,34 @@ namespace {
 
 
 namespace Kiwi::OpenGL {
+    namespace EOpenGLExtensions {
+        String ToString(Type t) {
+            switch (t) {
+                case DEBUG_OUTPUT:
+                    return "GL_ARB_debug_output";
+                case CLIP_CONTROL:
+                    return "GL_ARB_clip_control";
+                case ES2_COMPATIBILITY:
+                    return "GL_ARB_ES2_compatibility";
+                case SPIRV_EXTENSIONS:
+                    return "GL_ARB_spirv_extensions";
+                case GL_SPIRV:
+                    return "GL_ARB_gl_spirv";
+            }
+        }
+
+        std::vector<Type> Enumerate() {
+            return {
+                DEBUG_OUTPUT,
+                CLIP_CONTROL,
+                ES2_COMPATIBILITY,
+                SPIRV_EXTENSIONS,
+                GL_SPIRV,
+            };
+        }
+    }
+
+
     bool RenderContextGL::Init() {
         auto loadResult = LoadContext();
         if (!loadResult.has_value()) {
@@ -109,9 +137,9 @@ namespace Kiwi::OpenGL {
     }
 
     void RenderContextGL::CreateExtensionsInfo() {
-        for (auto extension : Cast<EOpenGLExtensions>::Enumerate()) {
+        for (auto extension : EOpenGLExtensions::Enumerate()) {
             m_extensions[extension] = {
-                .extensionName = Cast<EOpenGLExtensions>::ToString(extension).value_or("")
+                .extensionName = EOpenGLExtensions::ToString(extension)
             };
         }
 

@@ -2,9 +2,9 @@
 
 #include <common/meta/TypeTraits.hpp>
 #include <common/cast/Cast.hpp>
-#include <common/Errors.hpp>
 #include <common/Definitions.hpp>
 #include <common/meta/Concepts.hpp>
+#include <common/types/Errors.hpp>
 #include <common/types/Result.hpp>
 
 #include <xxhash.h>

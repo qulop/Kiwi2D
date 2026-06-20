@@ -1,7 +1,7 @@
 #pragma once
 
 #include <common/meta/TypeTraits.hpp>
-#include <common/Errors.hpp>
+#include <common/types/Opt.hpp>
 
 #include <driver/vulkan/core/VulkanTypes.hpp>
 

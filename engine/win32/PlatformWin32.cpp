@@ -3,6 +3,7 @@
 
 #include <common/cast/Cast.hpp>
 #include <common/types/String.hpp>
+#include <common/types/Opt.hpp>
 
 #include <math/vec/Vec.hpp>
 
@@ -122,7 +123,7 @@ namespace Kiwi::Platform {
             return m.isPrimary;
         });
 
-        return (it == monitors.end()) ? nullopt : Opt{ *it };
+        return (it == monitors.end()) ? ZERO_OPT : Opt<DisplayInfo>{ *it };
     }
 
     size_t GetDisplaysCount() noexcept {

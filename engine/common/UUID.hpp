@@ -2,6 +2,7 @@
 
 #include <common/Definitions.hpp>
 #include <common/meta/TypeTraits.hpp>
+#include <common/types/Opt.hpp>
 #include <common/Numeric.hpp>
 
 

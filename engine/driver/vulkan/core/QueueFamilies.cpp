@@ -63,7 +63,7 @@ namespace Kiwi::Vulkan {
 
     Opt<DeviceQueues> DeviceQueues::Create(VkDevice device, QueueFamilyIndices indices) {
         if (!indices.AllIndicesComplete()) {
-            return nullopt;
+            return ZERO_OPT;
         }
 
         DeviceQueues queues;

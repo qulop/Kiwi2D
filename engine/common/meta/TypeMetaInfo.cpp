@@ -7,10 +7,10 @@ namespace Kiwi {
     TypeMetaInfo::TypeMetaInfo(StringView typeName) :
       m_typeName(typeName)
     {
-        auto hash = TypeHash::FromData(typeName.data(), typeName.size());
+        Opt hash = TypeHash::FromData(typeName.data(), typeName.size());
         KIWI_ASSERT(hash, "We should always have a hash from type name string!");
 
-        m_typeHash = hash.value();
+        m_typeHash = *hash;
     }
 
     const String& TypeMetaInfo::GetTypeName() const {

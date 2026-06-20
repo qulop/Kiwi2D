@@ -35,7 +35,7 @@ namespace Kiwi {
 
         SourcesMap result;
 
-        auto&& [_, versionProps] = ExtractPreprocessor(VERSION_TOKEN_NAME).value_or(PreprocessorProperties{});
+        auto&& [_, versionProps] = ExtractPreprocessor(VERSION_TOKEN_NAME).GetOrDefault();
         if (versionProps.empty()) {
             return Error::Create(
                 EShaderPreprocessError::SHADER_VERSION_MISSING
@@ -44,7 +44,7 @@ namespace Kiwi {
 
         while (true) {
             auto&& [preprocName, preprocProps] = ExtractPreprocessor(STAGE_BEGIN_TOKEN_NAME)
-                .value_or(std::make_pair(String{}, std::vector<String>{}));
+                .ValueOr(std::make_pair(String{}, std::vector<String>{}));
 
             if (preprocName.IsEmpty() || preprocName != STAGE_BEGIN_TOKEN_NAME) {
                 if (preprocName.IsEmpty()) {
@@ -67,7 +67,7 @@ namespace Kiwi {
             }
 
             const size_t stageCodeBeginPos = JumpToNextLine();
-            const size_t stageCodeEndPos = FindPreprocessorPosition(STAGE_END_TOKEN_NAME).value_or(StringView::npos);
+            const size_t stageCodeEndPos = FindPreprocessorPosition(STAGE_END_TOKEN_NAME).ValueOr(StringView::npos);
 
             if (stageCodeEndPos == StringView::npos) {
                 return Error::Create(
@@ -94,7 +94,7 @@ namespace Kiwi {
 
             auto optCurrToken = GetCurrentToken(tokenBegin);
             if (!optCurrToken) {
-                return nullopt;
+                return ZERO_OPT;
             }
 
             if (*optCurrToken == token) {
@@ -104,26 +104,26 @@ namespace Kiwi {
             searchPos = m_currPos = (tokenBegin + token.length());
         }
 
-        return nullopt;
+        return ZERO_OPT;
     }
 
     Opt<PreprocessorGLSL::PreprocessorProperties> PreprocessorGLSL::ExtractPreprocessor(StringView token) {
-        size_t pos = FindPreprocessorPosition(token).value_or(StringView::npos);
+        size_t pos = FindPreprocessorPosition(token).ValueOr(StringView::npos);
         if (pos == StringView::npos) {
-            return nullopt;
+            return ZERO_OPT;
         }
 
         pos = m_src.find_first_not_of(Globals::Misc::WHITESPACE, pos + 1);
-        String foundPreprocessor = GetCurrentToken(pos).value_or("");
+        String foundPreprocessor = GetCurrentToken(pos).ValueOr("");
         if (foundPreprocessor.IsEmpty()) {
-            return nullopt;
+            return ZERO_OPT;
         }
 
         pos += foundPreprocessor.Size() + 1;
 
         size_t endOfLinePos = m_src.find_first_of(Globals::Misc::END_OF_LINE, pos);
         if (endOfLinePos == StringView::npos) {
-            return nullopt;
+            return ZERO_OPT;
         }
 
         Opt<std::vector<String>> properties = Tokenize(pos, endOfLinePos);

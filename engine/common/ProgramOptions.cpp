@@ -12,22 +12,40 @@
 
 
 namespace Kiwi {
-    EOptionArgType CmdLineOption::DeduceArgumentType(StringView arg) noexcept {
+    namespace EOptionArgType {
+        String ToString(Type t) {
+             switch (t) {
+                 case INT:
+                     return "int";
+                 case BOOL:
+                     return "bool";
+                 case STRING:
+                     return "string";
+                 case PATH:
+                     return "path";
+                 default:
+                     return "none";
+             }
+        }
+    }
+
+
+    EOptionArgType::Type CmdLineOption::DeduceArgumentType(StringView arg) noexcept {
         KIWI_ASSERT_BASIC(!arg.empty() && !arg.starts_with('-'));
 
         if (arg == "true" || arg == "false") {
-            return EOptionArgType::BOOL;
+            return EOptionArgType::Type::BOOL;
         }
         if (String::ParseIntI64(arg)) {
-            return EOptionArgType::INT;
+            return EOptionArgType::Type::INT;
         }
         if (std::filesystem::exists(arg)) {
-            return EOptionArgType::PATH;
+            return EOptionArgType::Type::PATH;
         }
-        return EOptionArgType::STRING;
+        return EOptionArgType::Type::STRING;
     }
 
-    bool CmdLineOption::CheckArgumentType(StringView arg, EOptionArgType expected) noexcept {
+    bool CmdLineOption::CheckArgumentType(StringView arg, EOptionArgType::Type expected) noexcept {
         if (arg.empty() || arg.starts_with('-')) {
             return false;
         }
@@ -60,17 +78,17 @@ namespace Kiwi {
             Opt<String> optionName = GetOptionName(token.ToStringView());
             if (!optionName) {
                 Console::WriteLine("Token \"{}\" not recognized as an option", token);
-                return nullopt;
+                return ZERO_OPT;
             }
 
-            auto foundOption = std::ranges::find(existingOptions, optionName.value(), &CmdLineOption::name);
+            auto foundOption = std::ranges::find(existingOptions, *optionName, &CmdLineOption::name);
             if (foundOption == existingOptions.end()) {
-                Console::WriteLine("Unknown option \"{}\"", optionName.value());
-                return nullopt;
+                Console::WriteLine("Unknown option \"{}\"", *optionName);
+                return ZERO_OPT;
             }
 
             // Just a flag case - just adding the std::monostate{}(i.e. "nothing")
-            if (foundOption->type == EOptionArgType::NONE) {
+            if (foundOption->type == EOptionArgType::Type::NONE) {
                 result.m_options[foundOption->name] = std::monostate{};
                 continue;
             }
@@ -81,14 +99,14 @@ namespace Kiwi {
             Opt<ArgumentType> argument = ParseArgument(argToken.ToStringView(), *foundOption);
             if (!argument) {
                 Console::WriteLine("Failed to parse an argument for option \"-{}\". Invalid token: \"{}\". <{}> type expected instead",
-                    optionName.value(), argToken, Cast<EOptionArgType>::ToString(foundOption->type).value()
+                    *optionName, argToken, EOptionArgType::ToString(foundOption->type)
                 );
 
-                return nullopt;
+                return ZERO_OPT;
             }
 
 
-            result.m_options[optionName.value()] = *argument;
+            result.m_options[*optionName] = *argument;
         }
 
         return result;
@@ -125,26 +143,26 @@ namespace Kiwi {
     Opt<String> ProgramOptions::GetOptionName(StringView opt) {
         size_t beginOfFlagName = opt.find_first_not_of('-');
         if (beginOfFlagName == StringView::npos) {
-            return nullopt;
+            return ZERO_OPT;
         }
 
         return String{ opt.substr(beginOfFlagName) };
     }
 
     Opt<ProgramOptions::ArgumentType> ProgramOptions::ParseArgument(StringView arg, const CmdLineOption& opt) {
-        KIWI_ASSERT(opt.type != EOptionArgType::NONE, "Hmm... Looks like someone pass a wrong option here (๏ᆺ๏υ)");
+        KIWI_ASSERT(opt.type != EOptionArgType::Type::NONE, "Hmm... Looks like someone pass a wrong option here (๏ᆺ๏υ)");
 
         if (!CmdLineOption::CheckArgumentType(arg, opt.type)) {
-            return nullopt;
+            return ZERO_OPT;
         }
 
-        if (opt.type == EOptionArgType::INT) {
-            return String::ParseIntI32(arg).value();
+        if (opt.type == EOptionArgType::Type::INT) {
+            return String::ParseIntI32(arg).GetValue();
         }
-        if (opt.type == EOptionArgType::BOOL) {
-            return String::ParseBool(arg).value();
+        if (opt.type == EOptionArgType::Type::BOOL) {
+            return String::ParseBool(arg).GetValue();
         }
-        if (opt.type == EOptionArgType::PATH) {
+        if (opt.type == EOptionArgType::Type::PATH) {
             return std::filesystem::path { arg };
         }
 

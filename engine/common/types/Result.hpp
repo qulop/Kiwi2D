@@ -1,7 +1,7 @@
 #pragma once
 
 #include <common/PCH.hpp>
-#include <common/Errors.hpp>
+#include <common/types/Errors.hpp>
 #include <common/meta/Concepts.hpp>
 #include <common/Debug.hpp>
 

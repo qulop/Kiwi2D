@@ -51,7 +51,7 @@ namespace Kiwi {
 
         s_applicationOutputDirectory = m_cliOptions
             .Get<std::filesystem::path>(CmdLine::APPLICATION_OUT_DIR)
-            .value_or(Platform::GetPathToSysTemp());
+            .ValueOr(Platform::GetPathToSysTemp());
 
         // Logger initialization
         LoggerInitInfo loggerInfo {

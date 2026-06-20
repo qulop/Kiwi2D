@@ -12,6 +12,11 @@ namespace Kiwi::Globals::Misc {
 }
 
 
+namespace Kiwi {
+    template<typename T>
+    class Opt;
+}
+
 namespace Kiwi::Misc {
     class ParserBase {
     public:

@@ -5,50 +5,37 @@
 #include <common/cast/Cast.hpp>
 #include <common/Definitions.hpp>
 #include <common/types/String.hpp>
+#include <common/types/Opt.hpp>
 
 
 namespace Kiwi {
-    enum class EOptionArgType {
-        NONE,
-        INT, BOOL,
-        STRING,
-        PATH
-    };
-
-    template<>
-    struct CastTraits<EOptionArgType> {
-        KIWI_NODISCARD KIWI_FORCEINLINE static Opt<String> ToString(EOptionArgType t) {
-            switch (t) {
-                case EOptionArgType::INT:
-                    return "int";
-                case EOptionArgType::BOOL:
-                    return "bool";
-                case EOptionArgType::STRING:
-                    return "string";
-                case EOptionArgType::PATH:
-                    return "path";
-                default:
-                    return "none";
-            }
-        }
+    namespace EOptionArgType {
+        enum Type : u8 {
+            NONE,
+            INT, BOOL,
+            STRING,
+            PATH
+        };
+        
+        String ToString(Type t);
     };
 
 
     struct CmdLineOption {
     public:
         String name;
-        EOptionArgType type = EOptionArgType::STRING;
+        EOptionArgType::Type type = EOptionArgType::Type::STRING;
 
     public:
         CmdLineOption() = default;
-        CmdLineOption(String name, EOptionArgType type) :
+        CmdLineOption(String name, EOptionArgType::Type type) :
             name(std::move(name)),
             type(type)
         {}
 
     public:
-        KIWI_NODISCARD static EOptionArgType DeduceArgumentType(StringView arg) noexcept;
-        KIWI_NODISCARD static bool CheckArgumentType(StringView arg, EOptionArgType expected) noexcept;
+        KIWI_NODISCARD static EOptionArgType::Type DeduceArgumentType(StringView arg) noexcept;
+        KIWI_NODISCARD static bool CheckArgumentType(StringView arg, EOptionArgType::Type expected) noexcept;
     };
 
 
@@ -71,14 +58,14 @@ namespace Kiwi {
         template<typename T>
         KIWI_NODISCARD Opt<T> Get(const String& opt) const {
             if (!HasOption(opt) || std::holds_alternative<std::monostate>(m_options.at(opt))) {
-                return nullopt;
+                return ZERO_OPT;
             }
 
             if (const T* res = std::get_if<T>(&m_options.at(opt))) {
                 return *res;
             }
 
-            return nullopt;
+            return ZERO_OPT;
         }
 
         ProgramOptions& operator=(const ProgramOptions& other);

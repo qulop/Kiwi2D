@@ -2,7 +2,6 @@
 
 #include <common/meta/TypeTraits.hpp>
 #include <common/Definitions.hpp>
-#include <common/Errors.hpp>
 #include <common/filesystem/FileContent.hpp>
 #include <common/filesystem/FileOpenMode.hpp>
 #include <common/types/Result.hpp>

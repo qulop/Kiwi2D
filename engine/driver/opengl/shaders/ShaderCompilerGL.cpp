@@ -97,7 +97,7 @@ namespace Kiwi::OpenGL {
                     "Either EShaderStage::SHADER_PROGRAM or EShaderStage::NONE passed here"
         );
 
-        Hash64 hashedShaderSource = Hash64::FromData(src).value_or(Hash64{});
+        Hash64 hashedShaderSource = Hash64::FromData(src).GetOrDefault();
         if (hashedShaderSource.IsEmpty()) {
             KIWI_CTX_LOG(ERROR, "Failed to cast integer hash of the shader source into the string");
             return KIWI_GL_UNDEFINED_ID;
@@ -148,7 +148,7 @@ namespace Kiwi::OpenGL {
             return KIWI_GL_UNDEFINED_ID;
         }
 
-        GlID id = glCreateShader(Cast<EShaderStage>::ToGLenum(stage).value_or(KIWI_GL_UNDEFINED_ID));
+        GlID id = glCreateShader(Cast<EShaderStage>::ToGLenum(stage).ValueOr(KIWI_GL_UNDEFINED_ID));
 
         glShaderBinary(1, &id,
                         GL_SHADER_BINARY_FORMAT_SPIR_V, byteCode.data(),

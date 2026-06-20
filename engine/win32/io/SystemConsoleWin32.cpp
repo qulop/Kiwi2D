@@ -1,8 +1,9 @@
 #include "SystemConsoleWin32.hpp"
 
 #include <common/cast/Cast.hpp>
-#include <platform/PlatformVars.hpp>
+#include <common/types/Opt.hpp>
 
+#include <platform/PlatformVars.hpp>
 #include "platform/Platform.hpp"
 
 
@@ -52,14 +53,14 @@ namespace Kiwi::Platform::Win32 {
 
         HANDLE hnd = GetStdHandle(STD_INPUT_HANDLE);
         if (hnd == NULL || hnd == INVALID_HANDLE_VALUE) {
-            return nullopt;
+            return ZERO_OPT;
         }
 
         char buffer[READ_BUFFER_SIZE];
         DWORD readCount = 0;
 
         if (!ReadConsoleA(hnd, buffer, READ_BUFFER_SIZE - 1, &readCount, nullptr)) {
-            return nullopt;
+            return ZERO_OPT;
         }
 
         buffer[readCount] = '\0';
@@ -67,19 +68,19 @@ namespace Kiwi::Platform::Win32 {
     }
 
     Opt<i32> SystemConsoleWin32::ReadInt32() {
-        return String::ParseIntI32(ReadString().value_or("").ToStringView());
+        return String::ParseIntI32(ReadString().GetOrDefault().ToStringView());
     }
 
     Opt<i64> SystemConsoleWin32::ReadInt64() {
-        return String::ParseIntI64(ReadString().value_or("").ToStringView());
+        return String::ParseIntI64(ReadString().GetOrDefault().ToStringView());
     }
 
     Opt<float> SystemConsoleWin32::ReadFloat() {
-        return String::ParseFloat(ReadString().value_or("").ToStringView());
+        return String::ParseFloat(ReadString().GetOrDefault().ToStringView());
     }
 
     Opt<double> SystemConsoleWin32::ReadDouble() {
-        return String::ParseDouble(ReadString().value_or("").ToStringView());
+        return String::ParseDouble(ReadString().GetOrDefault().ToStringView());
     }
 
     void SystemConsoleWin32::SetCursorPosition(u16 x, u16 y) {
