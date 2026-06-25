@@ -4,11 +4,14 @@
 
 #include <renderer/Renderer.hpp>
 #include <renderer/Camera2D.hpp>
+#include <renderer/Texture.hpp>
 
 #include <input/InputSubsystem.hpp>
 #include <input/KeyCodes.hpp>
 
 #include <gui/ImGuiSubsystem.hpp>
+
+#include <platform/Platform.hpp>
 
 #include <common/Time.hpp>
 
@@ -21,6 +24,9 @@
 
 #include <algorithm>
 #include <cmath>
+#include <filesystem>
+#include <random>
+#include <stb_image.h>
 
 
 namespace Benchmark {
@@ -32,6 +38,33 @@ namespace Benchmark {
             glm::mat4 m = glm::translate(glm::mat4(1.0f), glm::vec3(center.x, center.y, 0.0f));
             m = glm::rotate(m, angle, glm::vec3(0.0f, 0.0f, 1.0f));
             return glm::scale(m, glm::vec3(size.x, size.y, 1.0f));
+        }
+
+        // Loads an image file (resolved next to the executable, where CMake copies the
+        // `sprites/` directory) into a GPU texture. Returns null on failure.
+        SharedPtr<ATexture2D> LoadTexture(const std::string& relativePath) {
+            const std::filesystem::path full =
+                Platform::GetApplicationPath().parent_path() / relativePath;
+
+            stbi_set_flip_vertically_on_load(true);
+
+            i32 width = 0, height = 0, channels = 0;
+            stbi_uc* data = stbi_load(full.string().c_str(), &width, &height, &channels, 0);
+            if (data == nullptr) {
+                return nullptr;
+            }
+
+            ImageDesc desc;
+            desc.width = width;
+            desc.height = height;
+            desc.channels = channels;
+            desc.format = EImageFormat::FromChannels(channels);
+            desc.size = width * height * channels;
+            desc.data = data;
+
+            SharedPtr<ATexture2D> texture = ATexture2D::Create(desc);
+            stbi_image_free(data);
+            return texture;
         }
     }
 
@@ -68,6 +101,17 @@ namespace Benchmark {
             m_glVersion = reinterpret_cast<const char*>(v);
         }
 
+        // Optional sprite images handed out at random alongside the plain colour quads.
+        // Any that fail to load are simply skipped, leaving more coloured squares.
+        for (const char* path : { "sprites/cat.png", "sprites/dog.png", "sprites/capy.png" }) {
+            if (SharedPtr<ATexture2D> texture = LoadTexture(path)) {
+                m_textures.push_back(std::move(texture));
+            }
+            else {
+                KIWI_CTX_LOG(WARNING, "Failed to load benchmark sprite: {}", path);
+            }
+        }
+
         RebuildSprites(m_currentCount);
         return true;
     }
@@ -87,6 +131,11 @@ namespace Benchmark {
         const f32 cellH = m_worldH / static_cast<f32>(rows);
         const Vec2 size{ cellW * 0.82f, cellH * 0.82f };
 
+        // Each quad rolls for "plain coloured square" (option 0) or one of the loaded
+        // sprite images. Equal weight per option, so the field is a mix of both.
+        static std::mt19937 rng{ std::random_device{}() };
+        std::uniform_int_distribution<size_t> pick(0, m_textures.size());
+
         for (i32 i = 0; i < count; ++i) {
             const i32 cx = i % cols;
             const i32 cy = i / cols;
@@ -101,6 +150,12 @@ namespace Benchmark {
                             0.5f + 0.5f * std::sin(h + 4.188f),
                             1.0f };
             s.phase = static_cast<f32>(i % 97) * 0.0647f;
+
+            // Option 0 keeps the flat-colour square; higher rolls map to a sprite image.
+            const size_t roll = pick(rng);
+            if (roll > 0) {
+                s.texture = m_textures[roll - 1];
+            }
 
             m_sprites.push_back(s);
         }
@@ -223,9 +278,16 @@ namespace Benchmark {
         renderer->BeginScene(*m_camera);
         for (const SpriteInstance& s : m_sprites) {
             const f32 pulse = 0.85f + 0.15f * std::sin(m_time * 2.0f + s.phase);
-            renderer->SubmitDraw(
-                MakeTransform(s.basePos, Vec2{ s.size.x * pulse, s.size.y * pulse }, m_time * 0.4f + s.phase),
-                s.color);
+            const glm::mat4 transform =
+                MakeTransform(s.basePos, Vec2{ s.size.x * pulse, s.size.y * pulse }, m_time * 0.4f + s.phase);
+
+            // Sprite-backed quads still rotate and scale; only the fill differs.
+            if (s.texture) {
+                renderer->SubmitDraw(transform, s.texture);
+            }
+            else {
+                renderer->SubmitDraw(transform, s.color);
+            }
         }
         renderer->EndScene();
     }

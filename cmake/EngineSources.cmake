@@ -27,7 +27,9 @@ set(ENGINE_LIBRARY_SRC
     engine/scene/Entity.cpp
     engine/scene/Scene.cpp
     engine/scene/SceneSerializer.cpp
+    engine/scene/PhysicsWorld2D.cpp
     engine/scene/components/Transform2D.cpp
+    engine/scene/components/RigidBody2D.cpp
     # --- END ---
 
     # --- BEGIN: OpenGL backend ---

@@ -5,6 +5,7 @@
 #include <common/UUID.hpp>
 
 #include <scene/Entity.hpp>
+#include <scene/PhysicsWorld2D.hpp>
 
 #include <vector>
 #include <memory>
@@ -30,11 +31,15 @@ namespace Kiwi {
 
         KIWI_NODISCARD const std::vector<std::shared_ptr<Entity>>& GetEntities() const { return m_entities; }
 
+        KIWI_NODISCARD PhysicsWorld2D& GetPhysicsWorld() { return m_physicsWorld; }
+        KIWI_NODISCARD const PhysicsWorld2D& GetPhysicsWorld() const { return m_physicsWorld; }
+
     private:
         void FlushDestructionQueue();
 
     private:
         std::vector<std::shared_ptr<Entity>> m_entities;
         std::vector<Entity*> m_entitiesToDestroy;
+        PhysicsWorld2D m_physicsWorld;
     };
 }

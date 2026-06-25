@@ -12,6 +12,7 @@ namespace Kiwi {
     class Entity;
     class Camera2D;
     class Renderer;
+    class ATexture2D;
 }
 
 namespace Kiwi::Editor {
@@ -71,6 +72,10 @@ namespace Arkanoid {
         std::shared_ptr<Camera2D> m_camera;
 
         SharedPtr<Kiwi::Editor::ImGuiSubsystem> m_imgui;
+
+        // Procedurally generated disc texture so the ball renders as an actual circle
+        // (the batch renderer otherwise only draws quads).
+        SharedPtr<ATexture2D> m_ballTexture;
 
         Entity* m_paddle = nullptr;
         Entity* m_ball = nullptr;

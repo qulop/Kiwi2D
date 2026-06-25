@@ -62,3 +62,13 @@ add_custom_command(
             $<TARGET_FILE_DIR:${BENCHMARK_TARGET_NAME}>/resources
     COMMENT "[Benchmark] Copying engine resources to the output directory..."
 )
+
+# Ship the sprite images (cat, dog, capybara) next to the executable so they resolve
+# relative to the application path at runtime.
+add_custom_command(
+    TARGET ${BENCHMARK_TARGET_NAME} POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+            ${CMAKE_CURRENT_SOURCE_DIR}/sprites
+            $<TARGET_FILE_DIR:${BENCHMARK_TARGET_NAME}>/sprites
+    COMMENT "[Benchmark] Copying sprite images to the output directory..."
+)

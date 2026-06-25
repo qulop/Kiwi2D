@@ -38,16 +38,30 @@ namespace Arkanoid {
     };
 
 
-    // A destructible brick. `alive` is cleared on hit; dead bricks are skipped during
-    // rendering and collision and removed from the scene.
+    // Visual + behavioural flavour of a brick.
+    enum class EBrickType {
+        Normal,         // breaks in a single hit
+        Iron,           // indestructible; the ball just bounces off
+        Reinforced      // takes several hits, brightening with each one
+    };
+
+
+    // A brick. For breakable types `alive` is cleared once `hitPoints` reaches zero;
+    // dead bricks are skipped during rendering and collision and removed from the
+    // scene. Iron bricks are never destroyed and do not count toward the win goal.
     class BrickComponent : public Component {
         KIWI_CREATE_OBJECT(BrickComponent, Component);
 
     public:
+        EBrickType type = EBrickType::Normal;
+
         Vec2 halfExtents{ 50.0f, 18.0f };
         Vec4 color{ 1.0f, 1.0f, 1.0f, 1.0f };
         i32 hitPoints = 1;
+        i32 maxHitPoints = 1;   // used to drive the "brighten on hit" feedback
         bool alive = true;
+
+        KIWI_NODISCARD bool IsBreakable() const { return type != EBrickType::Iron; }
 
         ~BrickComponent() override = default;
     };

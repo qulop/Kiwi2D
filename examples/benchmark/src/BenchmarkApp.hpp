@@ -14,6 +14,7 @@
 namespace Kiwi {
     class Camera2D;
     class Renderer;
+    class ATexture2D;
 }
 
 namespace Kiwi::Editor {
@@ -25,12 +26,14 @@ namespace Benchmark {
     using namespace Kiwi;
 
 
-    // One animated quad in the stress field.
+    // One animated quad in the stress field. When `texture` is null the quad is drawn
+    // as a flat colour (the original behaviour); otherwise it shows that sprite image.
     struct SpriteInstance {
         Vec2 basePos{ 0.0f, 0.0f };
         Vec2 size{ 0.0f, 0.0f };
         Vec4 color{ 1.0f, 1.0f, 1.0f, 1.0f };
         f32  phase = 0.0f;
+        SharedPtr<ATexture2D> texture;
     };
 
 
@@ -82,6 +85,10 @@ namespace Benchmark {
         SharedPtr<Kiwi::Editor::ImGuiSubsystem> m_imgui;
 
         std::vector<SpriteInstance> m_sprites;
+
+        // Sprite images randomly handed out to quads (cat / dog / capybara). Quads that
+        // get none stay flat-coloured squares.
+        std::vector<SharedPtr<ATexture2D>> m_textures;
 
         f32 m_worldW = 0.0f;
         f32 m_worldH = 0.0f;

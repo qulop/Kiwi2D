@@ -4,6 +4,7 @@
 #include <scene/Entity.hpp>
 #include <scene/components/Transform2D.hpp>
 #include <scene/components/SpriteRenderer.hpp>
+#include <scene/components/RigidBody2D.hpp>
 
 #include <common/types/String.hpp>
 
@@ -38,6 +39,20 @@ namespace Kiwi {
                 }
 
                 entityJson["spriteRenderer"] = std::move(spriteJson);
+            }
+
+            if (const RigidBody2D* body = entity.GetComponent<RigidBody2D>()) {
+                entityJson["rigidBody2D"] = {
+                    { "type",            static_cast<u8>(body->type) },
+                    { "velocity",        { body->velocity.x, body->velocity.y } },
+                    { "angularVelocity", body->angularVelocity },
+                    { "gravityScale",    body->gravityScale },
+                    { "linearDamping",   body->linearDamping },
+                    { "angularDamping",  body->angularDamping },
+                    { "fixedRotation",   body->fixedRotation },
+                    { "mass",            body->GetMass() },
+                    { "inertia",         body->GetInertia() }
+                };
             }
 
             return entityJson;
@@ -79,6 +94,22 @@ namespace Kiwi {
                 };
                 // Texture resolution by UUID requires an AssetManager lookup at load time;
                 // the serialized texture UUID is preserved for the loader to bind later.
+            }
+
+            if (entityJson.contains("rigidBody2D")) {
+                const nlohmann::json& bodyJson = entityJson.at("rigidBody2D");
+                RigidBody2D* body = entity->AddComponent<RigidBody2D>();
+
+                const auto& velocity = bodyJson.at("velocity");
+                body->type = static_cast<EBodyType>(bodyJson.at("type").get<u8>());
+                body->velocity = Vec2{ velocity.at(0).get<f32>(), velocity.at(1).get<f32>() };
+                body->angularVelocity = bodyJson.at("angularVelocity").get<f32>();
+                body->gravityScale = bodyJson.at("gravityScale").get<f32>();
+                body->linearDamping = bodyJson.at("linearDamping").get<f32>();
+                body->angularDamping = bodyJson.at("angularDamping").get<f32>();
+                body->fixedRotation = bodyJson.at("fixedRotation").get<bool>();
+                body->SetMass(bodyJson.at("mass").get<f32>());
+                body->SetInertia(bodyJson.at("inertia").get<f32>());
             }
         }
     }

@@ -8,6 +8,7 @@ set(TESTS_SRC
     scene/Entity.test.cpp
     scene/Scene.test.cpp
     scene/Transform2D.test.cpp
+    scene/RigidBody2D.test.cpp
 )
 
 set(BUILD_GMOCK OFF CACHE BOOL "" FORCE)

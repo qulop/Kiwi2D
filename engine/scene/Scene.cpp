@@ -28,9 +28,13 @@ namespace Kiwi {
     }
 
     void Scene::OnUpdate(f32 deltaTime) {
+        // Game logic runs first so it can set velocities / apply forces this frame;
+        // the physics step then integrates those into the transforms.
         for (const std::shared_ptr<Entity>& entity : m_entities) {
             entity->OnUpdate(deltaTime);
         }
+
+        m_physicsWorld.Step(*this, deltaTime);
 
         FlushDestructionQueue();
     }

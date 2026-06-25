@@ -4,6 +4,7 @@
 
 #include <renderer/Renderer.hpp>
 #include <renderer/Camera2D.hpp>
+#include <renderer/Texture.hpp>
 
 #include <scene/Scene.hpp>
 
@@ -11,6 +12,8 @@
 #include <input/KeyCodes.hpp>
 
 #include <gui/ImGuiSubsystem.hpp>
+
+#include <platform/Platform.hpp>
 
 #include <common/Time.hpp>
 
@@ -20,7 +23,9 @@
 #include <imgui.h>
 
 #include <algorithm>
+#include <filesystem>
 #include <random>
+#include <stb_image.h>
 
 
 namespace Snake {
@@ -44,6 +49,34 @@ namespace Snake {
         }
 
         constexpr f32 MinStepInterval = 0.06f;
+
+        // Loads an image file into a GPU texture. Returns null on failure so callers can
+        // fall back to plain coloured quads. The path is resolved next to the executable,
+        // where CMake copies the example's `sprites/` directory at build time.
+        SharedPtr<ATexture2D> LoadTexture(const std::string& relativePath) {
+            const std::filesystem::path full =
+                Platform::GetApplicationPath().parent_path() / relativePath;
+
+            stbi_set_flip_vertically_on_load(true);
+
+            i32 width = 0, height = 0, channels = 0;
+            stbi_uc* data = stbi_load(full.string().c_str(), &width, &height, &channels, 0);
+            if (data == nullptr) {
+                return nullptr;
+            }
+
+            ImageDesc desc;
+            desc.width = width;
+            desc.height = height;
+            desc.channels = channels;
+            desc.format = EImageFormat::FromChannels(channels);
+            desc.size = width * height * channels;
+            desc.data = data;
+
+            SharedPtr<ATexture2D> texture = ATexture2D::Create(desc);
+            stbi_image_free(data);
+            return texture;
+        }
     }
 
 
@@ -63,6 +96,11 @@ namespace Snake {
         if (!m_imgui->Init()) {
             KIWI_CTX_LOG(ERROR, "Failed to initialize the ImGui subsystem");
             return false;
+        }
+
+        m_appleTexture = LoadTexture("sprites/apple.png");
+        if (!m_appleTexture) {
+            KIWI_CTX_LOG(WARNING, "Failed to load the apple sprite; falling back to a coloured quad");
         }
 
         ResetGame();
@@ -269,10 +307,19 @@ namespace Snake {
             }
         }
 
-        // Food.
-        renderer->SubmitDraw(
-            MakeQuadTransform(TileToWorld(m_food.x, m_food.y), Vec2{ TileSize * 0.6f, TileSize * 0.6f }),
-            Vec4{ 0.95f, 0.30f, 0.28f, 1.0f });
+        // Food — an apple sprite, or a red quad if the texture failed to load.
+        {
+            const glm::mat4 foodTransform =
+                MakeQuadTransform(TileToWorld(m_food.x, m_food.y), Vec2{ TileSize * 0.9f, TileSize * 0.9f });
+            if (m_appleTexture) {
+                renderer->SubmitDraw(foodTransform, m_appleTexture);
+            }
+            else {
+                renderer->SubmitDraw(
+                    MakeQuadTransform(TileToWorld(m_food.x, m_food.y), Vec2{ TileSize * 0.6f, TileSize * 0.6f }),
+                    Vec4{ 0.95f, 0.30f, 0.28f, 1.0f });
+            }
+        }
 
         // Snake body. The head is brighter than the rest.
         const Vec4 headColor{ 0.55f, 0.95f, 0.40f, 1.0f };

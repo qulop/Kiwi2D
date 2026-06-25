@@ -7,6 +7,8 @@
 #include <renderer/Renderer.hpp>
 #include <renderer/Camera2D.hpp>
 
+#include <renderer/Texture.hpp>
+
 #include <scene/Scene.hpp>
 #include <scene/Entity.hpp>
 #include <scene/components/Transform2D.hpp>
@@ -24,7 +26,9 @@
 #include <imgui.h>
 
 #include <algorithm>
+#include <cmath>
 #include <random>
+#include <vector>
 
 
 namespace Arkanoid {
@@ -47,6 +51,62 @@ namespace Arkanoid {
             std::uniform_real_distribution<f32> dist(a, b);
             return dist(rng);
         }
+
+        Vec4 Lerp(const Vec4& a, const Vec4& b, f32 t) {
+            return Vec4{
+                a.r + (b.r - a.r) * t,
+                a.g + (b.g - a.g) * t,
+                a.b + (b.b - a.b) * t,
+                a.a + (b.a - a.a) * t
+            };
+        }
+
+        // Builds a soft-edged white disc texture so the ball can be drawn as a real
+        // circle. A 1px alpha ramp at the rim keeps it from looking jagged. The disc is
+        // white so the renderer's per-quad tint colours it.
+        SharedPtr<ATexture2D> MakeCircleTexture(u32 diameter) {
+            std::vector<u8> pixels(static_cast<size_t>(diameter) * diameter * 4, 0);
+
+            const f32 radius = static_cast<f32>(diameter) * 0.5f;
+            const f32 center = radius - 0.5f;
+
+            for (u32 y = 0; y < diameter; ++y) {
+                for (u32 x = 0; x < diameter; ++x) {
+                    const f32 dx = static_cast<f32>(x) - center;
+                    const f32 dy = static_cast<f32>(y) - center;
+                    const f32 dist = std::sqrt(dx * dx + dy * dy);
+                    const f32 alpha = std::clamp(radius - dist, 0.0f, 1.0f);
+
+                    const size_t idx = (static_cast<size_t>(y) * diameter + x) * 4;
+                    pixels[idx + 0] = 255;
+                    pixels[idx + 1] = 255;
+                    pixels[idx + 2] = 255;
+                    pixels[idx + 3] = static_cast<u8>(alpha * 255.0f);
+                }
+            }
+
+            ImageDesc desc;
+            desc.width = static_cast<i32>(diameter);
+            desc.height = static_cast<i32>(diameter);
+            desc.channels = 4;
+            desc.format = EImageFormat::RGBA_8;
+            desc.size = static_cast<i32>(pixels.size());
+            desc.data = pixels.data();
+
+            return ATexture2D::Create(desc);
+        }
+
+        // Colour shown for a brick, accounting for the "brighten on each hit" feedback
+        // of reinforced bricks. Normal and iron bricks just use their stored colour.
+        Vec4 BrickDisplayColor(const BrickComponent& brick) {
+            if (brick.type != EBrickType::Reinforced || brick.maxHitPoints <= 1) {
+                return brick.color;
+            }
+
+            const f32 taken = static_cast<f32>(brick.maxHitPoints - brick.hitPoints);
+            const f32 frac = taken / static_cast<f32>(brick.maxHitPoints - 1); // 0 full .. 1 last hit
+            return Lerp(brick.color, Vec4{ 1.0f, 1.0f, 1.0f, 1.0f }, 0.6f * frac);
+        }
     }
 
 
@@ -59,6 +119,8 @@ namespace Arkanoid {
 
         // Map the logical world (0..W, 0..H) directly onto the camera. y grows upward.
         m_camera = std::make_shared<Camera2D>(0.0f, WorldWidth, 0.0f, WorldHeight);
+
+        m_ballTexture = MakeCircleTexture(64);
 
         // Debug/HUD overlay. The GL context is already current at this point, so the
         // ImGui GL3 + GLFW backends initialize cleanly.
@@ -113,6 +175,13 @@ namespace Arkanoid {
             { 0.61f, 0.35f, 0.71f, 1.0f },
         };
 
+        const Vec4 ironColor{ 0.55f, 0.57f, 0.60f, 1.0f };
+        const Vec4 reinforcedBase{ 0.40f, 0.28f, 0.55f, 1.0f };
+
+        // Column pattern repeated across the whole field:
+        //   col % 3 == 0 -> Normal (one hit)
+        //   col % 3 == 1 -> Iron (indestructible)
+        //   col % 3 == 2 -> Reinforced (three hits, brightens each time)
         for (i32 row = 0; row < BrickRows; ++row) {
             for (i32 col = 0; col < BrickColumns; ++col) {
                 Entity* brickEntity = m_scene->CreateEntity("Brick");
@@ -126,10 +195,29 @@ namespace Arkanoid {
 
                 auto* brick = brickEntity->AddComponent<BrickComponent>();
                 brick->halfExtents = Vec2{ brickW * 0.5f, brickH * 0.5f };
-                brick->color = rowColors[row];
-                brick->hitPoints = 1;
 
-                ++m_bricksRemaining;
+                switch (col % 3) {
+                    case 1:
+                        brick->type = EBrickType::Iron;
+                        brick->color = ironColor;
+                        brick->hitPoints = 1;       // never consumed
+                        brick->maxHitPoints = 1;
+                        break;
+                    case 2:
+                        brick->type = EBrickType::Reinforced;
+                        brick->color = reinforcedBase;
+                        brick->hitPoints = 3;
+                        brick->maxHitPoints = 3;
+                        ++m_bricksRemaining;
+                        break;
+                    default:
+                        brick->type = EBrickType::Normal;
+                        brick->color = rowColors[row];
+                        brick->hitPoints = 1;
+                        brick->maxHitPoints = 1;
+                        ++m_bricksRemaining;
+                        break;
+                }
             }
         }
     }
@@ -313,14 +401,20 @@ namespace Arkanoid {
                     ball->velocity.y = -ball->velocity.y;
                 }
 
-                if (--brick->hitPoints <= 0) {
-                    brick->alive = false;
-                    m_scene->DestroyEntity(entity.get());
-                    --m_bricksRemaining;
-                    m_score += 100;
+                // Iron bricks only deflect the ball; they never take damage.
+                if (brick->IsBreakable()) {
+                    if (--brick->hitPoints <= 0) {
+                        brick->alive = false;
+                        m_scene->DestroyEntity(entity.get());
+                        --m_bricksRemaining;
+                        m_score += 100;
 
-                    if (m_bricksRemaining <= 0) {
-                        m_state = EGameState::Won;
+                        if (m_bricksRemaining <= 0) {
+                            m_state = EGameState::Won;
+                        }
+                    }
+                    else {
+                        m_score += 25; // chipped a reinforced brick
                     }
                 }
                 break; // one brick per frame keeps the response stable
@@ -364,7 +458,7 @@ namespace Arkanoid {
                 continue;
             }
             auto* t = entity->GetComponent<Transform2D>();
-            renderer->SubmitDraw(MakeQuadTransform(t->position, t->scale), brick->color);
+            renderer->SubmitDraw(MakeQuadTransform(t->position, t->scale), BrickDisplayColor(*brick));
         }
 
         // Paddle.
@@ -374,11 +468,16 @@ namespace Arkanoid {
                                  Vec4{ 0.95f, 0.95f, 0.98f, 1.0f });
         }
 
-        // Ball.
+        // Ball — a tinted disc texture so it reads as an actual circle.
         {
             auto* t = m_ball->GetComponent<Transform2D>();
-            renderer->SubmitDraw(MakeQuadTransform(t->position, t->scale),
-                                 Vec4{ 1.0f, 0.85f, 0.30f, 1.0f });
+            const Vec4 ballTint{ 1.0f, 0.85f, 0.30f, 1.0f };
+            if (m_ballTexture) {
+                renderer->SubmitDraw(MakeQuadTransform(t->position, t->scale), m_ballTexture, ballTint);
+            }
+            else {
+                renderer->SubmitDraw(MakeQuadTransform(t->position, t->scale), ballTint);
+            }
         }
 
         renderer->EndScene();

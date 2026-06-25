@@ -62,3 +62,13 @@ add_custom_command(
             $<TARGET_FILE_DIR:${SNAKE_TARGET_NAME}>/resources
     COMMENT "[Snake] Copying engine resources to the output directory..."
 )
+
+# Ship the game sprites (apple, ...) next to the executable so they resolve relative
+# to the application path at runtime.
+add_custom_command(
+    TARGET ${SNAKE_TARGET_NAME} POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+            ${CMAKE_CURRENT_SOURCE_DIR}/sprites
+            $<TARGET_FILE_DIR:${SNAKE_TARGET_NAME}>/sprites
+    COMMENT "[Snake] Copying game sprites to the output directory..."
+)

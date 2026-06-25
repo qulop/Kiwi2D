@@ -12,6 +12,7 @@ namespace Kiwi {
     class Scene;
     class Camera2D;
     class Renderer;
+    class ATexture2D;
 }
 
 namespace Kiwi::Editor {
@@ -90,6 +91,8 @@ namespace Snake {
         std::shared_ptr<Camera2D> m_camera;
 
         SharedPtr<Kiwi::Editor::ImGuiSubsystem> m_imgui;
+
+        SharedPtr<ATexture2D> m_appleTexture;   // food sprite (falls back to a red quad)
 
         std::deque<Cell> m_body;          // front() is the head
         EDirection m_direction = EDirection::Right;
