@@ -1,6 +1,7 @@
 #include "SQLiteDatabase.hpp"
 
 #include <common/types/Errors.hpp>
+#include <common/types/String.hpp>
 
 
 namespace Kiwi {
@@ -27,10 +28,15 @@ namespace Kiwi {
     }
 
 
+    bool SQLiteDatabase::IsDatabaseExist(std::string_view path) {
+        return std::filesystem::exists(path);
+    }
+
     Result<void> SQLiteDatabase::Open(std::string_view path, EDatabaseOpenFlags::Type flags) {
-        if (!(flags & EDatabaseOpenFlags::URI)) {
-            if (!std::filesystem::exists(path)) {
-                return Error::Create(EErrorIO::INVALID_PATH, "Provided path does not exist");
+        if (flags == EDatabaseOpenFlags::AUTO) {
+            flags = EDatabaseOpenFlags::READ_WRITE;
+            if (!IsDatabaseExist(path)) {
+                flags |= EDatabaseOpenFlags::CREATE;
             }
         }
 
@@ -43,7 +49,7 @@ namespace Kiwi {
             return Error::Create(EErrorIO::IO_ERROR, errmsg);
         }
 
-        m_connection = std::unique_ptr<sqlite3, int(*)(sqlite3*)>(connection, sqlite3_close);
+        m_connection.reset(connection, sqlite3_close);
 
         return Success<void>();
     }
@@ -92,13 +98,26 @@ namespace Kiwi {
                         row[columnName] = nullptr;
                         break;
                 }
-
-                resultRowsSet.push_back(std::move(row));
             }
+
+            resultRowsSet.push_back(std::move(row));
         }
 
         sqlite3_finalize(stmt);
 
         return Success(resultRowsSet);
+    }
+
+    bool SQLiteDatabase::TableExists(std::string_view tableName) {
+        String query = String::Format(
+            "SELECT name FROM sqlite_schema WHERE type='table' AND name='{}';",
+            tableName
+        );
+        if (Result r = Execute(query.ToStringView())) {
+            return !r->empty();
+        }
+        else {
+            return false;
+        }
     }
 }

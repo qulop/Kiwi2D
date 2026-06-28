@@ -15,7 +15,10 @@ namespace Kiwi {
 
     class SQLiteDatabase : public ISqlDatabase {
     public:
-        SQLiteDatabase() = delete;
+        KIWI_NODISCARD static bool IsDatabaseExist(std::string_view path);
+
+    public:
+        SQLiteDatabase() = default;
         SQLiteDatabase(SQLiteDatabase&& other) = default;
 
         KIWI_NODISCARD Result<void> Open(std::string_view path, EDatabaseOpenFlags::Type flags) override;
@@ -23,11 +26,13 @@ namespace Kiwi {
 
         Result<std::vector<nlohmann::json>> Execute(std::string_view query) override;
 
+        bool TableExists(std::string_view tableName) override;
+
 
         ~SQLiteDatabase() override = default;
 
     private:
-        std::unique_ptr<sqlite3, int(*)(sqlite3*)> m_connection;
+        std::shared_ptr<sqlite3> m_connection;
     };
 
 }
