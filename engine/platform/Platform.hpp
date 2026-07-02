@@ -57,7 +57,9 @@ namespace Kiwi::Platform {
 
     KIWI_NODISCARD std::vector<String> GetApplicationArguments() noexcept;
 
-    KIWI_NODISCARD std::filesystem::path GetApplicationPath() noexcept;
+    KIWI_NODISCARD std::filesystem::path GetExecutablePath() noexcept;
+    KIWI_NODISCARD std::filesystem::path GetExecutableDirectoryPath() noexcept;
+
     KIWI_NODISCARD std::filesystem::path GetPathToSysTemp() noexcept;
 
     KIWI_NODISCARD String WideToUTF8(const wchar_t* wstr) noexcept;
