@@ -158,7 +158,7 @@ namespace Kiwi::Platform {
         i32 argc = 0;
         LPWSTR* argv = CommandLineToArgvW(GetCommandLineW(), &argc);
 
-        // Skip the executable path - we can obtain it by GetApplicationPath()
+        // Skip the executable path - we can obtain it by GetExecutablePath()
         for (i32 i = 1; i < argc; i++) {
             String arg = String::FromWideCharPtr(argv[i]);
             Globals::Platform::g_applicationArguments.emplace_back(std::move(arg));
@@ -167,12 +167,16 @@ namespace Kiwi::Platform {
         return Globals::Platform::g_applicationArguments;
     }
 
-    std::filesystem::path GetApplicationPath() noexcept {
+    std::filesystem::path GetExecutablePath() noexcept {
         TCHAR path[MAX_PATH];
         GetModuleFileName(nullptr, path, MAX_PATH);
         KIWI_ASSERT(GetLastError() != ERROR_INSUFFICIENT_BUFFER, "Failed to get application path buffer: ERROR_INSUFFICIENT_BUFFER");
 
         return std::filesystem::path{ path };
+    }
+
+    std::filesystem::path GetExecutableDirectoryPath() noexcept {
+        return GetExecutablePath().parent_path();
     }
 
     std::filesystem::path GetPathToSysTemp() noexcept {
