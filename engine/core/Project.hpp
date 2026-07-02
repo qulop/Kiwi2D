@@ -66,6 +66,8 @@ namespace Kiwi {
         static constexpr StringView CACHE_DIRECTORY_NAME = "DataCache";
 
     public:
+        KIWI_NODISCARD static bool Validate(const std::filesystem::path& projectPath);
+
         KIWI_NODISCARD static Result<std::shared_ptr<Project>> FromConfig(const std::filesystem::path& projectPath, const ProjectConfig& config);
 
         KIWI_NODISCARD static Result<std::shared_ptr<Project>> Open(const std::filesystem::path& projectPath);
@@ -80,6 +82,9 @@ namespace Kiwi {
         KIWI_NODISCARD const std::filesystem::path& GetProjectDirectory() const;
 
         KIWI_NODISCARD std::shared_ptr<AssetManager> GetAssetManager() const;
+
+    private:
+        KIWI_NODISCARD static Opt<std::filesystem::path> FindConfigFileInDirectory(const std::filesystem::path& projectPath);
 
     private:
         std::filesystem::path m_projectDirectory;

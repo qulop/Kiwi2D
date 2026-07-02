@@ -97,6 +97,19 @@ namespace Kiwi {
     }
 
 
+    bool Project::Validate(const std::filesystem::path& projectPath) {
+        const Opt<std::filesystem::path> projectConfigPath = FindConfigFileInDirectory(projectPath);
+        if (!projectConfigPath) {
+            return false;
+        }
+
+        const Result<FileContent> configReadResult = File::LoadFromFile(*projectConfigPath, EFileOpenMode::READ | EFileOpenMode::BINARY);
+        if (!configReadResult) {
+            return false;
+        }
+
+        return nlohmann::json::accept(configReadResult->GetAsString());
+    }
 
     Result<std::shared_ptr<Project>> Project::FromConfig(const std::filesystem::path& projectPath, const ProjectConfig& config) {
         for (const auto& directory : config.GetDirectoryPaths()) {
@@ -131,18 +144,17 @@ namespace Kiwi {
             return Error::Create(EErrorIO::INVALID_PATH, "Provided path either empty or is not correct(not exists or not a directory)");
         }
 
-        for (const std::filesystem::directory_entry& entry : std::filesystem::directory_iterator(projectPath)) {
-            if (entry.is_regular_file() && entry.path().extension() == KIWI_PROJECT_EXTENSION) {
-                const Result<ProjectConfig> config = ProjectConfig::ReadConfig(entry.path());
-                if (!config) {
-                    return config.GetError();
-                }
-
-                return FromConfig(projectPath, *config);
-            }
+        const Opt<std::filesystem::path> projectConfigPath = FindConfigFileInDirectory(projectPath);
+        if (!projectConfigPath) {
+            return Error::Create(EErrorIO::DOES_NOT_EXIST, "Failed to find a project file by the provided path");
         }
 
-        return Error::Create(EErrorIO::DOES_NOT_EXIST, "Failed to find a project file by the provided path");
+        const Result<ProjectConfig> config = ProjectConfig::ReadConfig(*projectConfigPath);
+        if (!config) {
+            return config.GetError();
+        }
+
+        return FromConfig(projectPath, *config);
     }
 
     Result<std::shared_ptr<Project>> Project::CreateNew(const ProjectCreateInfo& createInfo) {
@@ -181,5 +193,19 @@ namespace Kiwi {
 
     std::shared_ptr<AssetManager> Project::GetAssetManager() const {
         return m_assetManager;
+    }
+
+    Opt<std::filesystem::path> Project::FindConfigFileInDirectory(const std::filesystem::path& projectPath) {
+        if (!std::filesystem::exists(projectPath) || !std::filesystem::is_directory(projectPath)) {
+            return ZERO_OPT;
+        }
+
+        for (const std::filesystem::directory_entry& entry : std::filesystem::directory_iterator(projectPath)) {
+            if (entry.is_regular_file() && entry.path().extension() == KIWI_PROJECT_EXTENSION) {
+                return entry.path();
+            }
+        }
+
+        return ZERO_OPT;
     }
 }
