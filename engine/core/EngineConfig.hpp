@@ -14,6 +14,7 @@ namespace Kiwi::CmdLine {
     constexpr StringView APPLICATION_OUT_DIR = "ApplicationOutDir";
     constexpr StringView WINDOW_NAME = "MainWindowName";
     constexpr StringView LOG_NAME = "LogFileName";
+    constexpr StringView ACTIVE_PROJECT_ID = "ActiveProjectID";
 }
 
 

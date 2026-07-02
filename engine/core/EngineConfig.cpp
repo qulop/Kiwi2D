@@ -13,7 +13,8 @@ namespace Kiwi {
             CmdLineOption(CmdLine::ENGINE_OUT_DIR, EOptionArgType::PATH),
             CmdLineOption(CmdLine::APPLICATION_OUT_DIR, EOptionArgType::PATH),
             CmdLineOption(CmdLine::WINDOW_NAME, EOptionArgType::STRING),
-            CmdLineOption(CmdLine::LOG_NAME, EOptionArgType::STRING)
+            CmdLineOption(CmdLine::LOG_NAME, EOptionArgType::STRING),
+            CmdLineOption(CmdLine::ACTIVE_PROJECT_ID, EOptionArgType::INT)
         };
     }
 
