@@ -1,6 +1,7 @@
 #include "Engine.hpp"
 
 #include <core/EngineConfig.hpp>
+#include <core/ProjectSubsystem.hpp>
 
 #include <misc/WindowSubsystem.hpp>
 
@@ -11,10 +12,21 @@
 
 namespace Kiwi {
     bool Engine::Init(const ProgramOptions& opts) {
+        // Project subsystem initialization
+        Opt<i32> activeProjectID = opts
+            .Get<i32>(CmdLine::ACTIVE_PROJECT_ID);
+
+        RegisterSubsystem<ProjectSubsystem>(activeProjectID);
+        if (!GetSubsystem<ProjectSubsystem>()->Init()) {
+            return false;
+        }
+
+        // VSync enabled/disabled
         m_engineConfig.vsyncEnabled = opts
             .Get<bool>(CmdLine::VSYNC_ENABLE)
-            .ValueOr(m_engineConfig.vsyncEnabled);
+            .ValueOr(m_engineConfig.vsyncEnabled);  // By default disabled
 
+        // Window creation
         std::shared_ptr<WindowSubsystem> windowSubsystem = GetSubsystem<WindowSubsystem>();
 
         String wndTitle = opts
@@ -28,9 +40,9 @@ namespace Kiwi {
         m_window->SetVSyncEnable(m_engineConfig.vsyncEnabled);
         m_window->MaximizeWindow(true);
 
+        // Renderer initalization
         m_renderer = std::make_shared<Renderer>();
         if (!m_renderer->Init()) {
-            KIWI_CTX_LOG(ERROR, "Failed to initialize the renderer");
             return false;
         }
 
