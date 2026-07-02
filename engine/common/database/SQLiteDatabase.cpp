@@ -28,11 +28,11 @@ namespace Kiwi {
     }
 
 
-    bool SQLiteDatabase::IsDatabaseExist(std::string_view path) {
+    bool SQLiteDatabase::IsDatabaseExist(std::filesystem::path path) {
         return std::filesystem::exists(path);
     }
 
-    Result<void> SQLiteDatabase::Open(std::string_view path, EDatabaseOpenFlags::Type flags) {
+    Result<void> SQLiteDatabase::Open(std::filesystem::path path, EDatabaseOpenFlags::Type flags) {
         if (flags == EDatabaseOpenFlags::AUTO) {
             flags = EDatabaseOpenFlags::READ_WRITE;
             if (!IsDatabaseExist(path)) {
@@ -42,7 +42,7 @@ namespace Kiwi {
 
         sqlite3* connection = nullptr;
         i32 sqliteOpenFlags = EDatabaseOpenFlags::ToSQLiteOpenFlags(flags);
-        if (sqlite3_open_v2(path.data(), &connection, sqliteOpenFlags, nullptr) != SQLITE_OK) {
+        if (sqlite3_open_v2(path.string().data(), &connection, sqliteOpenFlags, nullptr) != SQLITE_OK) {
             const char* errmsg = sqlite3_errmsg(connection);
             sqlite3_close(connection);
 

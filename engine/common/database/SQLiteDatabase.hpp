@@ -15,13 +15,13 @@ namespace Kiwi {
 
     class SQLiteDatabase : public ISqlDatabase {
     public:
-        KIWI_NODISCARD static bool IsDatabaseExist(std::string_view path);
+        KIWI_NODISCARD static bool IsDatabaseExist(std::filesystem::path path);
 
     public:
         SQLiteDatabase() = default;
         SQLiteDatabase(SQLiteDatabase&& other) = default;
 
-        KIWI_NODISCARD Result<void> Open(std::string_view path, EDatabaseOpenFlags::Type flags) override;
+        KIWI_NODISCARD Result<void> Open(std::filesystem::path path, EDatabaseOpenFlags::Type flags) override;
         KIWI_NODISCARD bool IsOpen() const override;
 
         Result<std::vector<nlohmann::json>> Execute(std::string_view query) override;

@@ -46,7 +46,7 @@ namespace Kiwi {
 
 
     KIWI_INTERFACE ISqlDatabase {
-        KIWI_NODISCARD virtual Result<void> Open(std::string_view path, EDatabaseOpenFlags::Type flags = EDatabaseOpenFlags::AUTO) = 0;
+        KIWI_NODISCARD virtual Result<void> Open(std::filesystem::path path, EDatabaseOpenFlags::Type flags = EDatabaseOpenFlags::AUTO) = 0;
         KIWI_NODISCARD virtual bool IsOpen() const = 0;
         KIWI_NODISCARD virtual bool TableExists(std::string_view tableName) = 0;
 
