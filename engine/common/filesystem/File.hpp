@@ -55,6 +55,7 @@ namespace Kiwi {
         KIWI_NODISCARD Result<std::shared_ptr<byte>> ReadAsBytes(bool rewindOnEnd = false) const;
 
         void Rewind() const;
+        void Close() const;
 
         KIWI_NODISCARD size_t GetFileSize() const;
         KIWI_NODISCARD EFileOpenMode::Type GetOpenMode() const;

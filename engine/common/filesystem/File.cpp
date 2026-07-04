@@ -70,16 +70,18 @@ namespace Kiwi {
         errno = 0;
         m_stream.open(path, stdMode);
         if (!m_stream.is_open()) {
-            if (const errno_t err = errno; err != 0) {
-                return Error::Create(EErrorIO::FromPosixCode(err), std::strerror(err));
+            const i32 errNo = errno;
+
+            if (errNo == 0) {
+                return Error::Create(EErrorIO::INVALID_ARGUMENT, "Stream error without an OS error (likely wrong flags combination in open modes)");
             }
 
-            std::error_code ec;
-            if (!std::filesystem::exists(path, ec)) {
-                return Error::Create(EErrorIO::DOES_NOT_EXIST, ec.message());
+            if (std::error_code ec; std::filesystem::is_directory(path, ec)) {
+                return Error::Create(EErrorIO::IS_DIRECTORY, "Path refers to a directory");
             }
 
-            return Error::Create(EErrorIO::UNKNOWN);
+            const std::error_code ec(errNo, std::generic_category());
+            return Error::Create(EErrorIO::FromPosixCode(errNo), ec.message());
         }
 
         m_mode = mode;
@@ -258,6 +260,10 @@ namespace Kiwi {
 
         m_stream.seekg(0, std::ios::beg);
         m_stream.seekp(0, std::ios::beg);
+    }
+
+    void File::Close() const {
+        m_stream.close();
     }
 
     size_t File::GetFileSize() const {
