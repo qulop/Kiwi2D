@@ -150,9 +150,9 @@ namespace Kiwi::Platform {
         return IsDebuggerPresent();
     }
 
-    std::vector<String> GetApplicationArguments() noexcept {
-        if (!Globals::Platform::g_applicationArguments.empty()) {
-            return Globals::Platform::g_applicationArguments;
+    std::vector<String> GetCmdLineArguments() noexcept {
+        if (!Globals::Platform::g_cmdLineArguments.empty()) {
+            return Globals::Platform::g_cmdLineArguments;
         }
 
         i32 argc = 0;
@@ -161,10 +161,10 @@ namespace Kiwi::Platform {
         // Skip the executable path - we can obtain it by GetExecutablePath()
         for (i32 i = 1; i < argc; i++) {
             String arg = String::FromWideCharPtr(argv[i]);
-            Globals::Platform::g_applicationArguments.emplace_back(std::move(arg));
+            Globals::Platform::g_cmdLineArguments.emplace_back(std::move(arg));
         }
 
-        return Globals::Platform::g_applicationArguments;
+        return Globals::Platform::g_cmdLineArguments;
     }
 
     std::filesystem::path GetExecutablePath() noexcept {
@@ -177,6 +177,49 @@ namespace Kiwi::Platform {
 
     std::filesystem::path GetExecutableDirectoryPath() noexcept {
         return GetExecutablePath().parent_path();
+    }
+
+    void ExitProcess(u32 exitCode) noexcept {
+        ::ExitProcess(exitCode);
+    }
+
+    bool RestartExecutable(Opt<std::vector<String>> arguments) noexcept {
+        const std::wstring exePathStr = GetExecutablePath().wstring();
+
+        std::wstring cmdLineArgs = std::vformat(L"\"{}\"", std::make_wformat_args(exePathStr));
+        if (arguments) {
+            for (const String& arg : *arguments) {
+                cmdLineArgs += L' ' + std::wstring(arg.begin(), arg.end());
+            }
+        }
+
+        std::vector<wchar_t> cmdLineBuf{ cmdLineArgs.begin(), cmdLineArgs.end() };
+        cmdLineBuf.push_back(L'\0');
+
+        STARTUPINFOW startupInfoW = { sizeof(startupInfoW) };
+        PROCESS_INFORMATION processInfo = {};
+
+        const BOOL ok = CreateProcessW(
+            exePathStr.c_str(),
+            cmdLineBuf.data(),
+            nullptr,
+            nullptr,
+            FALSE,
+            0,
+            nullptr,
+            nullptr,
+            &startupInfoW,
+            &processInfo
+        );
+
+        if (!ok) {
+            return false;
+        }
+
+        CloseHandle(processInfo.hProcess);
+        CloseHandle(processInfo.hThread);
+
+        return true;
     }
 
     std::filesystem::path GetPathToSysTemp() noexcept {
