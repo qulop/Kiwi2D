@@ -7,6 +7,7 @@
 
 namespace Kiwi {
     class Project;
+    struct ProjectCreateInfo;
     KIWI_INTERFACE ISqlDatabase;
 
 
@@ -31,8 +32,10 @@ namespace Kiwi {
         explicit ProjectSubsystem(Opt<i32> activeProjectID);
 
         KIWI_NODISCARD bool Init() override;
-        KIWI_NODISCARD std::shared_ptr<Project> GetActiveProject() const;
 
+        KIWI_NODISCARD Result<std::shared_ptr<Project>> CreateNewProject(const ProjectCreateInfo& createInfo) const;
+
+        KIWI_NODISCARD std::shared_ptr<Project> GetActiveProject() const;
         KIWI_NODISCARD const std::vector<ProjectDescription>& GetAllProjects() const;
 
     private:

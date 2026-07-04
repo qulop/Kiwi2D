@@ -62,6 +62,30 @@ namespace Kiwi {
         return true;
     }
 
+    Result<std::shared_ptr<Project>> ProjectSubsystem::CreateNewProject(const ProjectCreateInfo& createInfo) const {
+        KIWI_ASSERT_BASIC(m_projectsDB->IsOpen());
+
+        Result<std::shared_ptr<Project>> createResult = Project::CreateNew(createInfo);
+        if (!createResult) {
+            return createResult;
+        }
+
+        const String newProjectInsertQuery = String::Format(
+            KIWI_MAKE_STRING(
+                INSERT INTO Projects (ProjectName, Path) VALUES ('{}', '{}');
+            ),
+            createInfo.projectName,
+            createInfo.projectPath.string()
+        );
+
+        const Result insertResult = m_projectsDB->Execute(newProjectInsertQuery.ToStringView());
+        if (!insertResult) {
+            return insertResult.GetError();
+        }
+
+        return createResult;
+    }
+
     std::shared_ptr<Project> ProjectSubsystem::GetActiveProject() const {
         KIWI_ASSERT_BASIC(m_activeProject);
 
