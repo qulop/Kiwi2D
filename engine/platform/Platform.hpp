@@ -55,10 +55,13 @@ namespace Kiwi::Platform {
     KIWI_NODISCARD bool IsDisplayCurrentlyActive(const DisplayInfo& info) noexcept;
     KIWI_NODISCARD bool IsUnderDebug() noexcept;
 
-    KIWI_NODISCARD std::vector<String> GetApplicationArguments() noexcept;
+    KIWI_NODISCARD std::vector<String> GetCmdLineArguments() noexcept;
 
     KIWI_NODISCARD std::filesystem::path GetExecutablePath() noexcept;
     KIWI_NODISCARD std::filesystem::path GetExecutableDirectoryPath() noexcept;
+
+    void ExitProcess(u32 exitCode = KIWI_EXIT_SUCCESS) noexcept;
+    KIWI_NODISCARD bool RestartExecutable(Opt<std::vector<String>> arguments) noexcept;
 
     KIWI_NODISCARD std::filesystem::path GetPathToSysTemp() noexcept;
 
