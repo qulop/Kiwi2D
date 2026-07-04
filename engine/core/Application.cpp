@@ -42,7 +42,7 @@ namespace Kiwi {
             Console::WriteLine("Connection to the profiler server failed to establish");
         }
 
-        if (Opt options = ProgramOptions::Parse(Platform::GetApplicationArguments()); options) {
+        if (Opt options = ProgramOptions::Parse(Platform::GetCmdLineArguments()); options) {
            m_cliOptions = std::move(*options);
         }
         else {
