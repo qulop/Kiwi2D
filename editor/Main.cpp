@@ -40,7 +40,7 @@ namespace Kiwi {
     #ifdef KIWI_MSVC_USED
         return Kiwi::EntryPoint(__argc, __argv);
     #else
-        std::vector<Kiwi::String> args = Kiwi::Platform::GetApplicationArguments();
+        std::vector<Kiwi::String> args = Kiwi::Platform::GetCmdLineArguments();
         std::vector<char*> argv = args
             | std::views::transform([](Kiwi::String& s) -> char* { return s.GetMutableRaw(); })
             | std::ranges::to<std::vector<char*>>();
