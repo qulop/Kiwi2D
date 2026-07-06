@@ -62,11 +62,8 @@ namespace Kiwi {
             return false;
         }
 
-        // Window initialization
-        RegisterSubsystem<WindowSubsystem>();
-        GetSubsystem<WindowSubsystem>()->Init();
 
-
+        // Engine initialization
         m_engine = std::make_shared<Engine>();
         if (!m_engine->Init(m_cliOptions)) {
             KIWI_CTX_LOG(ERROR, "Failed to initialize the engine instance");

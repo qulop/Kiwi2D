@@ -17,17 +17,26 @@ namespace Kiwi {
             .Get<i32>(CmdLine::ACTIVE_PROJECT_ID);
 
         RegisterSubsystem<ProjectSubsystem>(activeProjectID);
-        if (!GetSubsystem<ProjectSubsystem>()->Init()) {
+
+        std::shared_ptr<ProjectSubsystem> projectSubsystem = GetSubsystem<ProjectSubsystem>();
+        if (!projectSubsystem->Init()) {
             return false;
         }
+
+        ERenderAPI::Type renderAPI = projectSubsystem->GetRenderAPI();
 
         // VSync enabled/disabled
         m_engineConfig.vsyncEnabled = opts
             .Get<bool>(CmdLine::VSYNC_ENABLE)
-            .ValueOr(m_engineConfig.vsyncEnabled);  // By default disabled
+            .ValueOr(m_engineConfig.vsyncEnabled);  // Disabled by default
 
-        // Window creation
+        // Window initialization and creation
+        RegisterSubsystem<WindowSubsystem>(renderAPI);
+
         std::shared_ptr<WindowSubsystem> windowSubsystem = GetSubsystem<WindowSubsystem>();
+        if (!windowSubsystem->Init()) {
+            return false;
+        }
 
         String wndTitle = opts
             .Get<String>(CmdLine::WINDOW_NAME)
@@ -40,9 +49,9 @@ namespace Kiwi {
         m_window->SetVSyncEnable(m_engineConfig.vsyncEnabled);
         m_window->MaximizeWindow(true);
 
-        // Renderer initalization
+        // Renderer initialization
         m_renderer = std::make_shared<Renderer>();
-        if (!m_renderer->Init()) {
+        if (!m_renderer->Init(renderAPI)) {
             return false;
         }
 
