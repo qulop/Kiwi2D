@@ -1,6 +1,6 @@
 #pragma once
 
-#include <common/cast/CastTraits.hpp>
+#include <common/types/String.hpp>
 
 
 namespace Kiwi {

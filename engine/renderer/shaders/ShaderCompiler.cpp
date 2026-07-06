@@ -19,11 +19,12 @@ namespace Kiwi {
             return nullptr;
         }
 
-        std::shared_ptr<Project> activeProject = projectSubsystem->GetActiveProject();
-        if (!activeProject) {
+        Opt<std::shared_ptr<Project>> optActiveProject = projectSubsystem->GetActiveProject();
+        if (!optActiveProject) {
             return nullptr;
         }
 
+        std::shared_ptr<Project> activeProject = *optActiveProject;
         switch (activeProject->GetConfig().renderAPI) {
         case ERenderAPI::OpenGL:
             return std::make_unique<OpenGL::ShaderCompilerGL>();

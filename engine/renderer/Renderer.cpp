@@ -10,10 +10,10 @@
 
 
 namespace Kiwi {
-    bool Renderer::Init() {
-        m_factory = IGraphicObjectsFactory::Create();
+    bool Renderer::Init(ERenderAPI::Type renderAPI) {
+        m_factory = IGraphicObjectsFactory::Create(renderAPI);
 
-        m_renderContext = IRenderContext::Create();
+        m_renderContext = m_factory->CreateContext();
         if (!m_renderContext->Init()) {
             KIWI_CTX_LOG(ERROR, "Failed to initialize a render context");
             return false;
@@ -28,7 +28,6 @@ namespace Kiwi {
         pipelineInitInfo.msaaSamplesCount = 4;
 
         if (!m_renderContext->GetPipeline()->Init(pipelineInitInfo)) {
-            KIWI_CTX_LOG(ERROR, "Failed to initialize a pipeline");
             return false;
         }
 

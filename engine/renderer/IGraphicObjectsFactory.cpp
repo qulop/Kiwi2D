@@ -6,7 +6,11 @@
 
 
 namespace Kiwi {
-    std::shared_ptr<IGraphicObjectsFactory> IGraphicObjectsFactory::Create() {
+    std::shared_ptr<IGraphicObjectsFactory> IGraphicObjectsFactory::Create(ERenderAPI::Type api) {
+        if (api == ERenderAPI::OpenGL) {
+            return std::make_shared<OpenGL::GraphicObjectsFactoryGL>();
+        }
+
         return std::make_shared<Vulkan::GraphicObjectsFactoryVK>();
     }
 }

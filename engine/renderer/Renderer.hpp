@@ -4,6 +4,8 @@
 
 #include <core/Object.hpp>
 
+#include <renderer/pipeline/RenderAPI.hpp>
+
 #include <math/Rect.hpp>
 
 
@@ -19,7 +21,7 @@ namespace Kiwi {
         KIWI_CREATE_OBJECT(Renderer, AObject);
 
     public:
-        KIWI_NODISCARD bool Init();
+        KIWI_NODISCARD bool Init(ERenderAPI::Type renderAPI);
 
         void SetViewport(const I32Rect& viewport) const;
 
