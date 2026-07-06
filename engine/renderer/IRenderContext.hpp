@@ -30,13 +30,13 @@ namespace Kiwi {
         KIWI_NODISCARD virtual ARenderPipeline* GetPipeline() = 0;
         KIWI_NODISCARD virtual ERenderAPI::Type GetUsedAPI() const = 0;
 
-        KIWI_NODISCARD virtual TextureHandle CreateTexture(const ImageDesc& imageDesc) = 0;
-        virtual void DestroyTexture(TextureHandle handle) = 0;
+        // KIWI_NODISCARD virtual TextureHandle CreateTexture(const ImageDesc& imageDesc) = 0;
+        // virtual void DestroyTexture(TextureHandle handle) = 0;
+        //
+        // KIWI_NODISCARD virtual ShaderHandle CreateShader() = 0;
+        // virtual void DestroyShader(ShaderHandle handle) = 0;
 
-        KIWI_NODISCARD virtual ShaderHandle CreateShader() = 0;
-        virtual void DestroyShader(ShaderHandle handle) = 0;
 
-        
         ~IRenderContext() override = default;
     };
 }
