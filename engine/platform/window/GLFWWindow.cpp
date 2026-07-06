@@ -17,10 +17,8 @@
 #include <GLFW/glfw3native.h>
 
 namespace Kiwi {
-    bool GLFWWindow::Init(StringView windowName, const Platform::DisplayInfo& display) {
-	    KIWI_ASSERT(display.resolution.x && display.resolution.y, "Width and/or height cannot be least or equal zero!");
-
-	    if (!Super::Init(windowName, display)) {
+    bool GLFWWindow::Init(const WindowInitInfo& initInfo) {
+        if (!Super::Init(initInfo)) {
             return false;
         }
 
@@ -29,24 +27,42 @@ namespace Kiwi {
 	        return false;
 	    }
 
-        // TODO: resizability should be configurable from the command line
-	    glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
-	    glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
+        const Platform::DisplayInfo& displayInfo = initInfo.displayInfo;
 
-	    GLFWmonitor* monitor = MapToGLFWmonitor(display);
+	    glfwWindowHint(GLFW_RESIZABLE, initInfo.resizable ? GLFW_TRUE : GLFW_FALSE);
+
+        m_renderAPI = initInfo.renderAPI;
+        if (m_renderAPI == ERenderAPI::OpenGL) {
+	        glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_API);
+            glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+            glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
+            glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+        }
+        else {
+	        glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
+        }
+
+	    GLFWmonitor* monitor = MapToGLFWmonitor(displayInfo);
         if (!monitor) {
-            KIWI_CTX_LOG(ERROR, "Failed to map our DisplayInfo(with name {}) to GLFWmonitor*", display.name);
+            KIWI_CTX_LOG(ERROR, "Failed to map our DisplayInfo(with name {}) to GLFWmonitor*", displayInfo.name);
             return false;
         }
 
         i32 monitorX = 0, monitorY = 0;
         glfwGetMonitorPos(monitor, &monitorX, &monitorY);
 
-	    m_window = glfwCreateWindow(display.resolution.x, display.resolution.y, windowName.data(), nullptr, nullptr);
+	    m_window = glfwCreateWindow(
+	        displayInfo.resolution.x, displayInfo.resolution.y,
+	        initInfo.windowName.ToCString(), nullptr, nullptr
+	    );
 	    if (!m_window) {
 	        KIWI_CTX_LOG(CRITICAL, "Failed to create the main window");
 	        return false;
 	    }
+
+        if (m_renderAPI == ERenderAPI::OpenGL) {
+            glfwMakeContextCurrent(m_window);
+        }
 
         glfwSetWindowPos(m_window, monitorX, monitorY);
 
@@ -136,6 +152,10 @@ namespace Kiwi {
         else {
             std::unreachable();
         }
+    }
+
+    ERenderAPI::Type GLFWWindow::GetRenderAPI() const {
+        return m_renderAPI;
     }
 
     void GLFWWindow::MaximizeWindow(bool val) {

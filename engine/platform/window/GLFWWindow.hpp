@@ -16,7 +16,7 @@ namespace Kiwi {
 		GLFWWindow() = default;
 
 	public:
-        KIWI_NODISCARD bool Init(StringView windowName, const Platform::DisplayInfo& display) override;
+        KIWI_NODISCARD bool Init(const WindowInitInfo& initInfo) override;
 
 
         void ChangePosition(i32 x, i32 y) const override;
@@ -34,6 +34,8 @@ namespace Kiwi {
         KIWI_NODISCARD EWindowVendor GetVendor() const override;
         KIWI_NODISCARD void* GetNativeWindowPtr() const override;
         KIWI_NODISCARD Platform::NativeWindowHandle GetNativeWindowHandle() const override;
+
+        KIWI_NODISCARD ERenderAPI::Type GetRenderAPI() const override;
 
 		void MaximizeWindow(bool val) override;
 

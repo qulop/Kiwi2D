@@ -16,6 +16,15 @@ namespace Kiwi {
         std::unreachable();
     }
 
+    bool AWindow::Init(const WindowInitInfo& initInfo) {
+	    KIWI_ASSERT(
+	        initInfo.displayInfo.resolution.x && initInfo.displayInfo.resolution.y,
+	        "Width and/or height cannot be least or equal zero!"
+	    );
+
+        return true;
+    }
+
     void AWindow::ToCenter() const {
         if (auto primaryDisplay = Platform::GetPrimaryDisplay()) {
             const I32Vec2 centerVec = GetWindowSizes().Center();

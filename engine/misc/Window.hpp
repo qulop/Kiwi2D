@@ -4,6 +4,8 @@
 
 #include <platform/Platform.hpp>
 
+#include <renderer/pipeline/RenderAPI.hpp>
+
 #include <math/Rect.hpp>
 
 
@@ -16,6 +18,14 @@ namespace Kiwi {
     };
 
 
+    struct WindowInitInfo {
+        String windowName;
+        Platform::DisplayInfo displayInfo;
+        ERenderAPI::Type renderAPI;
+        bool resizable = false;
+    };
+
+
     class AWindow : public AObject {
         KIWI_CREATE_OBJECT(AWindow, AObject);
 
@@ -23,7 +33,7 @@ namespace Kiwi {
         KIWI_NODISCARD static std::shared_ptr<AWindow> CreateWindowImpl();
 
     public:
-        KIWI_NODISCARD virtual bool Init(StringView windowName, const Platform::DisplayInfo& display) { return true; }
+        KIWI_NODISCARD virtual bool Init(const WindowInitInfo& initInfo);
 
         virtual void ChangePosition(i32 x, i32 y) const = 0;
         virtual void Resize(i32 width, i32 height) = 0;
@@ -41,6 +51,8 @@ namespace Kiwi {
         KIWI_NODISCARD virtual EWindowVendor GetVendor() const = 0;
         KIWI_NODISCARD virtual void* GetNativeWindowPtr() const = 0;
         KIWI_NODISCARD virtual Platform::NativeWindowHandle GetNativeWindowHandle() const = 0;
+
+        KIWI_NODISCARD virtual ERenderAPI::Type GetRenderAPI() const = 0;
 
         virtual void MaximizeWindow(bool val) = 0;
 
@@ -63,6 +75,8 @@ namespace Kiwi {
         ~AWindow() override = default;
 
         protected:
+            ERenderAPI::Type m_renderAPI = ERenderAPI::NONE;
+
             std::atomic<bool> m_isMaximized = false;
             std::atomic<bool> m_isResizable = false;
     };

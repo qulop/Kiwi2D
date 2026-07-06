@@ -2,13 +2,17 @@
 
 
 namespace Kiwi {
+    WindowSubsystem::WindowSubsystem(ERenderAPI::Type renderAPI) :
+        m_renderAPI(renderAPI)
+    {}
+
     bool WindowSubsystem::Init() {
         Super::Init();
 
         return true;
     }
 
-    bool WindowSubsystem::CreateMainWindow(StringView title) {
+    bool WindowSubsystem::CreateMainWindow(const String& title) {
         KIWI_ASSERT(!m_mainWindow, "Main window already created!");
 
         std::vector<Platform::DisplayInfo> displayInfos = Platform::EnumerateDisplays();
@@ -33,8 +37,14 @@ namespace Kiwi {
             selectedDisplay->refreshRate
         );
 
+        WindowInitInfo wndInitInfo;
+        wndInitInfo.windowName = title;
+        wndInitInfo.displayInfo = *selectedDisplay;
+        wndInitInfo.renderAPI = m_renderAPI;
+        wndInitInfo.resizable = false;  // TODO
+
         m_mainWindow = AWindow::CreateWindowImpl();
-        if (!m_mainWindow->Init(title, *selectedDisplay)) {
+        if (!m_mainWindow->Init(wndInitInfo)) {
             return false;
         }
 
