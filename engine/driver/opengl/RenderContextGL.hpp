@@ -7,6 +7,9 @@
 
 
 namespace Kiwi::OpenGL {
+    class RenderPipelineGL;
+
+
      namespace EOpenGLExtensions {
          enum Type : u8 {
             DEBUG_OUTPUT      = KIWI_BIT(0),
@@ -50,13 +53,17 @@ namespace Kiwi::OpenGL {
 
     public:
         KIWI_NODISCARD bool Init() override;
-        KIWI_NODISCARD ERenderAPI::Type GetUsedAPI() const override;
 
         KIWI_NODISCARD bool SetupDebugLayerCallback(const PFN_DebugCallback& debugCallback) override;
+
+        KIWI_NODISCARD ERenderAPI::Type GetUsedAPI() const override;
+        KIWI_NODISCARD ARenderPipeline* GetPipeline() override;
 
         KIWI_NODISCARD constexpr EOpenGLLoaderVendor GetLoaderVendor() const;
 
         KIWI_NODISCARD bool CheckExtensionForSupport(const char* ext) const;
+
+        ~RenderContextGL() override = default;
 
     private:
         KIWI_NODISCARD std::expected<void, ELoadContextError> LoadContext();
@@ -64,6 +71,8 @@ namespace Kiwi::OpenGL {
         void CreateExtensionsInfo();
 
     private:
+        RenderPipelineGL* m_pipeline = nullptr;
+
         bool m_contextLoaded = false;
         std::unordered_map<EOpenGLExtensions::Type, ExtensionSupportInfo> m_extensions;
     };

@@ -4,6 +4,8 @@
 #include <common/meta/TypeTraits.hpp>
 #include <common/cast/Cast.hpp>
 
+#include <driver/opengl/pipeline/RenderPipelineGL.hpp>
+
 #include <glad/glad.h>
 #include <glfw/glfw3.h>
 
@@ -54,7 +56,7 @@ namespace Kiwi::OpenGL {
     bool RenderContextGL::Init() {
         auto loadResult = LoadContext();
         if (!loadResult.has_value()) {
-            KIWI_CTX_LOG(ERROR, "Failed to load OpenGL context. The reason: {}",
+            KIWI_CTX_LOG(CRITICAL, "Failed to load OpenGL context. The reason: {}",
                 GetLoadErrorMessage(loadResult.error())
             );
             return false;
@@ -74,6 +76,8 @@ namespace Kiwi::OpenGL {
             isSupported = isExtensionSupported;
         }
 
+        m_pipeline = KIWI_NOTHROW_NEW RenderPipelineGL();
+
         return true;
     }
 
@@ -83,6 +87,10 @@ namespace Kiwi::OpenGL {
 
     bool RenderContextGL::SetupDebugLayerCallback(const PFN_DebugCallback &debugCallback) {
         return true;
+    }
+
+    ARenderPipeline* RenderContextGL::GetPipeline() {
+        return m_pipeline;
     }
 
     bool RenderContextGL::CheckExtensionForSupport(const char *ext) const {
