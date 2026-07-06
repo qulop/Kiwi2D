@@ -5,6 +5,7 @@
 
 namespace Kiwi {
     class ImGuiSubsystem;
+    class AImGuiLayer;
 }
 
 
@@ -13,6 +14,12 @@ namespace Kiwi::Editor {
         KIWI_CREATE_OBJECT(EditorApp, Application)
 
     public:
+        enum class EEditorState {
+            NONE,
+            LAUNCHER,
+            EDITOR
+        };
+
         KIWI_NODISCARD bool Init() override;
 
         void BeforeFrameBegin() override;
@@ -24,6 +31,8 @@ namespace Kiwi::Editor {
         ~EditorApp() override = default;
 
     private:
-        std::shared_ptr<ImGuiSubsystem> m_imguiSubsystem;
+        EEditorState m_editorState = EEditorState::NONE;
+
+        std::shared_ptr<AImGuiLayer> m_uiLayer;
     };
 }

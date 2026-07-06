@@ -1,9 +1,13 @@
 #include "Editor.hpp"
 
+#include <app/LauncherLayer.hpp>
+
 #include <imgui/ImGuiSubsystem.hpp>
 
 #include <misc/WindowSubsystem.hpp>
 
+#include <core/Project.hpp>
+#include <core/ProjectSubsystem.hpp>
 
 
 namespace Kiwi::Editor {
@@ -13,36 +17,44 @@ namespace Kiwi::Editor {
         }
 
         RegisterSubsystem<ImGuiSubsystem>();
-        m_imguiSubsystem = GetSubsystem<ImGuiSubsystem>();
-        KIWI_ENSURE(m_imguiSubsystem);
-
-        if (!m_imguiSubsystem->Init()) {
-            KIWI_CTX_LOG(ERROR, "Failed to initialize ImGui");
+        if (!GetSubsystem<ImGuiSubsystem>()->Init()) {
             return false;
         }
 
-        return true;
+        std::shared_ptr<ProjectSubsystem> projectSubsystem = GetSubsystem<ProjectSubsystem>();
+        KIWI_ENSURE(projectSubsystem);
+
+        if (!projectSubsystem->GetActiveProject()) {
+            m_editorState = EEditorState::LAUNCHER;
+            m_uiLayer = std::make_shared<LauncherLayer>();
+        }
+        else {
+            m_editorState = EEditorState::EDITOR;
+        }
+
+
+        return m_uiLayer->Init();
     }
 
     void EditorApp::BeforeFrameBegin() {
-        Super::BeforeFrameBegin();
+        KIWI_ASSERT_BASIC(m_uiLayer);
 
-        m_imguiSubsystem->BeginFrame();
+        Super::BeforeFrameBegin();
+        m_uiLayer->BeginFrame();
     }
 
     void EditorApp::BeforeFrameEnd() {
-        Super::BeforeFrameEnd();
+        KIWI_ASSERT_BASIC(m_uiLayer);
 
-        m_imguiSubsystem->EndFrame();
+        Super::BeforeFrameEnd();
+        m_uiLayer->EndFrame();
     }
 
     void EditorApp::Update() {
-        Super::Update();
+        KIWI_ASSERT_BASIC(m_uiLayer);
 
-        if (ImGui::Begin("Hierarchy")) {
-            ImGui::Text("Main Camera");
-        }
-        ImGui::End();
+        Super::Update();
+        m_uiLayer->Update();
     }
 }
 
