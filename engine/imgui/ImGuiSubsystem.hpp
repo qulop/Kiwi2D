@@ -2,6 +2,7 @@
 
 #include <core/Object.hpp>
 #include <common/Definitions.hpp>
+
 #include <imgui/ImGuiBackend.hpp>
 
 #include <imgui.h>
@@ -14,9 +15,10 @@ namespace Kiwi {
         KIWI_CREATE_OBJECT(ImGuiSubsystem, ASubsystem);
 
     public:
+        static void SetDarkThemeColors();
+
         ImGuiSubsystem() = default;
 
-    public:
         KIWI_NODISCARD bool Init() override;
         void DeInit() override;
 
@@ -25,8 +27,6 @@ namespace Kiwi {
 
 
     private:
-        void SetDarkThemeColors();
-
         std::unique_ptr<IImGuiBackend> CreateImGuiBackend();
 
     private:

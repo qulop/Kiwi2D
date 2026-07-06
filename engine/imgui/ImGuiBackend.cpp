@@ -11,9 +11,12 @@
 
 
 namespace Kiwi {
-    void ImGuiBackendOpenGL::Init(std::shared_ptr<AWindow> mainWindow) {
-        ImGui_ImplGlfw_InitForOpenGL((GLFWwindow*)mainWindow->GetNativeWindowPtr(), true);
-        ImGui_ImplOpenGL3_Init("#version 460 core");
+    bool ImGuiBackendOpenGL::Init(std::shared_ptr<AWindow> mainWindow) {
+        if (!ImGui_ImplGlfw_InitForOpenGL((GLFWwindow*)mainWindow->GetNativeWindowPtr(), true)) {
+            return false;
+        }
+
+        return ImGui_ImplOpenGL3_Init("#version 460 core");
     }
 
     void ImGuiBackendOpenGL::DeInit() {
@@ -32,8 +35,9 @@ namespace Kiwi {
 
 
 
-    void ImGuiBackendVulkan::Init(std::shared_ptr<AWindow> mainWindow) {
+    bool ImGuiBackendVulkan::Init(std::shared_ptr<AWindow> mainWindow) {
         KIWI_NOT_IMPLEMENTED();
+        return false;
     }
 
     void ImGuiBackendVulkan::DeInit() {

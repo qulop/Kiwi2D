@@ -8,7 +8,7 @@ namespace Kiwi {
 
 
     KIWI_INTERFACE IImGuiBackend {
-        virtual void Init(std::shared_ptr<AWindow> mainWindow) = 0;
+        KIWI_NODISCARD virtual bool Init(std::shared_ptr<AWindow> mainWindow) = 0;
         virtual void DeInit() = 0;
 
         virtual void BeginFrame() = 0;
@@ -21,7 +21,7 @@ namespace Kiwi {
 
     class ImGuiBackendOpenGL : public IImGuiBackend {
     public:
-        void Init(std::shared_ptr<AWindow> mainWindow) override;
+        bool Init(std::shared_ptr<AWindow> mainWindow) override;
         void DeInit() override;
 
         void BeginFrame() override;
@@ -33,7 +33,7 @@ namespace Kiwi {
 
     class ImGuiBackendVulkan : public IImGuiBackend {
     public:
-        void Init(std::shared_ptr<AWindow> mainWindow) override;
+        bool Init(std::shared_ptr<AWindow> mainWindow) override;
         void DeInit() override;
 
         void BeginFrame() override;

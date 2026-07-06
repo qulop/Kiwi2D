@@ -1,5 +1,4 @@
 #include "ImGuiSubsystem.hpp"
-#include "ImGuiBackend.hpp"
 
 #include <core/ProjectSubsystem.hpp>
 #include <core/Project.hpp>
@@ -11,6 +10,11 @@
 
 
 namespace Kiwi {
+    void ImGuiSubsystem::SetDarkThemeColors() {
+        ImGui::StyleColorsDark();
+    }
+
+
     bool ImGuiSubsystem::Init() {
         if (!Super::Init()) {
             return false;
@@ -32,8 +36,9 @@ namespace Kiwi {
         std::shared_ptr<AWindow> mainWindow = windowSubsystem->GetMainWindow();
         KIWI_ENSURE(mainWindow);
 
-
-        m_backend->Init(mainWindow);
+        if (!m_backend->Init(mainWindow)) {
+            return false;
+        }
 
         const I32Rect windowSizes = mainWindow->GetWindowSizes();
         io.DisplaySize = ImVec2(
@@ -61,18 +66,11 @@ namespace Kiwi {
         m_backend->EndFrame();
     }
 
-    void ImGuiSubsystem::SetDarkThemeColors() {
-        ImGui::StyleColorsDark();
-    }
-
     std::unique_ptr<IImGuiBackend> ImGuiSubsystem::CreateImGuiBackend() {
-        std::shared_ptr<ProjectSubsystem> projectSubsystem = GetSubsystem<ProjectSubsystem>();
+        const std::shared_ptr<ProjectSubsystem> projectSubsystem = GetSubsystem<ProjectSubsystem>();
         KIWI_ENSURE(projectSubsystem);
 
-        std::shared_ptr<Project> project = projectSubsystem->GetActiveProject();
-        KIWI_ENSURE(project);
-
-        switch (project->GetConfig().renderAPI) {
+        switch (projectSubsystem->GetRenderAPI()) {
         case ERenderAPI::OpenGL:
             return std::make_unique<ImGuiBackendOpenGL>();
         case ERenderAPI::Vulkan:
