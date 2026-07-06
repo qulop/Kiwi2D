@@ -16,6 +16,7 @@ set(ENGINE_LIBRARY_SRC
 
     engine/imgui/ImGuiSubsystem.cpp
     engine/imgui/ImGuiBackend.cpp
+    engine/imgui/ImGuiLayer.cpp
 
     engine/misc/Window.cpp
     engine/misc/ParserBase.cpp
@@ -30,6 +31,7 @@ set(ENGINE_LIBRARY_SRC
     engine/driver/opengl/TextureGL.cpp
     engine/driver/opengl/shaders/ShaderGL.cpp
     engine/driver/opengl/shaders/ShaderCompilerGL.cpp
+    engine/driver/opengl/pipeline/RenderPipelineGL.cpp
     # --- END ---
 
     # --- BEGIN: Vulkan driver ---
@@ -81,6 +83,7 @@ set(ENGINE_LIBRARY_SRC
 set(ENGINE_APPLICATION_SRC
     editor/Main.cpp
     editor/app/Editor.cpp
+    editor/app/LauncherLayer.cpp
 )
 
 
