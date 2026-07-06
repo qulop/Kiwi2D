@@ -86,10 +86,20 @@ namespace Kiwi {
         return createResult;
     }
 
-    std::shared_ptr<Project> ProjectSubsystem::GetActiveProject() const {
-        KIWI_ASSERT_BASIC(m_activeProject);
+    ERenderAPI::Type ProjectSubsystem::GetRenderAPI() const {
+        if (m_activeProject) {
+            return m_activeProject->GetConfig().renderAPI;
+        }
 
-        return m_activeProject;
+        return ERenderAPI::OpenGL;  // Fallback API if there are no loaded project(for example, in launcher)
+    }
+
+    Opt<std::shared_ptr<Project>> ProjectSubsystem::GetActiveProject() const {
+        if (m_activeProject) {
+            return m_activeProject;
+        }
+
+        return ZERO_OPT;
     }
 
     const std::vector<ProjectSubsystem::ProjectDescription>& ProjectSubsystem::GetAllProjects() const {

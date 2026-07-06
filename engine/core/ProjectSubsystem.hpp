@@ -2,6 +2,8 @@
 
 #include <core/Object.hpp>
 
+#include <renderer/pipeline/RenderAPI.hpp>
+
 #include <nlohmann/json_fwd.hpp>
 
 
@@ -35,7 +37,9 @@ namespace Kiwi {
 
         KIWI_NODISCARD Result<std::shared_ptr<Project>> CreateNewProject(const ProjectCreateInfo& createInfo) const;
 
-        KIWI_NODISCARD std::shared_ptr<Project> GetActiveProject() const;
+        KIWI_NODISCARD ERenderAPI::Type GetRenderAPI() const;
+
+        KIWI_NODISCARD Opt<std::shared_ptr<Project>> GetActiveProject() const;
         KIWI_NODISCARD const std::vector<ProjectDescription>& GetAllProjects() const;
 
     private:
