@@ -27,8 +27,8 @@ set(ENGINE_LIBRARY_SRC
 
     # --- BEGIN: OpenGL driver ---
     engine/driver/opengl/RenderContextGL.cpp
-    engine/driver/opengl/GraphicObjectsFactoryGL.cpp
     engine/driver/opengl/TextureGL.cpp
+    engine/driver/opengl/core/OpenGlContext.cpp
     engine/driver/opengl/shaders/ShaderGL.cpp
     engine/driver/opengl/shaders/ShaderCompilerGL.cpp
     engine/driver/opengl/pipeline/RenderPipelineGL.cpp
@@ -45,7 +45,6 @@ set(ENGINE_LIBRARY_SRC
     engine/driver/vulkan/core/RenderPass.cpp
     engine/driver/vulkan/pipeline/RenderPipelineVK.cpp
     engine/driver/vulkan/memory/Allocator.cpp
-    engine/driver/vulkan/GraphicObjectsFactoryVK.cpp
     engine/driver/vulkan/GraphicDeviceVK.cpp
     engine/driver/vulkan/shaders/ShaderCompilerVK.cpp
     engine/driver/vulkan/shaders/ShaderVK.cpp
@@ -54,7 +53,6 @@ set(ENGINE_LIBRARY_SRC
     # --- BEGIN: Renderer ---
     engine/renderer/Renderer.cpp
     engine/renderer/IRenderContext.cpp
-    engine/renderer/IGraphicObjectsFactory.cpp
     engine/renderer/pipeline/RenderPipeline.cpp
     engine/renderer/shaders/Shader.cpp
     engine/renderer/shaders/ShaderMetaInfo.cpp
@@ -76,7 +74,7 @@ set(ENGINE_LIBRARY_SRC
     engine/common/Debug.cpp
     engine/common/UUID.cpp
     engine/common/Numeric.cpp
-    engine/common/Errors.cpp
+    engine/common/types/Errors.cpp
     engine/common/types/String.cpp
 )
 
