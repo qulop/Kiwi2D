@@ -50,8 +50,8 @@ namespace Kiwi {
         KIWI_CREATE_OBJECT(ATexture, AAsset);
 
     public:
-        virtual u32 GetWidth() const = 0;
-        virtual u32 GetHeight() const = 0;
+        KIWI_NODISCARD virtual u32 GetWidth() const = 0;
+        KIWI_NODISCARD virtual u32 GetHeight() const = 0;
 
         ~ATexture() override = default;
     };
@@ -62,9 +62,6 @@ namespace Kiwi {
         KIWI_CREATE_OBJECT(ATexture2D, ATexture)
 
     public:
-        KIWI_NODISCARD static std::shared_ptr<ATexture2D> Create(const ImageDesc& desc);
-
-
         ~ATexture2D() override = default;
     };
 }
