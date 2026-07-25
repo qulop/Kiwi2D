@@ -23,8 +23,32 @@ namespace Kiwi::Vulkan {
         return m_pipeline != nullptr;
     }
 
+    bool RenderContextVK::SetupDebugCallback(const PFN_DebugCallback& debugCallback) {
+        return true;
+    }
+
+    void RenderContextVK::SetClearColor(const Color& color) {
+
+    }
+
     ERenderAPI::Type RenderContextVK::GetUsedAPI() const {
         return ERenderAPI::Vulkan;
+    }
+
+    TextureHandle RenderContextVK::CreateTexture(const ImageDesc& imageDesc) {
+        return {};
+    }
+
+    bool RenderContextVK::DestroyTexture(TextureHandle handle) {
+        return false;
+    }
+
+    ShaderHandle RenderContextVK::CreateShader() {
+        return {};
+    }
+
+    bool RenderContextVK::DestroyShader(ShaderHandle handle) {
+        return false;
     }
 
     ARenderPipeline* RenderContextVK::GetPipeline() {
