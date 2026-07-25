@@ -13,19 +13,8 @@
 
 
 namespace Kiwi {
-    std::unique_ptr<AShaderCompiler> AShaderCompiler::Create() {
-        std::shared_ptr<ProjectSubsystem> projectSubsystem = GetSubsystem<ProjectSubsystem>();
-        if (!projectSubsystem) {
-            return nullptr;
-        }
-
-        Opt<std::shared_ptr<Project>> optActiveProject = projectSubsystem->GetActiveProject();
-        if (!optActiveProject) {
-            return nullptr;
-        }
-
-        std::shared_ptr<Project> activeProject = *optActiveProject;
-        switch (activeProject->GetConfig().renderAPI) {
+    std::unique_ptr<AShaderCompiler> AShaderCompiler::Create(ERenderAPI::Type api) {
+        switch (api) {
         case ERenderAPI::OpenGL:
             return std::make_unique<OpenGL::ShaderCompilerGL>();
         case ERenderAPI::Vulkan:

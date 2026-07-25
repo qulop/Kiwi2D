@@ -11,7 +11,7 @@
 #include <renderer/shaders/PreprocessorGLSL.hpp>
 #include <renderer/shaders/Shader.hpp>
 #include <renderer/shaders/SpirV.hpp>
-
+#include <renderer/pipeline/RenderAPI.hpp>
 
 
 namespace Kiwi {
@@ -26,7 +26,7 @@ namespace Kiwi {
         };
 
     public:
-        KIWI_NODISCARD static std::unique_ptr<AShaderCompiler> Create();
+        KIWI_NODISCARD static std::unique_ptr<AShaderCompiler> Create(ERenderAPI::Type api);
 
         KIWI_NODISCARD static Opt<PreprocessorGLSL::SourcesMap> PreprocessSource(const String& src);
         KIWI_NODISCARD static Result<std::map<EShaderStage, std::vector<u32>>> CompileToSpirV(const CompilationDetails& compilationDetails);
