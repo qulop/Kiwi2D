@@ -1,4 +1,4 @@
-#include "types/Errors.hpp"
+#include "Errors.hpp"
 
 
 namespace Kiwi {

@@ -7,7 +7,6 @@
 namespace Kiwi {
     template<Concepts::Enumeration EErrorEnum>
     struct ErrorDescription;
-
 }
 
 
@@ -15,7 +14,6 @@ namespace Kiwi::Concepts {
     template<typename T>
     concept ErrorEnumeration =
         Enumeration<T> &&
-        std::same_as<std::underlying_type_t<T>, u16> &&
         requires(T e) {
             { ErrorDescription<T>::Describe(e) } -> SameAs<String>;
         };
