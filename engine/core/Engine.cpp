@@ -57,13 +57,28 @@ namespace Kiwi {
 
         m_renderer->SetViewport(m_window->GetWindowSizes());
 
+        m_window->AddFramebufferResizeCallback(
+            [this](U32Rect newSize)
+            {
+                m_renderer->OnFramebufferResized(std::move(newSize));
+            }
+        );
+
         return true;
     }
 
     bool Engine::Update() {
         KIWI_PROFILE_ZONE_NAME("Engine::Update");
 
-        return m_window->Update();
+        m_window->PollEvents();
+        if (m_window->ShouldClose()) {
+            m_isRunning.exchange(false);
+            return false;
+        }
+
+        m_window->SwapBuffers();
+
+        return true;
     }
 
     bool Engine::IsRunning() const {
