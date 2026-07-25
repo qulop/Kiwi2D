@@ -1,21 +1,41 @@
-## 📄 __Kiwi__ - game engine for visual novels
+## 📄 __Kiwi__ - Game engine for 2D games
 
-<img alt="KiwiLogo-V1" src="resources/KiwiLogo-V1.png" width="512" height="512">
+> Note: The engine is still in the development stage
+
+<img alt="KiwiLogo" src="resources/KiwiLogo.svg" width="256" height="256">
 
 
 ### Requirements
 
-+ Compiler with support C++23
++ Compiler: GCC(MinGW) or Clang with support of C++23
 + CMake >= 3.5
-+ Python 3.x (for automatic playground build)
-+ OS Windows
++ Operation System: Windows 10/11
 ___
 
-### Quick start
+### Getting started
 
-All the required libraries are already installed in the __extern__ folder, so you don't need to install anything externally.
-
+#### 1) Clone the repository
 
 ```shell
-python3 scripts/build_playground.py
+git clone git@github.com:qulop/Kiwi2D.git --recursive 
 ```
+
+If you cloned the repository without using the `--recursive` flag, you can update all the required submodules using 
+the following command:
+```shell
+git submodule update --init
+```
+
+#### 2) Build
+
+If you're using CLion, you need to create at least one CMake build profile using either the GCC (MinGW) or Clang compiler.
+Then, run the CMake configuration and start building.
+
+In other case, you can build the project through the command line:
+```shell
+mkdir build; cd build
+cmake .. -G "MinGW Makefiles"
+cmake --build . --target KiwiEngine --config Release --parallel 
+```
+___
+
