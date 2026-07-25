@@ -2,7 +2,7 @@
 
 #include <renderer/shaders/Shader.hpp>
 
-#include <driver/opengl/basic/TypesGL.hpp>
+#include <driver/opengl/core/TypesGL.hpp>
 
 
 namespace Kiwi::OpenGL {
@@ -13,7 +13,7 @@ namespace Kiwi::OpenGL {
         GlID moduleID = KIWI_GL_UNDEFINED_ID;
 
         KIWI_NODISCARD const void* GetNativeHandle() const override {
-            return CastTo<const void*>(&moduleID);
+            return static_cast<const void*>(&moduleID);
         }
 
         ~ShaderModuleGL() override = default;

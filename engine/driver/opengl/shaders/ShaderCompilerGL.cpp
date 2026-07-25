@@ -76,7 +76,7 @@ namespace Kiwi::OpenGL {
         }
 
         GLchar buffer[256] = { '\0' };
-        auto bufferSize = BasicCast::To<GLsizei>(std::size(buffer));
+        auto bufferSize = static_cast<GLsizei>(std::size(buffer));
         if (isProgramReceived) {
             glGetProgramInfoLog(target, bufferSize, nullptr, buffer);
         }
@@ -152,7 +152,7 @@ namespace Kiwi::OpenGL {
 
         glShaderBinary(1, &id,
                         GL_SHADER_BINARY_FORMAT_SPIR_V, byteCode.data(),
-                        BasicCast::To<GLsizei>(byteCode.size() * sizeof(u32))
+                        static_cast<GLsizei>(byteCode.size() * sizeof(u32))
         );
         glSpecializeShader(id, entryPoint.data(), 0, nullptr, nullptr);
 

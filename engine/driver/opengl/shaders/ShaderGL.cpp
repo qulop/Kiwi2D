@@ -80,7 +80,7 @@ namespace Kiwi::OpenGL {
 
     ShaderGL::~ShaderGL() {
         for (const std::unique_ptr<IShaderModule>& id : std::views::values(m_shaderModules)) {
-            auto* nativeId = CastTo<const GlID*>(id->GetNativeHandle());
+            auto* nativeId = static_cast<const GlID*>(id->GetNativeHandle());
             glDeleteShader(*nativeId);
         }
         glDeleteProgram(m_programId);
