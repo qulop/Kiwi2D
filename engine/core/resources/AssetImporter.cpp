@@ -68,14 +68,14 @@ namespace Kiwi {
             return nullptr;
         }
 
-        std::unique_ptr<AShaderCompiler> shaderCompiler = AShaderCompiler::Create();
-        KIWI_ENSURE(shaderCompiler);
-
-        if (std::shared_ptr<AShader> result = shaderCompiler->CompileFile(*shaderFile)) {
-            return std::static_pointer_cast<AAsset>(result);
-        }
-
-        KIWI_LOG(ERROR, "Failed to compile a shader");
+        // std::unique_ptr<AShaderCompiler> shaderCompiler = AShaderCompiler::Create();
+        // KIWI_ENSURE(shaderCompiler);
+        //
+        // if (std::shared_ptr<AShader> result = shaderCompiler->CompileFile(*shaderFile)) {
+        //     return std::static_pointer_cast<AAsset>(result);
+        // }
+        //
+        // KIWI_LOG(ERROR, "Failed to compile a shader");
         return nullptr;
     }
 
@@ -101,6 +101,7 @@ namespace Kiwi {
         desc.size = width * height * channels;
         desc.data = data;
 
-        return ATexture2D::Create(desc);
+        return nullptr;
+        // return ATexture2D::Create(desc);
     }
 }
