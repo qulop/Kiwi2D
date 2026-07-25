@@ -1,82 +1,42 @@
 #include "RenderContextGL.hpp"
 
-#include <common/types/CString.hpp>
-#include <common/meta/TypeTraits.hpp>
-#include <common/cast/Cast.hpp>
-
+#include <driver/opengl/core/OpenGlContext.hpp>
+#include <driver/opengl/TextureGL.hpp>
 #include <driver/opengl/pipeline/RenderPipelineGL.hpp>
-
-#include <glad/glad.h>
-#include <glfw/glfw3.h>
-
-
-namespace {
-    std::array<Kiwi::StringView, 4> REQUIRED_OPENGL_EXTENSION = {
-        "GL_ARB_ES2_compatibility",
-        "GL_ARB_gl_spirv",
-        "GL_ARB_spirv_extensions",
-        "GL_ARB_clip_control"
-    };
-
-    std::array<Kiwi::StringView, 1> OPTIONAL_OPENGL_EXTENSION = {
-        "GL_ARB_debug_output"
-    };
-}
 
 
 namespace Kiwi::OpenGL {
-    namespace EOpenGLExtensions {
-        String ToString(Type t) {
-            switch (t) {
-                case DEBUG_OUTPUT:
-                    return "GL_ARB_debug_output";
-                case CLIP_CONTROL:
-                    return "GL_ARB_clip_control";
-                case ES2_COMPATIBILITY:
-                    return "GL_ARB_ES2_compatibility";
-                case SPIRV_EXTENSIONS:
-                    return "GL_ARB_spirv_extensions";
-                case GL_SPIRV:
-                    return "GL_ARB_gl_spirv";
-            }
-        }
-
-        std::vector<Type> Enumerate() {
-            return {
-                DEBUG_OUTPUT,
-                CLIP_CONTROL,
-                ES2_COMPATIBILITY,
-                SPIRV_EXTENSIONS,
-                GL_SPIRV,
-            };
-        }
-    }
-
-
     bool RenderContextGL::Init() {
-        auto loadResult = LoadContext();
-        if (!loadResult.has_value()) {
+        Result<void> loadResult = Context::LoadContext();
+        if (!loadResult) {
             KIWI_CTX_LOG(CRITICAL, "Failed to load OpenGL context. The reason: {}",
-                GetLoadErrorMessage(loadResult.error())
+                loadResult.GetError().GetDescription()
             );
             return false;
         }
 
-        CreateExtensionsInfo();
-        for (auto& [extensionName, isRequired, isSupported] : std::views::values(m_extensions)) {
-            bool isExtensionSupported = CheckExtensionForSupport(extensionName.ToCString());
+        bool allRequiredSupported = true;
+        for (EOpenGLExtensions::Type extension : EOpenGLExtensions::Enumerate()) {
+            ExtensionSupportInfo info = ExtensionSupportInfo();
+            info.extensionName = EOpenGLExtensions::ToString(extension);
+            info.isRequired = Context::IsExtensionRequired(info.extensionName.ToCString());
+            info.isSupported = Context::IsExtensionSupported(info.extensionName.ToCString());
 
-            if (!isExtensionSupported && isRequired) {
-                KIWI_CTX_LOG(ERROR, "The required extension \"{}\" doesn't supported - check your OpenGL driver",
-                    extensionName
+            if (!info.isSupported && info.isRequired) {
+                KIWI_CTX_LOG(ERROR, "The extension \"{}\" required, but not supported - check your OpenGL driver",
+                    info.extensionName
                 );
-                return false;
+                allRequiredSupported = false;
             }
 
-            isSupported = isExtensionSupported;
+            m_extensions[extension] = info;
         }
 
-        m_pipeline = KIWI_NOTHROW_NEW RenderPipelineGL();
+        if (!allRequiredSupported) {
+            return false;
+        }
+
+        m_shaderCompiler = std::make_unique<ShaderCompilerGL>();
 
         return true;
     }
@@ -85,76 +45,38 @@ namespace Kiwi::OpenGL {
         return ERenderAPI::OpenGL;
     }
 
-    bool RenderContextGL::SetupDebugLayerCallback(const PFN_DebugCallback &debugCallback) {
+    bool RenderContextGL::SetupDebugCallback(const PFN_DebugCallback& debugCallback) {
         return true;
     }
 
+    void RenderContextGL::SetClearColor(const Color& color) {
+        glClearColor(color.Red(), color.Green(), color.Blue(), color.Alpha());
+    }
+
     ARenderPipeline* RenderContextGL::GetPipeline() {
-        return m_pipeline;
+        return nullptr;
     }
 
-    bool RenderContextGL::CheckExtensionForSupport(const char *ext) const {
-        if (!m_contextLoaded) {
-            return false;
-        }
+    TextureHandle RenderContextGL::CreateTexture(const ImageDesc& imageDesc) {
+        KIWI_ENSURE(Context::IsLoaded());
 
-        GLint numExtension = 0;
-        glGetIntegerv(GL_NUM_EXTENSIONS, &numExtension);
-
-        for (GLint i = 0; i < numExtension; i++) {
-            auto* currExt = BasicCast::UnsafeCast<const char*>(glGetStringi(GL_EXTENSIONS, i));
-            if (CString::StrCmpBool(ext, currExt)) {
-                return true;
-            }
-        }
-
-        return false;
+        Texture2DGL* texture = Texture2DGL::Create(imageDesc);
+        return m_textureHandlePool.Add(texture);
     }
 
-    std::expected<void, RenderContextGL::ELoadContextError> RenderContextGL::LoadContext() {
-        if (GetLoaderVendor() != EOpenGLLoaderVendor::GLAD) KIWI_UNLIKELY {
-            return std::unexpected(ELoadContextError::UNSUPPORTED_LOADER);
-        }
+    bool RenderContextGL::DestroyTexture(TextureHandle handle) {
+        KIWI_ENSURE(Context::IsLoaded());
 
-        if (m_contextLoaded) {
-            return std::unexpected(ELoadContextError::ALREADY_LOADED);
-        }
+        return m_textureHandlePool.Remove(handle);
+    }
 
-        // SUPER-TODO: This is hardcoded at this moment, because we need to focus on the rendering system
-        // MAKE IT CONFIGURABLE LATER!
-        GLADloadproc procAddress = (GLADloadproc)&glfwGetProcAddress;
-        if (!gladLoadGLLoader(procAddress)) {
-            return std::unexpected(ELoadContextError::LOADER_ERROR);
-        }
+    ShaderHandle RenderContextGL::CreateShader() {
+        KIWI_ENSURE(Context::IsLoaded());
 
-        m_contextLoaded = true;
         return {};
     }
 
-    String RenderContextGL::GetLoadErrorMessage(ELoadContextError error) {
-        switch (error) {
-            case ELoadContextError::ALREADY_LOADED:
-                return "Context already loaded";
-            case ELoadContextError::UNSUPPORTED_LOADER:
-                return "Unsupported loader was selected from the ELoaderVendor enum";
-            case ELoadContextError::LOADER_ERROR:
-                return "OpenGL load failed. Perhaps, you trying to load context before make it current?";
-            default:
-                return "I have no fucking idea what to write here. The fucking IDE force me to add the 'default' block...";
-        }
-    }
-
-    void RenderContextGL::CreateExtensionsInfo() {
-        for (auto extension : EOpenGLExtensions::Enumerate()) {
-            m_extensions[extension] = {
-                .extensionName = EOpenGLExtensions::ToString(extension)
-            };
-        }
-
-        m_extensions[EOpenGLExtensions::DEBUG_OUTPUT].isRequired = false;
-    }
-
-    constexpr RenderContextGL::EOpenGLLoaderVendor RenderContextGL::GetLoaderVendor() const {
-        return EOpenGLLoaderVendor::GLAD;
+    bool RenderContextGL::DestroyShader(ShaderHandle handle) {
+        return false;
     }
 }

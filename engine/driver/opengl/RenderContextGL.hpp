@@ -3,31 +3,15 @@
 #include <renderer/IRenderContext.hpp>
 
 #include <common/meta/TypeTraits.hpp>
-#include <common/cast/CastTraits.hpp>
+
+#include <core/Handle.hpp>
+
+#include <driver/opengl/core/OpenGlContext.hpp>
+#include <driver/opengl/shaders/ShaderCompilerGL.hpp>
 
 
 namespace Kiwi::OpenGL {
     class RenderPipelineGL;
-
-
-     namespace EOpenGLExtensions {
-         enum Type : u8 {
-            DEBUG_OUTPUT      = KIWI_BIT(0),
-            CLIP_CONTROL      = KIWI_BIT(1),
-            ES2_COMPATIBILITY = KIWI_BIT(2),
-            SPIRV_EXTENSIONS  = KIWI_BIT(3),
-            GL_SPIRV          = KIWI_BIT(4),
-         };
-
-         String ToString(Type t);
-         std::vector<Type> Enumerate();
-    };
-
-    struct ExtensionSupportInfo {
-        String extensionName;
-        bool isRequired = true;
-        bool isSupported = false;
-    };
 
 
     class RenderContextGL : public IRenderContext {
@@ -42,38 +26,32 @@ namespace Kiwi::OpenGL {
             GLAD, GLEW, GL3W
         };
 
-        enum class ELoadContextError {
-            LOADER_ERROR,
-            UNSUPPORTED_LOADER,
-            ALREADY_LOADED
-        };
-
     public:
         RenderContextGL() = default;
 
     public:
         KIWI_NODISCARD bool Init() override;
 
-        KIWI_NODISCARD bool SetupDebugLayerCallback(const PFN_DebugCallback& debugCallback) override;
+        KIWI_NODISCARD bool SetupDebugCallback(const PFN_DebugCallback& debugCallback) override;
+
+        void SetClearColor(const Color& color) override;
 
         KIWI_NODISCARD ERenderAPI::Type GetUsedAPI() const override;
         KIWI_NODISCARD ARenderPipeline* GetPipeline() override;
 
-        KIWI_NODISCARD constexpr EOpenGLLoaderVendor GetLoaderVendor() const;
+        KIWI_NODISCARD TextureHandle CreateTexture(const ImageDesc& imageDesc) override;
+        KIWI_NODISCARD bool DestroyTexture(TextureHandle handle) override;
 
-        KIWI_NODISCARD bool CheckExtensionForSupport(const char* ext) const;
+        KIWI_NODISCARD ShaderHandle CreateShader() override;
+        KIWI_NODISCARD bool DestroyShader(ShaderHandle handle) override;
 
         ~RenderContextGL() override = default;
 
     private:
-        KIWI_NODISCARD std::expected<void, ELoadContextError> LoadContext();
-        KIWI_NODISCARD String GetLoadErrorMessage(ELoadContextError error);
-        void CreateExtensionsInfo();
-
-    private:
-        RenderPipelineGL* m_pipeline = nullptr;
-
-        bool m_contextLoaded = false;
         std::unordered_map<EOpenGLExtensions::Type, ExtensionSupportInfo> m_extensions;
+
+        std::unique_ptr<ShaderCompilerGL> m_shaderCompiler;
+
+        HandlePool<TextureHandle> m_textureHandlePool;
     };
 }
