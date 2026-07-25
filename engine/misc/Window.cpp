@@ -29,8 +29,8 @@ namespace Kiwi {
         if (auto primaryDisplay = Platform::GetPrimaryDisplay()) {
             const I32Vec2 centerVec = GetWindowSizes().Center();
 
-            const i32 cx = (CastTo<i32>(primaryDisplay->resolution.x) / 2) - centerVec.x;
-            const i32 cy = (CastTo<i32>(primaryDisplay->resolution.y) / 2) - centerVec.y;
+            const i32 cx = (static_cast<i32>(primaryDisplay->resolution.x) / 2) - centerVec.x;
+            const i32 cy = (static_cast<i32>(primaryDisplay->resolution.y) / 2) - centerVec.y;
 
             ChangePosition(cx, cy);
         }
@@ -45,7 +45,11 @@ namespace Kiwi {
         PollEvents();
         SwapBuffers();
 
-        return !IsWindowClosed();
+        return !ShouldClose();
+    }
+
+    void AWindow::AddFramebufferResizeCallback(const PFN_FramebufferResizeCallback& callback) {
+        m_framebufferResizeCallbacks.push_back(callback);
     }
 
     bool AWindow::IsMaximized() const {
@@ -66,5 +70,12 @@ namespace Kiwi {
 
     u32 AWindow::GetFramebufferHeight() const {
         return GetFramebufferSizes().Height();
+    }
+
+    void AWindow::NotifyFramebufferResized(U32Rect newSizes) {
+        std::ranges::for_each(m_framebufferResizeCallbacks, [&newSizes](const auto& callback)
+        {
+            std::invoke(callback, newSizes);
+        });
     }
 }

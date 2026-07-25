@@ -30,6 +30,9 @@ namespace Kiwi {
         KIWI_CREATE_OBJECT(AWindow, AObject);
 
     public:
+        using PFN_FramebufferResizeCallback = std::function<void(U32Rect)>;
+
+
         KIWI_NODISCARD static std::shared_ptr<AWindow> CreateWindowImpl();
 
     public:
@@ -59,9 +62,11 @@ namespace Kiwi {
         KIWI_NODISCARD virtual bool IsMaximized() const;
 
         KIWI_NODISCARD virtual bool Update();
-        KIWI_NODISCARD virtual bool IsWindowClosed() const = 0;
+        KIWI_NODISCARD virtual bool ShouldClose() const = 0;
 
         virtual void SetVSyncEnable(bool val) = 0;
+
+        virtual void AddFramebufferResizeCallback(const PFN_FramebufferResizeCallback& callback);
 
         KIWI_NODISCARD virtual I32Rect GetWindowSizes() const = 0;
         KIWI_NODISCARD virtual U32Rect GetFramebufferSizes() const = 0;
@@ -74,10 +79,15 @@ namespace Kiwi {
 
         ~AWindow() override = default;
 
-        protected:
-            ERenderAPI::Type m_renderAPI = ERenderAPI::NONE;
+    protected:
+		void NotifyFramebufferResized(U32Rect newSizes);
 
-            std::atomic<bool> m_isMaximized = false;
-            std::atomic<bool> m_isResizable = false;
+    protected:
+        ERenderAPI::Type m_renderAPI = ERenderAPI::NONE;
+
+        std::vector<PFN_FramebufferResizeCallback> m_framebufferResizeCallbacks;
+
+        std::atomic<bool> m_isMaximized = false;
+        std::atomic<bool> m_isResizable = false;
     };
 }
