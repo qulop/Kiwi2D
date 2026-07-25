@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="512" height="512" role="img" aria-label="KiwiEngine logo">
+  <defs>
+    <radialGradient id="bg" cx="30%" cy="20%" r="95%">
+      <stop offset="0%" stop-color="#171C18"/>
+      <stop offset="100%" stop-color="#070A08"/>
+    </radialGradient>
+    <linearGradient id="kiwi" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#B7F34A"/>
+      <stop offset="100%" stop-color="#58B82B"/>
+    </linearGradient>
+    <linearGradient id="core" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#16391D"/>
+      <stop offset="100%" stop-color="#0A1E10"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect x="4" y="4" width="192" height="192" rx="46" fill="url(#bg)"/>
+  <rect x="4.75" y="4.75" width="190.5" height="190.5" rx="45.25"
+        fill="none" stroke="#7EDB42" stroke-opacity=".42" stroke-width="1.5"/>
+
+  <!-- Minimal kiwi silhouette -->
+  <path d="M42 121
+           C40 88 65 58 99 52
+           C121 48 141 57 153 71
+           C163 82 168 94 166 100
+           C179 98 189 102 189 107
+           C188 112 176 113 163 111
+           C167 127 161 141 148 152
+           C130 167 100 170 75 161
+           C50 152 40 140 42 121Z"
+        fill="url(#kiwi)" stroke="#C8FF7A" stroke-opacity=".42" stroke-width="2" stroke-linejoin="round"/>
+
+
+
+  <!-- Eye -->
+  <circle cx="112" cy="75" r="5" fill="#F7FAF7"/>
+  <circle cx="113.5" cy="73.5" r="1.7" fill="#101410"/>
+
+  <!-- Subtle feather marks -->
+  <path d="M62 92 C68 88 76 87 82 90
+           M58 112 C65 108 74 107 81 111
+           M64 132 C71 129 80 128 87 132"
+        fill="none" stroke="#E1FFB7" stroke-opacity=".46"
+        stroke-width="2.6" stroke-linecap="round"/>
+
+  <!-- Feet -->
+  <path d="M85 159 C84 168 83 174 80 179
+           M108 161 C109 169 110 175 113 180
+           M74 181 H87
+           M107 183 H120"
+        fill="none" stroke="#D7E4D5" stroke-opacity=".75"
+        stroke-width="3" stroke-linecap="round"/>
+</svg>
