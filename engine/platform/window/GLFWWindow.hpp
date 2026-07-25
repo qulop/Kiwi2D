@@ -40,7 +40,7 @@ namespace Kiwi {
 		void MaximizeWindow(bool val) override;
 
 		KIWI_NODISCARD bool Update() override;
-        KIWI_NODISCARD bool IsWindowClosed() const override;
+        KIWI_NODISCARD bool ShouldClose() const override;
 
 		void SetVSyncEnable(bool val) override;
 

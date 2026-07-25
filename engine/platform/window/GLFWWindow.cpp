@@ -172,7 +172,7 @@ namespace Kiwi {
         return Super::Update();
 	}
 
-    bool GLFWWindow::IsWindowClosed() const {
+    bool GLFWWindow::ShouldClose() const {
         return glfwWindowShouldClose(m_window) == GLFW_TRUE;
     }
 
@@ -218,11 +218,22 @@ namespace Kiwi {
 	    return nullptr;
 	}
 
-	void GLFWWindow::SetupCallbacks() {
+    void GLFWWindow::SetupCallbacks() {
         // TODO
         // glfwSetErrorCallback([](int err, const char* desc) {
         //     KIWI_CTX_LOG(ERROR, "The error code: {}, description: {}", err, desc);
         // });
+
+        glfwSetFramebufferSizeCallback(m_window, [](GLFWwindow* window, int width, int height)
+        {
+            auto* self = static_cast<GLFWWindow*>(
+                glfwGetWindowUserPointer(window)
+            );
+
+            if (self != nullptr) {
+                self->NotifyFramebufferResized(U32Rect(0, 0, width, height));
+            }
+        });
 
 		// glfwSetKeyCallback(m_window, [](GLFWwindow* glfwWindow, int key, int scancode, int action, int mods) {
   //           auto* window = (GLFWWindow*)glfwGetWindowUserPointer(glfwWindow);
