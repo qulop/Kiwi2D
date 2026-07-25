@@ -10,7 +10,6 @@
 
 
 namespace Kiwi {
-    KIWI_INTERFACE IGraphicObjectsFactory;
     KIWI_INTERFACE IRenderContext;
     class ARenderPipeline;
     class AShaderCompiler;
@@ -25,11 +24,15 @@ namespace Kiwi {
 
         void SetViewport(const I32Rect& viewport) const;
 
+        void OnFramebufferResized(U32Rect newSize);
+
+        KIWI_NODISCARD bool BeginScene();
+        void Render();
+        void EndScene();
+
         ~Renderer() override = default;
 
     private:
-        std::shared_ptr<IGraphicObjectsFactory> m_factory;
-
         std::shared_ptr<IRenderContext> m_renderContext;
     };
 }
