@@ -1,10 +1,7 @@
 #include "Time.hpp"
 
 #include <common/sync/Thread.hpp>
-
-
 #include <common/Debug.hpp>
-#include <common/cast/Cast.hpp>
 
 
 namespace Kiwi {

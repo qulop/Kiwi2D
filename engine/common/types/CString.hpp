@@ -1,7 +1,6 @@
 #pragma once
 
 #include <common/Definitions.hpp>
-#include <common/cast/Cast.hpp>
 
 #include <memory/Memory.hpp>
 
@@ -204,7 +203,7 @@ namespace Kiwi {
 
 	    template<typename T>
 	    static T* Malloc(size_t sz) {
-            return CastTo<T*>(Memory::Malloc(sz));
+            return static_cast<T*>(Memory::Malloc(sz));
         }
 
 	    static void Free(void* ptr) {

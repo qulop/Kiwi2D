@@ -1,6 +1,7 @@
 #pragma once
 
 #include <common/meta/TypeTraits.hpp>
+#include <common/meta/Concepts.hpp>
 #include <common/types/CString.hpp>
 
 
@@ -265,14 +266,6 @@ namespace Kiwi {
 
     private:
         std::string m_data;
-    };
-}
-
-
-namespace Kiwi::Concepts {
-    template<typename T>
-    concept CanBeCastedToString = requires (T t) {
-        { CastTraits<T>::ToString(t) } -> std::convertible_to<String>;
     };
 }
 

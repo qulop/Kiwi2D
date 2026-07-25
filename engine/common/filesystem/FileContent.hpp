@@ -4,7 +4,6 @@
 #include <common/meta/Concepts.hpp>
 #include <common/types/CString.hpp>
 #include <common/types/String.hpp>
-#include <common/cast/Cast.hpp>
 #include <common/Definitions.hpp>
 #include <common/Debug.hpp>
 
@@ -59,18 +58,5 @@ namespace Kiwi {
 
         size_t m_contentByteSize = 0;
         std::vector<raw_byte> m_content;
-    };
-
-
-    template<>
-    struct CastTraits<FileContent> {
-        KIWI_NODISCARD KIWI_FORCEINLINE static String ToString(const FileContent& fc) {
-            return fc.GetAsString();
-        }
-
-        template<typename TByteType>
-        KIWI_NODISCARD KIWI_FORCEINLINE static std::vector<TByteType> ToBytesStream(const FileContent& fc) {
-            return fc.GetAsBytesStream<TByteType>();
-        }
     };
 }

@@ -28,7 +28,7 @@ namespace Kiwi::Details::Color {
     }
 
     constexpr byte HexPairIntoByte(char first, char second) {
-        return BasicCast::To<byte>((HexCharToI32(first) << 4) + HexCharToI32(second));
+        return static_cast<byte>((HexCharToI32(first) << 4) + HexCharToI32(second));
     }
 }
 
@@ -48,20 +48,20 @@ namespace Kiwi {
 
             using ValueType = VecType::value_type;
             return {
-                BasicCast::To<ValueType>(Details::Color::HexPairIntoByte(hex.at(1), hex.at(2)) / 255.f),
-                BasicCast::To<ValueType>(Details::Color::HexPairIntoByte(hex.at(3), hex.at(4)) / 255.f),
-                BasicCast::To<ValueType>(Details::Color::HexPairIntoByte(hex.at(5), hex.at(6)) / 255.f),
-                BasicCast::To<ValueType>(1)
+                static_cast<ValueType>(Details::Color::HexPairIntoByte(hex.at(1), hex.at(2)) / 255.f),
+                static_cast<ValueType>(Details::Color::HexPairIntoByte(hex.at(3), hex.at(4)) / 255.f),
+                static_cast<ValueType>(Details::Color::HexPairIntoByte(hex.at(5), hex.at(6)) / 255.f),
+                static_cast<ValueType>(1)
             };
         }
 
         template<Concepts::Number Tx>
         static constexpr Tx GetMaxNumericValueForType() noexcept {
             if constexpr (std::is_floating_point_v<std::decay_t<Tx>>) {
-                return BasicCast::To<Tx>(1);
+                return static_cast<Tx>(1);
             }
 
-            return BasicCast::To<Tx>(255);
+            return static_cast<Tx>(255);
         }
 
     public:
@@ -83,8 +83,8 @@ namespace Kiwi {
         {}
 
         constexpr Color(i32 r, i32 g, i32 b, i32 a = 1) :
-            m_color(ClampColorValues(BasicCast::To<f32>(r), BasicCast::To<f32>(g),
-                    BasicCast::To<f32>(b), BasicCast::To<f32>(a))) 
+            m_color(ClampColorValues(static_cast<f32>(r), static_cast<f32>(g),
+                    static_cast<f32>(b), static_cast<f32>(a)))
         {
             m_color.r /= 255;
             m_color.g /= 255;
@@ -154,7 +154,7 @@ namespace Kiwi {
         }
 
         KIWI_NODISCARD constexpr i32 FloatColorValueToByte(f32 value) const noexcept {
-            return BasicCast::To<i32>(255 * value);
+            return static_cast<i32>(255 * value);
         }
 
 

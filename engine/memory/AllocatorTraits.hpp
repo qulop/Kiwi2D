@@ -40,7 +40,7 @@ namespace Kiwi::Memory {
 
         template<typename Tx>
         Tx* CastPtr() {
-            return CastTo<Tx*>(ptr);
+            return static_cast<Tx*>(ptr);
         }
 
         KIWI_NODISCARD bool IsAllocated() const {

@@ -1,6 +1,5 @@
 #include "SystemConsoleWin32.hpp"
 
-#include <common/cast/Cast.hpp>
 #include <common/types/Opt.hpp>
 
 #include <platform/PlatformVars.hpp>

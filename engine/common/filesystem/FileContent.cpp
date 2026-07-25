@@ -84,7 +84,7 @@ namespace Kiwi {
         // TODO: Do we need here the check like `if (m_format != EFileContentDataFormat::PLAIN_TEXT)`?
 
         return String{
-            BasicCast::UnsafeCast<const char*>(m_content.data()),
+            reinterpret_cast<const char*>(m_content.data()),
             m_content.size()
         };
     }

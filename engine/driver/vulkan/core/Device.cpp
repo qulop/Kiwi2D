@@ -268,7 +268,7 @@ namespace Kiwi::Vulkan {
         const auto& deviceProperties = deviceDesc.properties;
         const auto& deviceFeatures = deviceDesc.features;
 
-        u64 rate = CastTo<u64>(GetVkPhysicalDeviceTypeGrade(deviceProperties.deviceType));
+        u64 rate = static_cast<u64>(GetVkPhysicalDeviceTypeGrade(deviceProperties.deviceType));
 
         rate += deviceProperties.limits.maxImageDimension2D + deviceProperties.limits.maxViewports;
         rate += (deviceProperties.limits.maxFramebufferWidth * deviceProperties.limits.maxFramebufferHeight);

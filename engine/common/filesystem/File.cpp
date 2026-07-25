@@ -1,7 +1,6 @@
 #include "File.hpp"
 
 #include <common/meta/TypeTraits.hpp>
-#include <common/cast/Cast.hpp>
 #include <common/Debug.hpp>
 
 #include <cerrno>

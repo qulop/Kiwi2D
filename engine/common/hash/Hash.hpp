@@ -1,7 +1,6 @@
 #pragma once
 
 #include <common/meta/TypeTraits.hpp>
-#include <common/cast/Cast.hpp>
 #include <common/Definitions.hpp>
 #include <common/meta/Concepts.hpp>
 #include <common/types/Errors.hpp>
@@ -58,10 +57,10 @@ namespace Kiwi {
 
         static Opt<Hash> FromData(const void* data, size_t size) {
             if constexpr (BitDepth == 32) {
-                return Hash<32>{ BasicCast::To<u32>(XXH32(data, size, /*seed=*/ 0)) };
+                return Hash<32>{ static_cast<u32>(XXH32(data, size, /*seed=*/ 0)) };
             }
             else {  // BitDepth == 64
-                return Hash<64>{ BasicCast::To<u64>(XXH64(data, size, /*seed=*/ 0)) };
+                return Hash<64>{ static_cast<u64>(XXH64(data, size, /*seed=*/ 0)) };
             }
         }
 
@@ -143,15 +142,15 @@ namespace Kiwi {
                 }
             }
 
-            return Hash{ BasicCast::To<value_type>(val) };
+            return Hash{ static_cast<value_type>(val) };
         }
 
         static Opt<Hash> FromData32(const void* data, size_t size) {
-            return Hash{ BasicCast::To<u32>(XXH32(data, size, /*seed=*/ 0)) };
+            return Hash{ static_cast<u32>(XXH32(data, size, /*seed=*/ 0)) };
         }
 
         static Opt<Hash> FromData64(const void* data, size_t size) {
-            return Hash{ BasicCast::To<u64>(XXH64(data, size, /*seed=*/ 0)) };
+            return Hash{ static_cast<u64>(XXH64(data, size, /*seed=*/ 0)) };
         }
 
     private:
@@ -163,12 +162,6 @@ namespace Kiwi {
     using Hash64 = Hash<64>;
 
 
-    template<>
-    struct CastTraits<Hash64> {
-        KIWI_NODISCARD KIWI_FORCEINLINE static Opt<String> ToString(Hash64 val) {
-            return val.ToString();
-        }
-    };
 }
 
 

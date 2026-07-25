@@ -1,7 +1,6 @@
 #include <platform/Platform.hpp>
 #include <platform/PlatformVars.hpp>
 
-#include <common/cast/Cast.hpp>
 #include <common/types/String.hpp>
 #include <common/types/Opt.hpp>
 
@@ -85,7 +84,7 @@ namespace Kiwi::Platform {
         std::vector<DisplayInfo> result;
 
         auto&& callback = [](HMONITOR hMonitor, HDC, LPRECT, LPARAM lParam) -> BOOL {
-            auto* res = BasicCast::UnsafeCast<std::vector<DisplayInfo>*>(lParam);
+            auto* res = reinterpret_cast<std::vector<DisplayInfo>*>(lParam);
 
             MONITORINFOEX info;
             info.cbSize = sizeof(info);
@@ -111,7 +110,7 @@ namespace Kiwi::Platform {
         };
 
 
-        EnumDisplayMonitors(nullptr, nullptr, callback, BasicCast::UnsafeCast<LPARAM>(&result));
+        EnumDisplayMonitors(nullptr, nullptr, callback, reinterpret_cast<LPARAM>(&result));
 
         return result;
     }
@@ -141,7 +140,7 @@ namespace Kiwi::Platform {
             return false;
         }
 
-        HMONITOR hReceivedMonitor = BasicCast::UnsafeCast<HMONITOR>(info.nativeHandle);
+        HMONITOR hReceivedMonitor = reinterpret_cast<HMONITOR>(info.nativeHandle);
 
         return hCurrentMonitor == hReceivedMonitor;
     }

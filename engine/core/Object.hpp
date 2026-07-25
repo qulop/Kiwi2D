@@ -84,7 +84,7 @@ namespace Kiwi {
 
         template<Concepts::DerivedFrom<ASubsystem> T>
         void RegisterSubsystem(T* subsystem) {
-            RegisterSubsystem(BasicCast::HierarchyCast<ASubsystem*>(subsystem));
+            RegisterSubsystem(static_cast<ASubsystem*>(subsystem));
         }
 
         template<Concepts::DerivedFrom<ASubsystem> T, typename... Args>

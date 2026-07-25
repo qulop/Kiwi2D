@@ -20,7 +20,7 @@ namespace Kiwi {
         template<u32 C>
             requires (C <= 3)
         constexpr static BasicVec4<T> Call(const BasicVec4<T>& v) {
-            BasicVec4 res{ BasicCast::To<T>(0) };
+            BasicVec4 res{ static_cast<T>(0) };
 
             for (size_t i = 0; i < BasicVec4<T>::Size(); i++) {
                 res[i] = v[C];

@@ -5,10 +5,7 @@
 //  or copy at http://www.boost.org/LICENSE_1_0.txt)             //
 ///////////////////////////////////////////////////////////////////
 
-
-#ifndef SR_UTILS_TYPES_UINTWIDE_H
-#define SR_UTILS_TYPES_UINTWIDE_H
-
+#pragma once
 
 #ifndef UINTWIDE_T_2018_10_02_H // NOLINT(llvm-header-guard)
 #define UINTWIDE_T_2018_10_02_H
@@ -7878,8 +7875,3 @@ WIDE_INTEGER_NAMESPACE_END
 #endif
 
 #endif // UINTWIDE_T_2018_10_02_H
-
-
-
-
-#endif

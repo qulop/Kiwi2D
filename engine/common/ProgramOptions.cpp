@@ -2,7 +2,6 @@
 
 #include <common/types/CString.hpp>
 #include <common/types/String.hpp>
-#include <common/cast/Cast.hpp>
 #include <common/ProgramOptions.hpp>
 #include <common/Debug.hpp>
 
