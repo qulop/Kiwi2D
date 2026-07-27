@@ -18,6 +18,8 @@ set(ENGINE_LIBRARY_SRC
     engine/imgui/ImGuiBackend.cpp
     engine/imgui/ImGuiLayer.cpp
 
+    engine/math/Transform.cpp
+
     engine/misc/Window.cpp
     engine/misc/ParserBase.cpp
     engine/misc/WindowSubsystem.cpp
