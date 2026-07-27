@@ -106,7 +106,7 @@ namespace Kiwi {
 
 
     class Error {
-        using ErrorCategoryDescriptionFN = String(*)(u16);
+        using PFN_ErrorCategoryDescription = String(*)(u16);
 
     public:
         template<Concepts::ErrorEnumeration EErrorEnum>
@@ -124,42 +124,46 @@ namespace Kiwi {
 
         template<Concepts::ErrorEnumeration EErrorEnum>
         KIWI_NODISCARD constexpr bool Is(EErrorEnum err) const {
-            return (categoryDescriptionFn == &ErrorDescription<EErrorEnum>::Describe) && (code == static_cast<u16>(err));
+            return (m_categoryDescriptionFn == &ErrorDescription<EErrorEnum>::Describe) && (m_code == static_cast<u16>(err));
         }
 
         template<Concepts::ErrorEnumeration EErrorEnum>
         KIWI_NODISCARD constexpr bool InCategory() const {
-            return categoryDescriptionFn == &ErrorDescription<EErrorEnum>::Describe;
+            return m_categoryDescriptionFn == &ErrorDescription<EErrorEnum>::Describe;
         }
 
         template<Concepts::ErrorEnumeration EErrorEnum>
         KIWI_NODISCARD constexpr Opt<EErrorEnum> GetAsEnum() const {
             if (InCategory<EErrorEnum>()) {
-                return static_cast<EErrorEnum>(code);
+                return static_cast<EErrorEnum>(m_code);
             }
 
             return ZERO_OPT;
         }
 
         KIWI_NODISCARD constexpr String GetDescription() const {
-            if (desc) {
-                return *desc;
+            if (m_desc) {
+                return *m_desc;
             }
 
-            return categoryDescriptionFn(code);
+            return m_categoryDescriptionFn(m_code);
         }
 
-        KIWI_NODISCARD constexpr bool operator==(const Error& other) const noexcept = default;
+        KIWI_NODISCARD constexpr bool operator==(const Error& other) const noexcept {
+            return (m_code == other.m_code)
+                && (m_categoryDescriptionFn == other.m_categoryDescriptionFn)
+                && (m_desc == other.m_desc);
+        }
 
     private:
-        constexpr Error(ErrorCategoryDescriptionFN categoryDescFn, u16 code, Opt<String> desc) :
-            categoryDescriptionFn(categoryDescFn),
-            code(code),
-            desc(std::move(desc))
+        constexpr Error(PFN_ErrorCategoryDescription categoryDescFn, u16 code, Opt<String> desc) :
+            m_categoryDescriptionFn(categoryDescFn),
+            m_code(code),
+            m_desc(std::move(desc))
         {}
 
-        ErrorCategoryDescriptionFN categoryDescriptionFn = nullptr;
-        u16 code = 0;
-        Opt<String> desc;
+        PFN_ErrorCategoryDescription m_categoryDescriptionFn = nullptr;
+        u16 m_code = 0;
+        Opt<String> m_desc;
     };
 }
