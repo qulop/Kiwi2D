@@ -1,10 +1,10 @@
 #pragma once
 
 
-#include <common/TypeTraits.hpp>
+#include <common/meta/TypeTraits.hpp>
 
 #include <math/CommonFunc.hpp>
-#include <math/vec/Vec4.hpp>
+#include <math/Vec4.hpp>
 
 #include <intrin.h>
 #include <xmmintrin.h>

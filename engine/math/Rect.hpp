@@ -1,7 +1,7 @@
 #pragma once
 
 #include <common/meta/Concepts.hpp>
-#include <math/vec/Vec2.hpp>
+#include <math/Vec2.hpp>
 
 
 
