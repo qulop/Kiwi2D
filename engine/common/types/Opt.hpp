@@ -93,6 +93,14 @@ namespace Kiwi {
             return ValueOr(ValueType());
         }
 
+        KIWI_NODISCARD constexpr bool operator==(const Opt& other) const {
+            return m_optional == other.m_optional;
+        }
+
+        KIWI_NODISCARD consteval bool operator!=(const Opt& other) const {
+            return m_optional != other.m_optional;
+        }
+
         KIWI_NODISCARD constexpr decltype(auto) operator*() const {
             return m_optional.operator*();
         }
