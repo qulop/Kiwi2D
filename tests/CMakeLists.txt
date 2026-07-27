@@ -4,6 +4,7 @@ project("Tests" LANGUAGES CXX)
 set(TESTS_SRC
     common/Result.test.cpp
     common/UUID.test.cpp
+    math/Vec.test.cpp
 )
 
 set(BUILD_GMOCK OFF CACHE BOOL "" FORCE)
@@ -15,6 +16,7 @@ add_subdirectory(${CMAKE_SOURCE_DIR}/third_party/gtest ${CMAKE_CURRENT_BINARY_DI
 add_executable("Tests" ${TESTS_SRC})
 target_include_directories("Tests"
     PRIVATE ${CMAKE_SOURCE_DIR}/engine/
+    PRIVATE ${CMAKE_SOURCE_DIR}/third_party/glm/
     PRIVATE ${CMAKE_SOURCE_DIR}/third_party/gtest/googletest/include
 )
 
