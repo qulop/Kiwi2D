@@ -24,7 +24,7 @@ TEST(UUID_Test, ReInitializationWithGeneratedUUID) {
     const Opt<UUID> uuid_1 = UUID::FromString(uuid_0.ToString());
 
     EXPECT_TRUE(uuid_1);
-    EXPECT_EQ(uuid_0, uuid_1.value());
+    EXPECT_EQ(uuid_0, uuid_1.GetValue());
 }
 
 TEST(UUID_Test, AssociativeContainers) {
