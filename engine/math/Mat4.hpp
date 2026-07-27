@@ -3,11 +3,11 @@
 #include <glm/glm.hpp>
 #include <glm/ext/matrix_transform.hpp>
 
-#include <math/vec/Vec4.hpp>
-#include <math/vec/Vec3.hpp>
+#include <math/Vec4.hpp>
+#include <math/Vec3.hpp>
 #include <math/CommonFunc.hpp>
-#include <math/simd/SIMD.hpp>
-
+#include <math/SIMD.hpp>
+#include <math/Angle.hpp>
 
 
 namespace Kiwi {
@@ -28,36 +28,48 @@ namespace Kiwi {
             return Mat4(1.f);
         }
 
+        static constexpr Mat4 Translate(const Vec3& v) noexcept {
+            return glm::translate(Identity().ToGlmMat4(), v.ToGlmVec3());
+        }
+
+        static constexpr Mat4 Scale(const Vec3& v) noexcept {
+            return glm::scale(Identity().m_matrix, v.ToGlmVec3());
+        }
+
+        static constexpr Mat4 Rotate(const Radians& radAngle, const Vec3& axis) noexcept {
+            return glm::rotate(Identity().m_matrix,  *radAngle, axis.ToGlmVec3());
+        }
+
+        static constexpr Mat4 LookAt(const Vec3& pos, const Vec3& target, const Vec3& up) noexcept {
+            return glm::lookAt(
+                pos.ToGlmVec3(),
+                target.ToGlmVec3(),
+                up.ToGlmVec3()
+            );
+        }
+
     public:
-        constexpr Mat4() :
-            m_matrix{ {}, {}, {}, {} }
-        {}
+        constexpr Mat4() = default;
 
         constexpr explicit Mat4(f32 scalar) :
-            m_matrix{
-                ColumnType(scalar, 0.f, 0.f, 0.f),
-                ColumnType(0.f, scalar, 0.f, 0.f),
-                ColumnType(0.f, 0.f, scalar, 0.f),
-                ColumnType(0.f, 0.f, 0.f, scalar)
-            }
+            m_matrix(scalar)
         {}
 
-        constexpr Mat4(const glm::mat4 &mat) {
-            m_matrix[0] = mat[0];
-            m_matrix[1] = mat[1];
-            m_matrix[2] = mat[2];
-            m_matrix[3] = mat[3];
-        }
+        constexpr Mat4(const glm::mat4& mat) :
+            m_matrix(mat)
+        {}
 
-        constexpr Mat4(glm::mat4 &&mat) noexcept {
-            m_matrix[0] = std::exchange(mat[0], glm::vec4(0));
-            m_matrix[1] = std::exchange(mat[1], glm::vec4(0));
-            m_matrix[2] = std::exchange(mat[2], glm::vec4(0));
-            m_matrix[3] = std::exchange(mat[3], glm::vec4(0));
-        }
+        constexpr Mat4(glm::mat4&& mat) noexcept :
+            m_matrix(std::move(mat))
+        {}
 
         constexpr Mat4(const ColumnType& c0, const ColumnType& c1, const ColumnType& c2, const ColumnType& c3) :
-            m_matrix{ c0, c1, c2, c3 }
+            m_matrix(
+                c0.ToGlmVec4(),
+                c1.ToGlmVec4(),
+                c2.ToGlmVec4(),
+                c3.ToGlmVec4()
+            )
         {}
 
         constexpr Mat4(
@@ -78,16 +90,16 @@ namespace Kiwi {
         constexpr Mat4(const Mat4& other) = default;
 
     public:
-        constexpr const ColumnType& operator[](u32 column) const {
-            KIWI_ASSERT(column < 4, "Out of bounds");
-
-            return m_matrix[column];
+        constexpr const glm::vec4& operator[](const u32 column) const {
+            return m_matrix[static_cast<glm::mat4::length_type>(column)];
         }
 
-        constexpr ColumnType & operator[](u32 column) {
-            KIWI_ASSERT(column < 4, "Out of bounds");
+        constexpr glm::vec4& operator[](const u32 column) {
+            return m_matrix[static_cast<glm::mat4::length_type>(column)];
+        }
 
-            return m_matrix[column];
+        constexpr f32& operator[](const u32 column, const u32 row) {
+            return m_matrix[static_cast<glm::mat4::length_type>(column)][static_cast<glm::mat4::length_type>(row)];
         }
 
         KIWI_NODISCARD constexpr Mat4 operator*(const Mat4& b) const {
@@ -120,37 +132,34 @@ namespace Kiwi {
         }
 
         constexpr bool operator==(const glm::mat4& other) const noexcept {
-            return (m_matrix[0] == other[0]) && (m_matrix[1] == other[1]) &&
-                (m_matrix[2] == other[2]) && (m_matrix[3] == other[3]);
+            return m_matrix == other;
         }
 
     public:
-        KIWI_NODISCARD constexpr Mat4 Translate(const Vec3& v) const noexcept {
-            Mat4 res{ *this };
-            res[3] = (m_matrix[0] * v[0]) + (m_matrix[1] * v[1]) + (m_matrix[2] * v[2]) + m_matrix[3];
-
-            return res;
+        KIWI_NODISCARD constexpr glm::mat4 ToGlmMat4() const noexcept {
+            return m_matrix;
         }
 
-        constexpr Mat4& TranslateSelf(const Vec3& v) noexcept {
-            return (*this = this->Translate(v));
+        KIWI_NODISCARD constexpr f32 GetDeterminant() const noexcept {
+            return glm::determinant(m_matrix);
         }
 
-        KIWI_NODISCARD constexpr Mat4 Scale(const Vec3& v) const noexcept {
-            Mat4 res;
-            res[0] = m_matrix[0] * v[0];
-            res[1] = m_matrix[1] * v[1];
-            res[2] = m_matrix[2] * v[2];
-            res[3] = m_matrix[3];
-
-            return res;
+        KIWI_NODISCARD constexpr Mat4& TranslateSelf(const Vec3& v) noexcept {
+            *this = Translate(v);
+            return *this;
         }
 
-        constexpr Mat4& ScaleSelf(const Vec3& v) noexcept {
-            return (*this = this->Scale(v));
+        KIWI_NODISCARD constexpr Mat4& ScaleSelf(const Vec3& v) noexcept {
+            *this = Scale(v);
+            return *this;
+        }
+
+        KIWI_NODISCARD constexpr Mat4& RotateSelf(const Radians& radAngle, const Vec3& axis) noexcept {
+            *this = Rotate(radAngle, axis);
+            return *this;
         }
 
     private:
-        ColumnType m_matrix[4];
+        glm::mat4 m_matrix;
     };
 }
