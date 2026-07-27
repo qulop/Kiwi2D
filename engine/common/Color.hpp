@@ -5,7 +5,7 @@
 #include <common/Definitions.hpp>
 #include <common/Debug.hpp>
 
-#include <math/vec/Vec4.hpp>
+#include <math/Vec4.hpp>
 
 
 namespace Kiwi::Details::Globals {

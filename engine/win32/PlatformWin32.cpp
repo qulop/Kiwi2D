@@ -4,8 +4,6 @@
 #include <common/types/String.hpp>
 #include <common/types/Opt.hpp>
 
-#include <math/vec/Vec.hpp>
-
 #include <shellapi.h>
 #include <cstdio>
 

@@ -1,7 +1,7 @@
 #pragma once
 
 #include <common/types/String.hpp>
-#include <math/vec/Vec2.hpp>
+#include <math/Vec2.hpp>
 
 #if defined(KIWI_WIN32_USED)
     #include <Windows.h>
