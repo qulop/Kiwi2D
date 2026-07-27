@@ -50,6 +50,19 @@ namespace Kiwi {
             return SelfType{ 0, -1 };
         }
 
+        static constexpr f32 Dot(const SelfType& lhs, const SelfType& rhs) noexcept {
+            return (lhs.x * rhs.x) + (lhs.y * rhs.y);
+        }
+
+        static constexpr SelfType Normalize(const SelfType& vec) noexcept {
+            f32 m = vec.Magnitude();
+            return SelfType(vec.x / m, vec.y / m);
+        }
+
+        static constexpr bool IsOrthogonal(const BasicVec2& lhs, const BasicVec2& rhs) noexcept {
+            return Dot(lhs, rhs) == 0;
+        }
+
     public:
         constexpr BasicVec2() noexcept :
             x(0), y(0)
@@ -84,7 +97,15 @@ namespace Kiwi {
             return x == other.x && y == other.y;
         }
 
+        constexpr bool operator==(const glm::vec2& other) const noexcept {
+            return *this == SelfType(other);
+        }
+
         constexpr bool operator!=(const SelfType& other) const noexcept {
+            return !(*this == other);
+        }
+
+        constexpr bool operator!=(const glm::vec2& other) const noexcept {
             return !(*this == other);
         }
 
@@ -92,8 +113,16 @@ namespace Kiwi {
             return SelfType(x + other.x, y + other.y);
         }
 
+        constexpr SelfType operator+(const glm::vec2& other) const noexcept {
+            return *this + SelfType(other);
+        }
+
         constexpr SelfType operator-(const SelfType& other) const noexcept {
             return SelfType(x - other.x, y - other.y);
+        }
+
+        constexpr SelfType operator-(const glm::vec2& other) const noexcept {
+            return *this - SelfType(other);
         }
 
         constexpr SelfType operator-() const noexcept {
@@ -165,13 +194,13 @@ namespace Kiwi {
         }
 
         constexpr ValueType& operator[](size_t idx) noexcept {
-            KIWI_ASSERT(idx < Size(), "index out of range");
+            static_assert(idx < Size(), "index out of range");
 
             return (idx == 0) ? x : y;
         }
 
         constexpr ValueType operator[](size_t idx) const noexcept {
-            KIWI_ASSERT(idx < Size(), "index out of range");
+            static_assert(idx < Size(), "index out of range");
 
             return (idx == 0) ? x : y;
         }
@@ -187,20 +216,6 @@ namespace Kiwi {
 
         KIWI_NODISCARD constexpr f32 Magnitude() const noexcept {
             return std::sqrt(Numeric::Pow2(x) + Numeric::Pow2(y));
-        }
-
-        constexpr f32 Dot(const SelfType& other) const noexcept {
-            return (x * other.x) + (y * other.y);
-        }
-
-        constexpr SelfType GetNormalized() const noexcept {
-            f32 m = Magnitude();
-            return SelfType(x / m, y / m);
-        }
-
-        constexpr SelfType& NormalizeSelf() noexcept {
-            *this = GetNormalized();
-            return *this;
         }
     };
 

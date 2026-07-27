@@ -1,6 +1,5 @@
 #pragma once
 
-
 #include <common/meta/Concepts.hpp>
 #include <common/Numeric.hpp>
 #include <common/Debug.hpp>
@@ -49,6 +48,29 @@ namespace Kiwi {
             return SelfType{ 0, -1, 0, 0 };
         }
 
+        static constexpr f32 Dot(const SelfType& lhs, const SelfType& rhs) noexcept {
+            return (lhs.x * rhs.x) + (lhs.y * rhs.y) + (lhs.z * rhs.z) + (lhs.w * rhs.w);
+        }
+
+        static constexpr SelfType Cross(const SelfType& lhs, const SelfType& rhs) noexcept {
+            return SelfType(
+                lhs.y * rhs.z - lhs.z * rhs.y,
+                lhs.z * rhs.x - lhs.x * rhs.z,
+                lhs.x * rhs.y - lhs.y * rhs.x,
+                0.f
+            );
+        }
+
+        static constexpr SelfType Normalize(const SelfType& vec) noexcept {
+            f32 m = vec.Magnitude();
+            return SelfType(
+                vec.x / m,
+                vec.y / m,
+                vec.z / m,
+                vec.w / m
+            );
+        }
+
     public:
         constexpr BasicVec4() noexcept :
             x(0), y(0), z(0), w(0)
@@ -75,7 +97,7 @@ namespace Kiwi {
         constexpr SelfType& operator=(std::array<ValueType, 4> arr) noexcept {
             x = arr[0];
             y = arr[1];
-            y = arr[2];
+            z = arr[2];
             w = arr[3];
 
             return *this;
@@ -170,39 +192,34 @@ namespace Kiwi {
         }
 
         constexpr ValueType& operator[](size_t idx) noexcept {
-            KIWI_ASSERT(idx < Size(), "index out of range");
+            static_assert(idx < Size(), "index out of range");
 
-            if (idx == 0) {
+            switch (idx) {
+            case 0:
                 return x;
-            }
-            else if (idx == 1) {
+            case 1:
                 return y;
-            }
-            else if (idx == 2) {
-                return z;
-            }
-            else {
+            case 2:
+                return x;
+            default:
                 return w;
             }
         }
 
         constexpr ValueType operator[](size_t idx) const noexcept {
-            KIWI_ASSERT(idx < Size(), "index out of range");
+            static_assert(idx < Size(), "index out of range");
 
-            if (idx == 0) {
+            switch (idx) {
+            case 0:
                 return x;
-            }
-            else if (idx == 1) {
+            case 1:
                 return y;
-            }
-            else if (idx == 2) {
-                return z;
-            }
-            else {
+            case 2:
+                return x;
+            default:
                 return w;
             }
         }
-
 
     public:
         constexpr std::array<ValueType, 4> ToArray() const noexcept {
@@ -215,24 +232,6 @@ namespace Kiwi {
 
         KIWI_NODISCARD constexpr f32 Magnitude() const noexcept {
             return std::sqrt(Numeric::Pow2(x) + Numeric::Pow2(y) + Numeric::Pow2(z) + Numeric::Pow2(w));
-        }
-
-        constexpr f32 Dot(const SelfType& other) const noexcept {
-            return (x * other.x) + (y * other.y) + (z * other.z) + (w * other.w);
-        }
-
-        constexpr SelfType GetNormalized() const noexcept {
-            f32 m = Magnitude();
-            return SelfType(x / m, y / m, z / m, w / m);
-        }
-
-        constexpr SelfType& NormalizeSelf() noexcept {
-            *this = GetNormalized();
-            return *this;
-        }
-
-        constexpr SelfType Cross(const SelfType& other) const noexcept {
-            return *this * other;
         }
     };
 

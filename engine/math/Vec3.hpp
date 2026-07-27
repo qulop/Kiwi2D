@@ -1,8 +1,6 @@
 #pragma once
 
-
 #include <common/meta/Concepts.hpp>
-
 #include <common/Numeric.hpp>
 
 #include <glm/vec3.hpp>
@@ -49,6 +47,22 @@ namespace Kiwi {
             return SelfType{ 0, -1, 0 };
         }
 
+        static constexpr f32 Dot(const SelfType& lhs, const SelfType& rhs) noexcept {
+            return (lhs.x * rhs.x) + (lhs.y * rhs.y) + (lhs.z * rhs.z);
+        }
+
+        static constexpr SelfType Cross(const SelfType& lhs, const SelfType& rhs) noexcept {
+            return SelfType(
+                lhs.y * rhs.z - lhs.z * rhs.y,
+                lhs.z * rhs.x - lhs.x * rhs.z,
+                lhs.x * rhs.y - lhs.y * rhs.x
+            );
+        }
+
+        static constexpr SelfType Normalize(const SelfType& vec) noexcept {
+            f32 m = vec.Magnitude();
+            return SelfType(vec.x / m, vec.y / m, vec.z / m);
+        }
 
     public:
         constexpr BasicVec3() noexcept :
@@ -166,29 +180,27 @@ namespace Kiwi {
         }
 
         constexpr ValueType& operator[](size_t idx) noexcept {
-            KIWI_ASSERT(idx < Size(), "index out of range");
+            static_assert(idx < Size(), "Index out of range");
 
-            if (idx == 0) {
+            switch (idx) {
+            case 0:
                 return x;
-            }
-            else if (idx == 1) {
+            case 1:
                 return y;
-            }
-            else {
+            default:
                 return z;
             }
         }
 
         constexpr ValueType operator[](size_t idx) const noexcept {
-            KIWI_ASSERT(idx < Size(), "index out of range");
+            static_assert(idx < Size(), "index out of range");
 
-            if (idx == 0) {
+            switch (idx) {
+            case 0:
                 return x;
-            }
-            else if (idx == 1) {
+            case 1:
                 return y;
-            }
-            else {
+            default:
                 return z;
             }
         }
@@ -205,35 +217,7 @@ namespace Kiwi {
         KIWI_NODISCARD constexpr f32 Magnitude() const noexcept {
             return std::sqrt(Numeric::Pow2(x) + Numeric::Pow2(y) + Numeric::Pow2(z));
         }
-
-        constexpr f32 Dot(const SelfType& other) const noexcept {
-            return (x * other.x) + (y * other.y) + (z * other.z);
-        }
-
-        constexpr SelfType GetNormalized() const noexcept {
-            f32 m = Magnitude();
-            return SelfType(x / m, y / m, z / m);
-        }
-
-        constexpr SelfType& NormalizeSelf() noexcept {
-            *this = GetNormalized();
-            return *this;
-        }
-
-        constexpr SelfType Cross(const SelfType& other) const noexcept {
-            return SelfType(
-                y * other.z - z * other.y,
-                z * other.x - x * other.z,
-                x * other.y - y * other.x
-            );
-        }
     };
-
-
-    template<Concepts::Number T>
-    constexpr BasicVec3<T> Cross(const BasicVec3<T>& lhs, const BasicVec3<T>& rhs) noexcept {
-        return lhs.Cross(rhs);
-    }
 
 
     using Vec3 = BasicVec3<f32>;
