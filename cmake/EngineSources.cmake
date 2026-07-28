@@ -11,6 +11,8 @@ set(ENGINE_LIBRARY_SRC
     engine/core/LogSubsystem.cpp
     engine/core/Project.cpp
     engine/core/ProjectSubsystem.cpp
+    engine/core/input/InputSubsystem.cpp
+    engine/core/input/KeyMapper.cpp
     engine/core/resources/AssetManager.cpp
     engine/core/resources/AssetImporter.cpp
 
