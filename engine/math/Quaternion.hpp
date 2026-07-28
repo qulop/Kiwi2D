@@ -42,7 +42,7 @@ namespace Kiwi {
     public:
         constexpr Quaternion() = default;
 
-        constexpr Quaternion(f32 w, f32 x, f32 y, f32 z) :
+        constexpr explicit Quaternion(f32 w, f32 x, f32 y, f32 z) :
             m_quat(w, x, y, z)
         {}
 
@@ -50,15 +50,15 @@ namespace Kiwi {
             m_quat(glmQuat)
         {}
 
-        constexpr Quaternion operator*(const Quaternion& other) const noexcept {
+        KIWI_NODISCARD constexpr Quaternion operator*(const Quaternion& other) const noexcept {
             return Quaternion(m_quat * other.m_quat);
         }
 
-        constexpr Quaternion operator*(const glm::quat& other) const noexcept {
+        KIWI_NODISCARD constexpr Quaternion operator*(const glm::quat& other) const noexcept {
             return Quaternion(m_quat * other);
         }
 
-        constexpr Mat4 ToMat4() const noexcept {
+        KIWI_NODISCARD constexpr Mat4 ToMat4() const noexcept {
             return Mat4(glm::toMat4(m_quat));
         }
 

@@ -20,11 +20,11 @@ namespace Kiwi {
         Transform& RotateLocal(const Radians& radAngle, const Vec3& axis);
         Transform& RotateWorld(const Radians& radAngle, const Vec3& axis);
 
-        const Vec3& GetPosition() const;
-        const Vec3& GetScale() const;
-        const Quaternion& GetRotation() const;
+        KIWI_NODISCARD const Vec3& GetPosition() const;
+        KIWI_NODISCARD const Vec3& GetScale() const;
+        KIWI_NODISCARD const Quaternion& GetRotation() const;
 
-        const Mat4& GetTransformMatrix() const;
+        KIWI_NODISCARD const Mat4& GetTransformMatrix() const;
 
     private:
         Vec3 m_position = Vec3(0.f);
