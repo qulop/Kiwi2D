@@ -33,3 +33,13 @@ namespace Kiwi {
         }
     };
 }
+
+namespace std {
+    float cos(const Kiwi::Radians& radAndle) {
+        return cos(*radAndle);
+    }
+
+    float sin(const Kiwi::Radians& radAngle) {
+        return sin(*radAngle);
+    }
+}
