@@ -8,6 +8,7 @@
 #include <core/EngineConfig.hpp>
 #include <core/LogSubsystem.hpp>
 #include <core/ProjectSubsystem.hpp>
+#include <core/input/InputSubsystem.hpp>
 
 #include <platform/io/SystemConsole.hpp>
 
@@ -62,13 +63,28 @@ namespace Kiwi {
             return false;
         }
 
-
         // Engine initialization
         m_engine = std::make_shared<Engine>();
         if (!m_engine->Init(m_cliOptions)) {
             KIWI_CTX_LOG(ERROR, "Failed to initialize the engine instance");
             return false;
         }
+
+        RegisterSubsystem<InputSubsystem>();
+        if (!GetSubsystem<InputSubsystem>()->Init()) {
+            return false;
+        }
+
+        GetSubsystem<WindowSubsystem>()
+            ->GetMainWindow()
+            ->AddWindowFocusChangedCallback(
+                [](bool isFocused)
+                {
+                    if (std::shared_ptr<InputSubsystem> i = GetSubsystem<InputSubsystem>()) {
+                        i->OnWindowFocusChanged(isFocused);
+                    }
+                }
+            );
 
         m_isInitialized.store(true);
         return true;
@@ -78,7 +94,15 @@ namespace Kiwi {
         ShutdownAllSubsystems();
         delete s_subsystems;
 
+    #ifdef KIWI_DEBUG_BUILD
         Console::WriteLine("All subsystems deleted");
+    #endif
+    }
+
+    void Application::BeforeFrameBegin() {
+        if (std::shared_ptr<InputSubsystem> inputSubsystem = GetSubsystem<InputSubsystem>()) {
+            inputSubsystem->BeginTick();
+        }
     }
 
     i32 Application::Run() {
@@ -86,16 +110,19 @@ namespace Kiwi {
 
         BeforeRun();
 
+        u64 tick = 0;
         while (true) {
             BeforeFrameBegin();
-
-            this->Update();
 
             if (!m_engine->Update()) {
                 break;
             }
 
+            // Updating the application after that window events was pooled in the `Engine::Update()`
+            Update();
+
             BeforeFrameEnd();
+            ++tick;
         }
 
         BeforeShutdown();

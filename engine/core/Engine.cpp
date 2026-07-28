@@ -57,6 +57,7 @@ namespace Kiwi {
 
         m_renderer->SetViewport(m_window->GetWindowSizes());
 
+        // TODO: if our `Renderer` lifetime would changed, `[this]` capturing may lead to the dangling pointer inside the callback
         m_window->AddFramebufferResizeCallback(
             [this](U32Rect newSize)
             {

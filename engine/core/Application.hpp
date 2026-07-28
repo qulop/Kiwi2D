@@ -23,7 +23,7 @@ namespace Kiwi {
         virtual void BeforeRun() {}
         virtual void BeforeShutdown();
 
-        virtual void BeforeFrameBegin() {}
+        virtual void BeforeFrameBegin();
         virtual void BeforeFrameEnd() {}
 
         KIWI_NODISCARD i32 Run();
