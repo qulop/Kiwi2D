@@ -3,6 +3,7 @@
 #include <renderer/IRenderContext.hpp>
 #include <renderer/pipeline/RenderPipeline.hpp>
 #include <renderer/GraphicDevice.hpp>
+#include <renderer/Camera.hpp>
 
 #include <misc/WindowSubsystem.hpp>
 
