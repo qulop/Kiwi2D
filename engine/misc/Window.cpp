@@ -52,6 +52,10 @@ namespace Kiwi {
         m_framebufferResizeCallbacks.push_back(callback);
     }
 
+    void AWindow::AddWindowFocusChangedCallback(const PFN_WindowFocusChangedCallback& callback) {
+        m_windowFocusChangedCallbacks.push_back(callback);
+    }
+
     bool AWindow::IsMaximized() const {
         return m_isMaximized.load();
     }
@@ -73,9 +77,10 @@ namespace Kiwi {
     }
 
     void AWindow::NotifyFramebufferResized(U32Rect newSizes) {
-        std::ranges::for_each(m_framebufferResizeCallbacks, [&newSizes](const auto& callback)
-        {
-            std::invoke(callback, newSizes);
-        });
+        NotifyWindowEvent(m_framebufferResizeCallbacks, newSizes);
+    }
+
+    void AWindow::NotifyWindowFocusChanged(bool isFocused) {
+        NotifyWindowEvent(m_windowFocusChangedCallbacks, isFocused);
     }
 }
