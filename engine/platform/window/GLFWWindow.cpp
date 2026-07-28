@@ -1,5 +1,9 @@
 #include "GLFWWindow.hpp"
 
+#include <core/LogSubsystem.hpp>
+#include <core/input/InputSubsystem.hpp>
+#include <core/input/KeyMapper.hpp>
+
 #include <common/Definitions.hpp>
 #include <common/types/CString.hpp>
 #include <common/Debug.hpp>
@@ -119,6 +123,12 @@ namespace Kiwi {
         glfwSetCursor(m_window, nullptr);
     }
 
+    void GLFWWindow::SetWindowSize(U32Vec2 size) {
+        glfwSetWindowSize(m_window, size.x, size.y);
+
+        NotifyFramebufferResized(U32Rect(0, 0, size.x, size.y));
+    }
+
     void GLFWWindow::SwapBuffers() {
         glfwSwapBuffers(m_window);
     }
@@ -218,11 +228,14 @@ namespace Kiwi {
 	    return nullptr;
 	}
 
-    void GLFWWindow::SetupCallbacks() {
-        // TODO
-        // glfwSetErrorCallback([](int err, const char* desc) {
-        //     KIWI_CTX_LOG(ERROR, "The error code: {}, description: {}", err, desc);
-        // });
+    void GLFWWindow::SetupCallbacks() const {
+        glfwSetErrorCallback([](int err, const char* desc) {
+            if (const std::shared_ptr<LogSubsystem> logger = GetSubsystem<LogSubsystem>()) {
+                logger->Log(ELogLevel::ERROR_LOG, "GLFW Error: the error code: {}, description: {}",
+                    err, desc
+                );
+            }
+        });
 
         glfwSetFramebufferSizeCallback(m_window, [](GLFWwindow* window, int width, int height)
         {
@@ -235,39 +248,43 @@ namespace Kiwi {
             }
         });
 
-		// glfwSetKeyCallback(m_window, [](GLFWwindow* glfwWindow, int key, int scancode, int action, int mods) {
-  //           auto* window = (GLFWWindow*)glfwGetWindowUserPointer(glfwWindow);
-  //           auto eventSubsystem = window->GetSubsystem<EventSubsystem>();
-  //
-		// 	if (action == GLFW_PRESS) {
-  //               eventSubsystem->Excite(KeyboardKeyPressed{ key, action });
-  //           }
-  //           else {
-  //               eventSubsystem->Excite(KeyboardKeyReleased{ key, action });
-  //           }
-  //       });
-  //
-  //
-		// glfwSetMouseButtonCallback(m_window, [](GLFWwindow* glfwWindow, int button, int action, int mods) {
-		//     auto* window = (GLFWWindow*)glfwGetWindowUserPointer(glfwWindow);
-  //           auto eventSubsystem = window->GetSubsystem<EventSubsystem>();
-  //
-		// 	if (action == GLFW_PRESS) {
-  //               eventSubsystem->Excite(MousePressEvent{ button });
-  //           }
-		// 	else {
-  //               eventSubsystem->Excite(MouseReleaseEvent{ button });
-  //           }
-		// });
-  //
-  //
-		// glfwSetCursorPosCallback(m_window, [](GLFWwindow* glfwWindow, double xpos, double ypos) {
-  //           auto eventSubsystem = ((GLFWWindow*)glfwGetWindowUserPointer(glfwWindow))->GetSubsystem<EventSubsystem>();
-  //
-  //           eventSubsystem->Excite(MouseMoveEvent{ xpos, ypos });
-  //       });
-  //
-  //
+		glfwSetKeyCallback(m_window, [](GLFWwindow*, int key, int scancode, int action, int mods) {
+		    if (std::shared_ptr<InputSubsystem> inputSubsystem = GetSubsystem<InputSubsystem>()) {
+		        const EKeyCode nativeKeyCode = KeyMapper::MapKeyGLFW(key);
+		        const EKeyAction nativeAction = KeyMapper::MapActionGLFW(action);
+
+		        inputSubsystem->UpdateKeyState(nativeKeyCode, nativeAction);
+		    }
+        });
+
+		glfwSetMouseButtonCallback(m_window, [](GLFWwindow*, int button, int action, int mods) {
+		    if (std::shared_ptr<InputSubsystem> inputSubsystem = GetSubsystem<InputSubsystem>()) {
+                const EKeyCode nativeMouseKeyCode = KeyMapper::MapKeyGLFW(button);
+		        const EKeyAction nativeAction = KeyMapper::MapActionGLFW(action);
+
+		        inputSubsystem->UpdateKeyState(nativeMouseKeyCode, nativeAction);
+		    }
+		});
+
+        glfwSetCursorPosCallback(m_window, [](GLFWwindow*, double xpos, double ypos) {
+            if (std::shared_ptr<InputSubsystem> inputSubsystem = GetSubsystem<InputSubsystem>()) {
+                inputSubsystem->UpdateMousePosition(
+                    Vec2(static_cast<f32>(xpos), static_cast<f32>(ypos))
+                );
+            }
+        });
+
+        glfwSetWindowFocusCallback(m_window, [](GLFWwindow* window, int isFocused)
+        {
+            auto* self = static_cast<GLFWWindow*>(
+                glfwGetWindowUserPointer(window)
+            );
+
+            if (self != nullptr) {
+                self->NotifyWindowFocusChanged(isFocused == GLFW_TRUE);
+            }
+        });
+
 		// glfwSetScrollCallback(m_window, [](GLFWwindow* glfwWindow, double xpos, double ypos) {
 		//     auto eventSubsystem = ((GLFWWindow*)glfwGetWindowUserPointer(glfwWindow))->GetSubsystem<EventSubsystem>();
   //

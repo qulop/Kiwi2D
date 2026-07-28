@@ -25,6 +25,7 @@ namespace Kiwi {
         void SetTitle(const String& title) override;
         void SetInnerCursor(const String& path) override;
         void ResetInnerCursor() override;
+        void SetWindowSize(U32Vec2 size) override;
 
         void SwapBuffers() override;
         void PollEvents() override;
@@ -52,7 +53,7 @@ namespace Kiwi {
     private:
 		KIWI_NODISCARD GLFWmonitor* MapToGLFWmonitor(const Platform::DisplayInfo& display) const;
 
-		void SetupCallbacks();
+		void SetupCallbacks() const;
 
 	private:
         GLFWcursor* m_cursor = nullptr;
