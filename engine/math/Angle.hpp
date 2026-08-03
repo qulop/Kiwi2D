@@ -32,14 +32,21 @@ namespace Kiwi {
             return value;
         }
     };
+
+
+    struct EulerAngles {
+        Radians pitch;
+        Radians yaw;
+        Radians roll;
+    };
 }
 
 namespace std {
-    float cos(const Kiwi::Radians& radAndle) {
+    KIWI_FORCEINLINE float cos(const Kiwi::Radians& radAndle) {
         return cos(*radAndle);
     }
 
-    float sin(const Kiwi::Radians& radAngle) {
+    KIWI_FORCEINLINE float sin(const Kiwi::Radians& radAngle) {
         return sin(*radAngle);
     }
 }
