@@ -56,6 +56,8 @@ set(ENGINE_LIBRARY_SRC
 
     # --- BEGIN: Renderer ---
     engine/renderer/Renderer.cpp
+    engine/renderer/Camera.cpp
+    engine/renderer/CameraController.cpp
     engine/renderer/IRenderContext.cpp
     engine/renderer/pipeline/RenderPipeline.cpp
     engine/renderer/shaders/Shader.cpp
