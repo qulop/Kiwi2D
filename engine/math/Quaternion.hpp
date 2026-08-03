@@ -23,6 +23,10 @@ namespace Kiwi {
             return Quaternion(1.f, 0.f, 0.f, 0.f);
         }
 
+        KIWI_NODISCARD static constexpr Quaternion FromXYZW(f32 x, f32 y, f32 z, f32 w) noexcept {
+            return Quaternion(x, y, z, w);
+        }
+
         KIWI_NODISCARD static constexpr Quaternion FromAngleAndAxis(const Radians& radAngle, const Vec3& axis) noexcept {
             return Quaternion(glm::angleAxis(
                 *radAngle,
@@ -45,7 +49,7 @@ namespace Kiwi {
     public:
         constexpr Quaternion() = default;
 
-        constexpr explicit Quaternion(f32 w, f32 x, f32 y, f32 z) :
+        constexpr explicit Quaternion(f32 x, f32 y, f32 z, f32 w) :
             m_quat(w, x, y, z)
         {}
 
@@ -61,8 +65,38 @@ namespace Kiwi {
             return Quaternion(m_quat * other);
         }
 
+        KIWI_NODISCARD constexpr Vec3 operator*(const Vec3& v) const noexcept {
+            return Vec3(m_quat * v.ToGlmVec3());
+        }
+
+        KIWI_NODISCARD constexpr Vec4 GetComponents() const noexcept {
+            return Vec4(
+                m_quat.x,
+                m_quat.y,
+                m_quat.z,
+                m_quat.w
+            );
+        }
+
+        KIWI_NODISCARD constexpr EulerAngles ToEulerAngles() const noexcept {
+            const glm::vec3 e = glm::eulerAngles(m_quat);
+            return EulerAngles {
+                .pitch = Radians(e.x),
+                .yaw = Radians(e.y),
+                .roll = Radians(e.z)
+            };
+        }
+
         KIWI_NODISCARD constexpr Mat4 ToMat4() const noexcept {
             return Mat4(glm::toMat4(m_quat));
+        }
+
+        KIWI_NODISCARD constexpr Quaternion Inversed() const noexcept {
+            return Quaternion(glm::inverse(m_quat));
+        }
+
+        KIWI_NODISCARD constexpr Vec3 RotateVector(const Vec3& v) const noexcept {
+            return *this * v;
         }
 
     private:

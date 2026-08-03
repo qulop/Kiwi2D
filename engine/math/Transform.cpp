@@ -42,7 +42,7 @@ namespace Kiwi {
         return *this;
     }
 
-    Transform& Transform::RotateLocal(const Radians& radAngle, const Vec3& axis) {
+    Transform& Transform::RotateInLocal(const Radians& radAngle, const Vec3& axis) {
         const Quaternion delta = Quaternion::FromAngleAndAxis(radAngle, axis);
         m_rotation = Quaternion::Normalize(
             m_rotation * delta
@@ -52,7 +52,7 @@ namespace Kiwi {
         return *this;
     }
 
-    Transform& Transform::RotateWorld(const Radians& radAngle, const Vec3& axis) {
+    Transform& Transform::RotateInWorld(const Radians& radAngle, const Vec3& axis) {
         const Quaternion delta = Quaternion::FromAngleAndAxis(radAngle, axis);
         m_rotation = Quaternion::Normalize(
             delta * m_rotation
@@ -72,6 +72,26 @@ namespace Kiwi {
 
     const Quaternion& Transform::GetRotation() const {
         return m_rotation;
+    }
+
+    Vec3 Transform::GetForward() const {
+        return m_rotation.RotateVector(Vec3(0.f, 0.f, -1.f));
+    }
+
+    Vec3 Transform::GetUp() const {
+        return m_rotation.RotateVector(Vec3::UpVector());
+    }
+
+    Vec3 Transform::GetRight() const {
+        return m_rotation.RotateVector(Vec3::RightVector());
+    }
+
+    Mat4 Transform::GetViewMatrix() const {
+        return Mat4::LookAt(
+            GetPosition(),
+            GetPosition() + GetForward(),
+            GetUp()
+        );
     }
 
     const Mat4& Transform::GetTransformMatrix() const {

@@ -17,13 +17,18 @@ namespace Kiwi {
 
         Transform& Translate(const Vec3& offset);
         Transform& Scale(const Vec3& scale);
-        Transform& RotateLocal(const Radians& radAngle, const Vec3& axis);
-        Transform& RotateWorld(const Radians& radAngle, const Vec3& axis);
+        Transform& RotateInLocal(const Radians& radAngle, const Vec3& axis);
+        Transform& RotateInWorld(const Radians& radAngle, const Vec3& axis);
 
         KIWI_NODISCARD const Vec3& GetPosition() const;
         KIWI_NODISCARD const Vec3& GetScale() const;
         KIWI_NODISCARD const Quaternion& GetRotation() const;
 
+        KIWI_NODISCARD Vec3 GetForward() const;
+        KIWI_NODISCARD Vec3 GetUp() const;
+        KIWI_NODISCARD Vec3 GetRight() const;
+
+        KIWI_NODISCARD Mat4 GetViewMatrix() const;
         KIWI_NODISCARD const Mat4& GetTransformMatrix() const;
 
     private:
