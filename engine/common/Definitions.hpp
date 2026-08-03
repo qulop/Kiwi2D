@@ -45,7 +45,7 @@
 
 #define KIWI_BIT(n)                     (1 << n)
 
-#define KIWI_IGNORE_RETURN(...)         (Globals::IGNORE = __VA_ARGS__)
+#define KIWI_IGNORE_RETURN(...)         (std::ignore = __VA_ARGS__)
 
 
 namespace Kiwi {

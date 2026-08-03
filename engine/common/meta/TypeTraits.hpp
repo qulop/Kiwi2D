@@ -11,13 +11,6 @@ namespace Kiwi::Traits::TypeTags {
     struct FloatingPoint64Tag {};
 
     struct GeneralFloatingPointTag {};
-
-    struct IgnoreAssignmentMetaClass {
-        template<typename T>
-        constexpr const IgnoreAssignmentMetaClass& operator=(const T&) const noexcept {
-            return *this;
-        }
-    };
 }
 
 namespace Kiwi::Traits {
@@ -97,8 +90,4 @@ namespace Kiwi {
 
         consteval auto operator<=>(const StringLiteral&) const = default;
     };
-}
-
-namespace Kiwi::Globals {
-    inline Traits::TypeTags::IgnoreAssignmentMetaClass IGNORE;
 }
