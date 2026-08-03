@@ -3,6 +3,8 @@
 #include <common/meta/TypeTraits.hpp>
 #include <common/Debug.hpp>
 
+#include <platform/Platform.hpp>
+
 #include <cerrno>
 
 
@@ -64,6 +66,10 @@ namespace Kiwi {
     }
 
     Result<void> File::Open(std::filesystem::path path, EFileOpenMode::Type mode) {
+        if (GetCurrentPlatform() == ECurrentPlatform::WINDOWS && !(mode & EFileOpenMode::BINARY)) {
+            mode |= EFileOpenMode::BINARY;
+        }
+
         const std::ios_base::openmode stdMode = EFileOpenMode::ToStdOpenMode(mode);
 
         errno = 0;

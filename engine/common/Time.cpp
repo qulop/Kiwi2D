@@ -37,6 +37,7 @@ namespace Kiwi {
 
     void Time::UpdateTime() {
         KIWI_ASSERT(ThisThread::IsMainThread(), "This function must be called from the main thread");
+        KIWI_ASSERT_BASIC(s_storage.wasInitialized);
 
         const auto nowCount = NowAsCount();
 
@@ -51,7 +52,7 @@ namespace Kiwi {
     void Time::SetInitializationPoint() {
         KIWI_ASSERT(!s_storage.wasInitialized, "Time::SetInitializationPoint() should be invoked only once");
 
-        TimePointType now = Now();
+        const TimePointType now = Now();
         s_storage.engineInitializationPoint = now;
 
         s_storage.lastFrameTime.store(now.time_since_epoch().count());
