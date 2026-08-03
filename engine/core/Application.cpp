@@ -27,6 +27,8 @@ namespace Kiwi {
     }
 
     bool Application::Init() {
+        Time::SetInitializationPoint();
+
     #ifdef KIWI_DEBUG_BUILD
         if (!Platform::CreateDebugConsole()) {
             return false;
@@ -63,15 +65,15 @@ namespace Kiwi {
             return false;
         }
 
+        RegisterSubsystem<InputSubsystem>();
+        if (!GetSubsystem<InputSubsystem>()->Init()) {
+            return false;
+        }
+
         // Engine initialization
         m_engine = std::make_shared<Engine>();
         if (!m_engine->Init(m_cliOptions)) {
             KIWI_CTX_LOG(ERROR, "Failed to initialize the engine instance");
-            return false;
-        }
-
-        RegisterSubsystem<InputSubsystem>();
-        if (!GetSubsystem<InputSubsystem>()->Init()) {
             return false;
         }
 
@@ -100,6 +102,8 @@ namespace Kiwi {
     }
 
     void Application::BeforeFrameBegin() {
+        Time::UpdateTime();
+
         if (std::shared_ptr<InputSubsystem> inputSubsystem = GetSubsystem<InputSubsystem>()) {
             inputSubsystem->BeginTick();
         }
