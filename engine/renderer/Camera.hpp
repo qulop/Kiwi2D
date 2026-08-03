@@ -8,15 +8,18 @@
 
 
 namespace Kiwi {
+    class InputState;
+
+
     class ACamera : public AObject {
         KIWI_CREATE_OBJECT(ACamera, AObject)
 
     public:
-        
+        KIWI_NODISCARD virtual const Transform& GetTransform() const;
 
+        ~ACamera() override = default;
 
     private:
         Transform m_transform;
-        Vec3 m_cameraTarget;
     };
 }
