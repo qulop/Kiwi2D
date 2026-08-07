@@ -11,11 +11,10 @@ namespace Kiwi::OpenGL {
     class ShaderCompilerGL : public AShaderCompiler {
         KIWI_CREATE_OBJECT(ShaderCompilerGL, AShaderCompiler)
 
-    private:
         using SourcesMap = typename PreprocessorGLSL::SourcesMap;
 
     public:
-        KIWI_NODISCARD std::shared_ptr<AShader> CompileFile(const File& sourceFile) override;
+        KIWI_NODISCARD Result<std::shared_ptr<AShader>> CompileFile(const ShaderCompilationRequest& request) override;
 
         KIWI_NODISCARD bool CheckCompilationOrLinkingResult(GLuint target, EShaderStage type) const;
 

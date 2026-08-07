@@ -16,22 +16,18 @@ namespace {
 
 
 namespace Kiwi::OpenGL {
-    std::shared_ptr<AShader> ShaderCompilerGL::CompileFile(const File& sourceFile) {
-        FileContent src = sourceFile.ReadAll().ValueOr(FileContent{});
-        if (src.IsEmpty()) {
-            return nullptr;
-        }
-
-        auto optPreprocessedSrc = PreprocessSource(src.GetAsString());
-        if (!optPreprocessedSrc) {
-            return nullptr;
+    Result<std::shared_ptr<AShader>> ShaderCompilerGL::CompileFile(const ShaderCompilationRequest& request) {
+        PreprocessorGLSL preprocessor;
+        Result<PreprocessorGLSL::SourcesMap> preprocessedSrc = preprocessor.Preprocess(request.path);
+        if (!preprocessedSrc) {
+            return preprocessedSrc.GetError();
         }
 
         bool completedWithoutErrors = true;
         std::map<EShaderStage, ShaderModuleGL> shaderModules;
         GlID shaderProgramId = glCreateProgram();
 
-        for (const auto& [stage, src] : *optPreprocessedSrc) {
+        for (const auto& [stage, src] : *preprocessedSrc) {
             GlID id = CompileShaderStage(stage, src.ToStringView());
             if (id == KIWI_GL_UNDEFINED_ID) {
                 completedWithoutErrors = false;
@@ -44,20 +40,20 @@ namespace Kiwi::OpenGL {
 
         if (!completedWithoutErrors) {
             ReleaseShaderResources(shaderProgramId, shaderModules);
-            return nullptr;
+            return Error::Create(EGeneralError::COMPILE_ERROR);
         }
 
         glLinkProgram(shaderProgramId);
         if (!CheckCompilationOrLinkingResult(shaderProgramId, EShaderStage::SHADER_PROGRAM)) {
             ReleaseShaderResources(shaderProgramId, shaderModules);
-            return nullptr;
+            return Error::Create(EGeneralError::LINKAGE_ERROR);
         }
 
         for (const auto& module : std::views::values(shaderModules)) {
             glDetachShader(shaderProgramId, module.moduleID);
         }
 
-        return std::shared_ptr<ShaderGL>(new ShaderGL(shaderProgramId, std::move(shaderModules)));
+        return Success(std::shared_ptr<AShader>(new ShaderGL(shaderProgramId, std::move(shaderModules))));
     }
 
     bool ShaderCompilerGL::CheckCompilationOrLinkingResult(GLuint target, EShaderStage type) const {
@@ -103,21 +99,8 @@ namespace Kiwi::OpenGL {
             return KIWI_GL_UNDEFINED_ID;
         }
 
-        // TODO:
-        // ShaderCacheManager& shaderCacheManager = ShaderCacheManager::GetInstance();
-        // if (auto shaderCacheEntry = shaderCacheManager.TryToFindCachedShader(hashedShaderSource); shaderCacheEntry) {
-        //     if (!shaderCacheManager.IsInLocalCache(hashedShaderSource)) {
-        //         if (!shaderCacheManager.AddToLocalCache(hashedShaderSource, shaderCacheEntry.value())) KIWI_UNLIKELY {
-        //             KIWI_CTX_LOG(ERROR, "Failed to add cache entry into the local cache");
-        //         }
-        //     }
-        //
-        //     return CreateFromSpirVByteCode(stage, "main", shaderCacheEntry.value().spriVByteCode);
-        // }
-
-
         // std::filesystem::path outputFilePath = shaderCacheManager.GetCacheDirAbsolutePath() / hashedShaderSource.ToString().ToStdString();
-
+        //
         // SpirV::CompilationDetails cDetails;
         // cDetails.stage = stage;
         // cDetails.src = src;
@@ -136,8 +119,6 @@ namespace Kiwi::OpenGL {
         //         hashedShaderSource
         //     );
         // }
-
-        // return id;
 
         return 0;
     }
