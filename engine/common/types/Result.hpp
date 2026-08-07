@@ -87,7 +87,7 @@ namespace Kiwi {
             return HasValue() ? std::addressof(GetValue()) : nullptr;
         }
 
-        KIWI_NODISCARD constexpr SuccessType StealValue() {
+        KIWI_NODISCARD constexpr SuccessType StealValue() && {
             KIWI_ENSURE(HasValue());
 
             return std::move(m_result).value();
@@ -99,7 +99,7 @@ namespace Kiwi {
             return m_result.error();
         }
 
-        KIWI_NODISCARD constexpr Error StealError() {
+        KIWI_NODISCARD constexpr Error StealError() && {
             KIWI_ENSURE(HasError());
 
             return std::move(m_result).error();
