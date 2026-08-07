@@ -46,6 +46,7 @@ namespace Kiwi {
             ALREADY_EXISTS,
             TIMEOUT,
             COMPILE_ERROR,
+            LINKAGE_ERROR,
             PARSE_ERROR,
         };
 

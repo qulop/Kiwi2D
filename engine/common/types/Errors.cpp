@@ -33,6 +33,8 @@ namespace Kiwi {
                 return "TIMEOUT";
             case COMPILE_ERROR:
                 return "COMPILE_ERROR";
+            case LINKAGE_ERROR:
+                return "LINKAGE_ERROR";
             case PARSE_ERROR:
                 return "PARSE_ERROR";
             default:
