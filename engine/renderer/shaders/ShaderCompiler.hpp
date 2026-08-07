@@ -15,6 +15,12 @@
 
 
 namespace Kiwi {
+    struct ShaderCompilationRequest {
+        std::filesystem::path path;
+        StringView entryPoint = "main";
+    };
+
+
     class AShaderCompiler : public AObject {
         KIWI_CREATE_OBJECT(AShaderCompiler, AObject)
 
@@ -28,13 +34,12 @@ namespace Kiwi {
     public:
         KIWI_NODISCARD static std::unique_ptr<AShaderCompiler> Create(ERenderAPI::Type api);
 
-        KIWI_NODISCARD static Opt<PreprocessorGLSL::SourcesMap> PreprocessSource(const String& src);
         KIWI_NODISCARD static Result<std::map<EShaderStage, std::vector<u32>>> CompileToSpirV(const CompilationDetails& compilationDetails);
 
         KIWI_NODISCARD static Result<std::map<EShaderStage, std::vector<u32>>> PreprocessAndCompileToSpirV(const File& sourceFile, ESpirVEnvironment env, ESpirVOptimizationLevel optimizationLvl);
 
     public:
-        KIWI_NODISCARD virtual std::shared_ptr<AShader> CompileFile(const File& sourceFile) = 0;
+        KIWI_NODISCARD virtual Result<std::shared_ptr<AShader>> CompileFile(const ShaderCompilationRequest& request) = 0;
 
         ~AShaderCompiler() override = default;
     };

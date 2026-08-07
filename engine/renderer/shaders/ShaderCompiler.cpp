@@ -24,36 +24,6 @@ namespace Kiwi {
         }
     }
 
-    Opt<PreprocessorGLSL::SourcesMap> AShaderCompiler::PreprocessSource(const String& src) {
-        PreprocessorGLSL preprocessor;
-
-        Result res = preprocessor.Preprocess(src);
-        if (res) {
-            return *res;
-        }
-
-        Opt<EShaderPreprocessError::Type> errKind = res.GetError().GetAsEnum<EShaderPreprocessError::Type>();
-        KIWI_ASSERT_BASIC(errKind && *errKind != EShaderPreprocessError::NONE);
-
-        // TODO: Idk where am i should output error messages, so for now just skip it
-        switch (*errKind) {
-        case EShaderPreprocessError::SHADER_VERSION_MISSING:
-            break;
-        case EShaderPreprocessError::INCORRECT_STAGE_NAME:
-            break;
-        case EShaderPreprocessError::END_OF_STAGE_MISSED:
-            break;
-        case EShaderPreprocessError::TOKEN_ALREADY_DECLARED:
-            break;
-        case EShaderPreprocessError::INCORRECT_PREPROCESSOR_PROPERTIES_COUNT:
-            break;
-        default:
-            break;
-        }
-
-        return ZERO_OPT;
-    }
-
     Result<std::map<EShaderStage, std::vector<u32>>> AShaderCompiler::CompileToSpirV(const CompilationDetails& compilationDetails) {
         std::map<EShaderStage, std::vector<u32>> result;
 
@@ -85,19 +55,20 @@ namespace Kiwi {
             );
         }
 
-        if (const Opt preprocessedSrc = PreprocessSource(src->GetAsString())) {
-            CompilationDetails d;
-            d.environment = env;
-            d.optimizationLvl = optimizationLvl;
-            d.preprocessedSrc = *preprocessedSrc;
 
-            if (Result compiledSpirV = CompileToSpirV(d)) {
-                return compiledSpirV;
-            }
-            else {
-                return compiledSpirV.GetError();
-            }
-        }
+        // if (const Opt preprocessedSrc = PreprocessSource(src->GetAsString())) {
+        //     CompilationDetails d;
+        //     d.environment = env;
+        //     d.optimizationLvl = optimizationLvl;
+        //     d.preprocessedSrc = *preprocessedSrc;
+        //
+        //     if (Result compiledSpirV = CompileToSpirV(d)) {
+        //         return compiledSpirV;
+        //     }
+        //     else {
+        //         return compiledSpirV.GetError();
+        //     }
+        // }
 
         return Error::Create(EGeneralError::COMPILE_ERROR, "Failed to preprocess a source file");
     }
