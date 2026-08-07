@@ -1,6 +1,7 @@
 #include "PreprocessorGLSL.hpp"
 
 #include <common/types/String.hpp>
+#include <common/filesystem/File.hpp>
 
 
 namespace {
@@ -30,11 +31,16 @@ namespace Kiwi {
     
     
 
-    Result<PreprocessorGLSL::SourcesMap> PreprocessorGLSL::Preprocess(const String& src) {
+    Result<PreprocessorGLSL::SourcesMap> PreprocessorGLSL::Preprocess(const std::filesystem::path& path) {
+        Result<FileContent> loadResult = File::LoadFromFile(path, EFileOpenMode::READ);
+        if (!loadResult) {
+            return loadResult.GetError();
+        }
+        const String src = loadResult.GetValue().GetAsString();
+
         Reset(src.ToStringView());
 
         SourcesMap result;
-
         auto&& [_, versionProps] = ExtractPreprocessor(VERSION_TOKEN_NAME).GetOrDefault();
         if (versionProps.empty()) {
             return Error::Create(

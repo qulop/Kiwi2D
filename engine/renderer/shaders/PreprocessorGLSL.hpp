@@ -43,7 +43,7 @@ namespace Kiwi {
         PreprocessorGLSL() = default;
 
     public:
-        KIWI_NODISCARD Result<SourcesMap> Preprocess(const String& src);
+        KIWI_NODISCARD Result<SourcesMap> Preprocess(const std::filesystem::path& path);
 
     private:
         KIWI_NODISCARD Opt<size_t> FindPreprocessorPosition(StringView token);
