@@ -11,6 +11,9 @@
 
 
 namespace Kiwi {
+    class ACameraController;
+
+
     class Engine final : public AObject {
         KIWI_CREATE_OBJECT(Engine, AObject)
 
@@ -29,6 +32,8 @@ namespace Kiwi {
     private:
         std::shared_ptr<AWindow>  m_window;
         std::shared_ptr<Renderer> m_renderer;
+
+        std::shared_ptr<ACameraController> m_cameraController;
 
         EngineConfig m_engineConfig;
 

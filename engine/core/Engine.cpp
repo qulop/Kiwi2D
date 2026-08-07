@@ -2,12 +2,17 @@
 
 #include <core/EngineConfig.hpp>
 #include <core/ProjectSubsystem.hpp>
+#include <core/input/InputSubsystem.hpp>
+
+#include <common/Time.hpp>
 
 #include <misc/WindowSubsystem.hpp>
 
 #include <platform/window/GLFWWindow.hpp>
 
 #include <profiler/EngineProfiler.hpp>
+
+#include <renderer/CameraController.hpp>
 
 
 namespace Kiwi {
@@ -57,13 +62,18 @@ namespace Kiwi {
 
         m_renderer->SetViewport(m_window->GetWindowSizes());
 
-        // TODO: if our `Renderer` lifetime would changed, `[this]` capturing may lead to the dangling pointer inside the callback
+        // TODO: if our `Engine` object lifetime would changed, `[this]` capturing may lead to the dangling pointer inside the callback
         m_window->AddFramebufferResizeCallback(
             [this](U32Rect newSize)
             {
                 m_renderer->OnFramebufferResized(std::move(newSize));
             }
         );
+
+        std::shared_ptr<ACamera> camera = std::make_shared<ACamera>();
+
+        m_cameraController = std::make_shared<FreeCameraController>();
+        m_cameraController->AttachCamera(camera);
 
         return true;
     }
@@ -78,6 +88,19 @@ namespace Kiwi {
         }
 
         m_window->SwapBuffers();
+
+        if (std::shared_ptr<InputSubsystem> input = GetSubsystem<InputSubsystem>()) {
+            m_cameraController->UpdateInput(
+                Time::DeltaTime(),
+                input->GetState()
+            );
+        }
+
+        if (m_renderer->BeginScene()) {
+            m_renderer->Render();
+        }
+
+
 
         return true;
     }
