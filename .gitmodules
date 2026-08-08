@@ -37,3 +37,6 @@
 [submodule "third_party/yaml-cpp"]
 	path = third_party/yaml-cpp
 	url = https://github.com/jbeder/yaml-cpp
+[submodule "third_party/luau"]
+	path = third_party/luau
+	url = https://github.com/luau-lang/luau
