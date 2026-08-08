@@ -14,6 +14,8 @@ function(kiwi_target_include_directories TARGET_NAME)
         ${TARGET_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/third_party/tracy/public
         ${TARGET_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/third_party/vma/include
         ${TARGET_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/third_party/sqlite3
+        ${TARGET_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/third_party/luau/Compiler/include
+        ${TARGET_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/third_party/luau/VM/include
     )
 
     if (${TARGET_NAME} EQUAL ${ENGINE_EDITOR_NAME})
@@ -47,6 +49,9 @@ function(kiwi_setup_library TARGET_NAME)
         PRIVATE xxhash
         PRIVATE Tracy::TracyClient
         PRIVATE SQLite3::SQLite3
+        PRIVATE
+            Luau.VM
+            Luau.Compiler
     )
     if(WIN32)
         target_link_libraries(${TARGET_NAME} PRIVATE Winmm)
